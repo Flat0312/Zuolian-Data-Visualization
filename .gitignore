@@ -1,0 +1,20 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Large files (exceed GitHub 100MB limit)
+*.pdf
+chi_sim.traineddata
+
+# OCR cache
+ocr_cache/
+
+# OCR output (large JSON files)
+*_ocr_text.json
+
+# Temp & backup files
+*.tmp
+*_备份_*.xlsx
+temp_*.csv
