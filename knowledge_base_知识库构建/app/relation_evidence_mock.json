@@ -1,0 +1,154 @@
+[
+  {
+    "relation_id": "ZLH-001__ZLH-002",
+    "pair_key": "ZLH-001__ZLH-002",
+    "person_a_id": "ZLH-001",
+    "person_a_name": "鲁迅",
+    "person_b_id": "ZLH-002",
+    "person_b_name": "茅盾",
+    "relation_types": [
+      "组织隶属",
+      "通信"
+    ],
+    "strength": 5,
+    "first_seen": "1933-01-14",
+    "last_seen": "1934-10-02",
+    "provenance": "mock",
+    "evidence_samples": [
+      {
+        "evidence_id": "lx-md-001",
+        "relation_type": "通信",
+        "source_title": "鲁迅日记",
+        "source_date": "1933-01-14",
+        "sort_date": "1933-01-14",
+        "excerpt": "微雪。午后得母亲信，九日发。得方璧信。晚费君来，并交到小峰信及版税泉百五十，即付以《两地书》稿一半，赠以《魯迅全集》一本。适夷来，并见赠《苏联童话集》一本",
+        "citation_ref": "鲁迅日记 1933年1月14日",
+        "support_note": "材料直接标示两人存在书信往来，可作为通信关系的基础证据。",
+        "provenance": "mock"
+      },
+      {
+        "evidence_id": "lx-md-002",
+        "relation_type": "组织隶属",
+        "source_title": "鲁迅日记",
+        "source_date": "1933-05-17",
+        "sort_date": "1933-05-17",
+        "excerpt": "晴。上午复东亚日报社信。玄珠来并赠《春蚕》一本。午后得季巿信。得邹韬奋信并还书。达夫来，未见",
+        "citation_ref": "鲁迅日记 1933年5月17日",
+        "support_note": "“玄珠”为茅盾别号，来访与赠书记录可支撑两人在左翼文艺圈中的直接往来。",
+        "provenance": "mock"
+      },
+      {
+        "evidence_id": "lx-md-003",
+        "relation_type": "组织隶属",
+        "source_title": "鲁迅日记",
+        "source_date": "1934-10-02",
+        "sort_date": "1934-10-02",
+        "excerpt": "小雨。上午得董永舒信并泉十五。得林绍仑信，即复。下午北新书局送来版税泉二百。茅盾来并赠《短篇小说集》一本。晚寄《动向》稿一篇",
+        "citation_ref": "鲁迅日记 1934年10月2日",
+        "support_note": "来访、赠书与稿件往还把二人置于同一文学生产与组织网络中，可支持组织关联判断。",
+        "provenance": "mock"
+      }
+    ]
+  },
+  {
+    "relation_id": "ZLH-001__ZLH-005",
+    "pair_key": "ZLH-001__ZLH-005",
+    "person_a_id": "ZLH-001",
+    "person_a_name": "鲁迅",
+    "person_b_id": "ZLH-005",
+    "person_b_name": "冯雪峰",
+    "relation_types": [
+      "组织隶属",
+      "通信"
+    ],
+    "strength": 5,
+    "first_seen": "1929-03-20",
+    "last_seen": "1933-12-23",
+    "provenance": "mock",
+    "evidence_samples": [
+      {
+        "evidence_id": "lx-fxf-001",
+        "relation_type": "组织隶属",
+        "source_title": "鲁迅日记",
+        "source_date": "1929-03-20",
+        "sort_date": "1929-03-20",
+        "excerpt": "晴。上午得李宗武信。夜杨维铨来。雪峰来。伏园、春台来",
+        "citation_ref": "鲁迅日记 1929年3月20日",
+        "support_note": "该条显示冯雪峰与鲁迅保持高频面访，是两人在左翼文学网络中密切合作的直接证据。",
+        "provenance": "mock"
+      },
+      {
+        "evidence_id": "lx-fxf-002",
+        "relation_type": "组织隶属",
+        "source_title": "鲁迅日记",
+        "source_date": "1930-03-24",
+        "sort_date": "1930-03-24",
+        "excerpt": "晴。午前王蕴如及广平携海婴来，同往东亚食堂午餐。午后同王蕴如往上海齿科医院作翻译。下牙肿痛，因请高桥医生将所余之牙全行拔去，计共五枚，豫付泉五十。晚三弟来。得丛芜信。夜柔石、雪峰来",
+        "citation_ref": "鲁迅日记 1930年3月24日",
+        "support_note": "鲁迅、冯雪峰与柔石共同出现于同一活动链条中，可支撑其组织协作关系。",
+        "provenance": "mock"
+      },
+      {
+        "evidence_id": "lx-fxf-003",
+        "relation_type": "通信",
+        "source_title": "鲁迅日记",
+        "source_date": "1933-12-23",
+        "sort_date": "1933-12-23",
+        "excerpt": "晴。上午得洛扬信。得紫佩信附心梅叔笺。午后同广平邀冯太太及其女儿并携海婴往光陆大戏院观儿童电影《米老鼠》及《神猫艳语》。夜寄孙师毅信。赠阿玉及阿菩泉五，俾明日可看儿童电影。收申报月刊社稿费十六元",
+        "citation_ref": "鲁迅日记 1933年12月23日",
+        "support_note": "通信记录说明两人不仅有面访，也存在持续书信联系，可补强通信关系。",
+        "provenance": "mock"
+      }
+    ]
+  },
+  {
+    "relation_id": "ZLH-001__ZLH-016",
+    "pair_key": "ZLH-001__ZLH-016",
+    "person_a_id": "ZLH-001",
+    "person_a_name": "鲁迅",
+    "person_b_id": "ZLH-016",
+    "person_b_name": "柔石",
+    "relation_types": [
+      "组织隶属"
+    ],
+    "strength": 4,
+    "first_seen": "1929-08-29",
+    "last_seen": "1930-06-17",
+    "provenance": "mock",
+    "evidence_samples": [
+      {
+        "evidence_id": "lx-rs-001",
+        "relation_type": "组织隶属",
+        "source_title": "鲁迅日记",
+        "source_date": "1929-08-29",
+        "sort_date": "1929-08-29",
+        "excerpt": "昙。上午梁耀南来。午后复侍桁信。寄幼渔信。晚明之来。夜矛尘来。柔石来，假泉廿。收本月编译费三百",
+        "citation_ref": "鲁迅日记 1929年8月29日",
+        "support_note": "来访与借款记录反映二人已有稳定交往，可作为关系形成阶段的档案线索。",
+        "provenance": "mock"
+      },
+      {
+        "evidence_id": "lx-rs-002",
+        "relation_type": "组织隶属",
+        "source_title": "鲁迅日记",
+        "source_date": "1930-03-28",
+        "sort_date": "1930-03-28",
+        "excerpt": "晴。上午广平来。得母亲信，二十一日发，即复。答矛尘信。午后侍桁、柔石来，假柔石泉卅。下午同柔石赴北四川路一带看屋，不得。复史沫特列女士信。晚三弟及广平来。柔石、雪峰来",
+        "citation_ref": "鲁迅日记 1930年3月28日",
+        "support_note": "共同外出与经济往来说明二人联系紧密，并非一次性偶遇，可支撑左联内部协作关系。",
+        "provenance": "mock"
+      },
+      {
+        "evidence_id": "lx-rs-003",
+        "relation_type": "组织隶属",
+        "source_title": "鲁迅日记",
+        "source_date": "1930-06-10",
+        "sort_date": "1930-06-10",
+        "excerpt": "晴。午后侍桁、柔石来。托柔石往德华银行汇寄诗荃买书款三百马克，合中币二百六十元。下午三弟来。晚复霁野信。夜陈延炘来。译《被解放的DonQuixote》第一幕讫",
+        "citation_ref": "鲁迅日记 1930年6月10日",
+        "support_note": "委托柔石处理具体事务，说明双方已形成较高程度的信任和工作配合。",
+        "provenance": "mock"
+      }
+    ]
+  }
+]

@@ -1,0 +1,145 @@
+[
+  {
+    "evidence_id": "EVI-489692805D",
+    "event_id": "EVT-00001",
+    "source": "左联词典",
+    "source_file": "input_输入/raw_texts_原始文本/左联词典.txt",
+    "source_loc": "第175页",
+    "quote": "“组织“、“反抗“。1930年3月2日,出席中国左翼作家联盟成立",
+    "confidence": 0.91,
+    "source_id": "SRC-0125",
+    "match_rule": "原始引文：集体事件命中标题/多人/地点"
+  },
+  {
+    "evidence_id": "EVI-8DB5BD3637",
+    "event_id": "EVT-00001",
+    "source": "左联词典",
+    "source_file": "input_输入/raw_texts_原始文本/左联词典.txt",
+    "source_loc": "第128页",
+    "quote": "“员会。中国左翼作家联盟的成立报导。署名“记者“,载《拓荒者》1930年3月10目1",
+    "confidence": 0.9,
+    "source_id": "SRC-0014",
+    "match_rule": "原始引文：集体事件命中标题/多人/地点"
+  },
+  {
+    "evidence_id": "EVI-3B84F7AC63",
+    "event_id": "EVT-00001",
+    "source": "左联词典",
+    "source_file": "input_输入/raw_texts_原始文本/左联词典.txt",
+    "source_loc": "第256页",
+    "quote": "起了重要作用。1930年3月2日出席中国左翼作家联盟成立",
+    "confidence": 0.9,
+    "source_id": "SRC-0683",
+    "match_rule": "原始引文：集体事件命中标题/多人/地点"
+  },
+  {
+    "evidence_id": "EVI-6883382B0E",
+    "event_id": "EVT-00001",
+    "source": "左联词典",
+    "source_file": "input_输入/raw_texts_原始文本/左联词典.txt",
+    "source_loc": "第354页",
+    "quote": "丝社几方面人士,磋商筹组中国左翼作家联盟。工作中,尊重与信任鲁迅,逼事同鲁迅商量,表现了优良的工作作风.1930年2",
+    "confidence": 0.9,
+    "source_id": "SRC-0538",
+    "match_rule": "原始引文：集体事件命中标题/多人/地点"
+  },
+  {
+    "evidence_id": "EVI-58338B3D55",
+    "event_id": "EVT-00001",
+    "source": "左联史",
+    "source_file": "input_输入/raw_texts_原始文本/左联史.txt",
+    "source_loc": "第507页",
+    "quote": "小说家。1930年3月2日出席中国左翼作家联盟成立大会,为左联发起人之一。左联成立后,参加左",
+    "confidence": 0.88,
+    "source_id": "SRC-0797",
+    "match_rule": "原始引文：集体事件命中标题/多人/地点"
+  },
+  {
+    "evidence_id": "EVI-0528D7CD44",
+    "event_id": "EVT-00001",
+    "source": "左联史",
+    "source_file": "input_输入/raw_texts_原始文本/左联史.txt",
+    "source_loc": "第97页",
+    "quote": "30年代的大规模革和文化运动到1930年2月中国自由运动大同盟成立,达到了又一个高潮。加人这个反对白色恐余、争取人身言论出版结社自由群众组织的,大多是左翼作家及进步文化人,包括许多后来中国左鬓作家联盟的成员如鲁迅、潘汉年、郁达夫、田汉、郑伯奇、彭康、画室 ( 冯雪峰 ) 、王",
+    "confidence": 0.88,
+    "source_id": "SRC-0283",
+    "match_rule": "原始引文：集体事件命中标题/多人/地点"
+  },
+  {
+    "evidence_id": "EVI-FD8EBDD93E",
+    "event_id": "EVT-00001",
+    "source": "左联词典",
+    "source_file": "input_输入/raw_texts_原始文本/左联词典.txt",
+    "source_loc": "第276页",
+    "quote": "同盟。3月2日,出席中国左翼作家联盟成立大会,在会上报告筠备经过,当选为常务委员.",
+    "confidence": 0.88,
+    "source_id": "SRC-0892",
+    "match_rule": "原始引文：集体事件命中标题/多人/地点"
+  },
+  {
+    "evidence_id": "EVI-21007B9057",
+    "event_id": "EVT-00001",
+    "source": "左联史",
+    "source_file": "input_输入/raw_texts_原始文本/左联史.txt",
+    "source_loc": "第45页",
+    "quote": "行前还和外甥苟克嘉一同拜访了鲁迅先生,向他汇报情况,听取他的指示;潘漠华是从开封去的。在中共党组织的领导上,“从1930年4、5月起,北方文化界开始着手筹备成立北方左翼作家联盟。当时",
+    "confidence": 0.86,
+    "source_id": "SRC-0827",
+    "match_rule": "原始引文：集体事件命中标题/多人/地点"
+  },
+  {
+    "evidence_id": "EVI-0357C10A69",
+    "event_id": "EVT-00004",
+    "source": "鲁迅日记",
+    "source_file": "input_输入/raw_texts_原始文本/日记全编：全2册 (鲁迅 著) (Z-Library).txt",
+    "source_loc": "1930年3月30日",
+    "quote": "星期。昙。上午往齿科医院治疗。白薇及林惠元来。午后侍桁、雪峰、柔石来。广平来。得李春朴信。晚三弟及王蕴如携烨儿来",
+    "confidence": 0.93,
+    "source_id": "SRC-0117",
+    "match_rule": "关系行+原始引文：精确日期与人物双重命中"
+  },
+  {
+    "evidence_id": "EVI-04DD852F1C",
+    "event_id": "EVT-00005",
+    "source": "左联史",
+    "source_file": "input_输入/raw_texts_原始文本/左联史.txt",
+    "source_loc": "第106页",
+    "quote": "没有东西抄出,请求开释。审判长未予理睬。开庭审讯时,柔石的同乡好友、左联作家林淡秋受王育和之托也出席旁听,因案情重大,当局出于保密考虑,旁听者极少。为救援柔石,鲁迅曾捐过款。1931年2月7日《鲁迅日记》: “为赎黄后绘,捐款一百元。“ “柔石等被",
+    "confidence": 0.91,
+    "source_id": "SRC-0740",
+    "match_rule": "原始引文：集体事件命中标题/多人/地点"
+  },
+  {
+    "evidence_id": "EVI-D016A6A994",
+    "event_id": "EVT-00005",
+    "source": "左联史",
+    "source_file": "input_输入/raw_texts_原始文本/左联史.txt",
+    "source_loc": "第109页",
+    "quote": "剑子手,才打吻到上述消息。“@ 鲁迅和左联的同志们终于获悉, .柔石等已于2月7日夜或2月8日娆晨被",
+    "confidence": 0.91,
+    "source_id": "SRC-0910",
+    "match_rule": "原始引文：集体事件命中标题/多人/地点"
+  },
+  {
+    "evidence_id": "EVI-43ECB964FE",
+    "event_id": "EVT-00005",
+    "source": "左联词典",
+    "source_file": "input_输入/raw_texts_原始文本/左联词典.txt",
+    "source_loc": "第526页",
+    "quote": "证,鲁迅《为丁忘却的记念》等2篇著名杂文和1931年1月楞石等被害后左联和革命作家国",
+    "confidence": 0.91,
+    "source_id": "SRC-0900",
+    "match_rule": "原始引文：集体事件命中标题/多人/地点"
+  },
+  {
+    "evidence_id": "EVI-2EC5596E2B",
+    "event_id": "EVT-00017",
+    "source": "鲁迅日记",
+    "source_file": "input_输入/raw_texts_原始文本/日记全编：全2册 (鲁迅 著) (Z-Library).txt",
+    "source_loc": "1929年2月16日",
+    "quote": "晴。午后寄其中堂信。寄小峰信。寄淑卿信。寄陈毓泰、温梓川信并还稿。寄疑今信并还稿。寄许羡蒙《语丝》。林语堂来。下午往内山书店。晚寄陈望道、汪馥泉信并译稿。疑今信复退回，因觅不到住址。夜雪峰来",
+    "confidence": 0.83,
+    "source_id": "SRC-0345",
+    "match_rule": "原始引文：精确日期与地点/参与人命中"
+  }
+]

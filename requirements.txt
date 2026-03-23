@@ -1,0 +1,13 @@
+# App requirements
+-r knowledge_base_知识库构建/app/requirements.txt
+
+# Data pipeline requirements
+openpyxl
+networkx
+requests
+openai
+pdfplumber
+pytesseract
+rapidocr-onnxruntime
+pdf2image
+PyMuPDF
