@@ -41,7 +41,6 @@ def apply_style() -> None:
     st.markdown(
         f"""
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=ZCOOL+XiaoWei&display=swap');
             :root {{
                 --paper: {PAPER};
                 --paper-light: {PAPER_LIGHT};
@@ -133,24 +132,10 @@ def apply_style() -> None:
                 max-width: 1360px;
                 padding-top: 2rem;
                 padding-bottom: 3rem;
-            }}
-            [data-testid="block-container"] > div {{
-                position: relative;
                 z-index: 1;
             }}
             [data-testid="block-container"]::before {{
-                content: "";
-                position: absolute;
-                inset: 1.2rem 0 .75rem 0;
-                border: 1px solid rgba(111,90,64,.34);
-                background:
-                    linear-gradient(180deg, rgba(250,245,235,.93), rgba(242,231,212,.9)),
-                    url("{paper}") center/220px repeat;
-                box-shadow:
-                    inset 0 0 0 1px rgba(255,249,239,.82),
-                    inset 0 0 38px rgba(124,95,61,.06);
-                pointer-events: none;
-                z-index: 0;
+                content: none;
             }}
             h1, h2, h3, h4 {{
                 font-family: var(--display);
@@ -564,7 +549,7 @@ def apply_style() -> None:
                     padding-top: 1.25rem;
                 }}
                 [data-testid="block-container"]::before {{
-                    inset: .85rem .25rem .5rem .25rem;
+                    content: none;
                 }}
                 .hero {{
                     padding: 1.35rem 1.15rem;
