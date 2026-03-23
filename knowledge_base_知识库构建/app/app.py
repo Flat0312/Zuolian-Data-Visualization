@@ -85,7 +85,17 @@ def main() -> None:
     apply_style()
     initialize_session_state()
 
-    data = load_data(BASE_DIR)
+    loading_hint = st.empty()
+    loading_hint.info("正在加载数据与视图资源，请稍候...")
+    try:
+        data = load_data(BASE_DIR)
+    except Exception as exc:
+        loading_hint.empty()
+        st.error("页面初始化失败，请刷新后重试。若在微信内打开，建议选择“在浏览器打开”。")
+        st.exception(exc)
+        return
+    loading_hint.empty()
+
     visible_edges_df = visible_edges(data)
     page = render_sidebar(data, visible_edges_df)
 

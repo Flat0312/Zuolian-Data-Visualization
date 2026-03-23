@@ -199,7 +199,6 @@ def _render_network_html(net: Network, cache_name: str, height: int) -> None:
         "</head>",
         f"""
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
             html, body {{
                 margin: 0;
                 padding: 0;
