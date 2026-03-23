@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: zuolian-kb
+    env: python
+    plan: free
+    autoDeploy: true
+    buildCommand: pip install --upgrade pip && pip install -r requirements.render.txt
+    startCommand: cd "knowledge_base_知识库构建/app" && streamlit run app.py --server.address 0.0.0.0 --server.port $PORT --server.headless true

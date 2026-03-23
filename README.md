@@ -125,6 +125,20 @@ python build_standard_kb_pipeline.py
 
 ---
 
+## ☁️ 在线部署（Render）
+
+仓库已内置 Render Blueprint 配置文件：`render.yaml`。
+
+上线步骤：
+
+1. 在 Render 选择 `New +` -> `Blueprint`。
+2. 连接仓库 `Flat0312/Zuolian-Data-Visualization`。
+3. 直接应用 `render.yaml` 并部署。
+
+详细说明见 [`DEPLOY_RENDER.md`](DEPLOY_RENDER.md)。
+
+---
+
 ## 🔐 环境变量
 
 涉及 LLM 的脚本已移除硬编码密钥，使用环境变量注入：
