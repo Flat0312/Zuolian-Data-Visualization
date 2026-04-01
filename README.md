@@ -7,6 +7,9 @@
 [![Data](https://img.shields.io/badge/Knowledge%20Data-Structured-0A7F5A)](#数据快照)
 [![License](https://img.shields.io/badge/License-MIT-black)](LICENSE)
 
+在线阅读：
+[GitHub Pages 静态阅读版](https://flat0312.github.io/Zuolian-Data-Visualization/)
+
 ![左联知识库横幅](knowledge_base_知识库构建/app/assets/banner.png)
 
 ---
@@ -179,6 +182,9 @@ python build_standard_kb_pipeline.py
 1. 在仓库中启用 GitHub Pages。
 2. Source 选择 `GitHub Actions`。
 3. 推送到 `main` 后，工作流会自动生成 `docs/` 并发布。
+
+发布地址：
+[https://flat0312.github.io/Zuolian-Data-Visualization/](https://flat0312.github.io/Zuolian-Data-Visualization/)
 
 如果你只想本地预览，也可以先运行：
 
