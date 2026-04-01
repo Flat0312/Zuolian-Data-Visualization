@@ -87,6 +87,58 @@ VERIFIED_EVENT_RULES: Dict[str, Dict[str, Any]] = {
         "manual_review_default": False,
         "participant_names": {"柔石", "胡也频", "李伟森", "冯铿", "殷夫"},
     },
+    "冯铿被捕事件": {
+        "standard_event_name": "冯铿被捕事件",
+        "corrected_date": "1931-01-17",
+        "date_precision": "日",
+        "historical_location": "上海东方旅社",
+        "current_address": "上海市黄浦区汉口路（东方旅社旧址门牌待复核）",
+        "corrected_persons": "冯铿",
+        "correction_reason": "上海党史网资料记载，冯铿于1931年1月17日下午在公共租界三马路（今汉口路）东方旅社举行秘密会议时被捕；原表大量以1月1日占位且地点冲突，现优先保留公开史料可核的具体日期。",
+        "source_url": "https://www.ccphistory.org.cn/shds/ssjc/content/cd2b9f77-aa37-488f-beb2-4853b6290e42.html",
+        "confidence": "high",
+        "manual_review_default": False,
+        "participant_names": {"冯铿"},
+    },
+    "殷夫被捕事件": {
+        "standard_event_name": "殷夫被捕事件",
+        "corrected_date": "1931-01-17",
+        "date_precision": "日",
+        "historical_location": "上海东方旅社31号房间",
+        "current_address": "上海市黄浦区汉口路（东方旅社旧址门牌待复核）",
+        "corrected_persons": "殷夫",
+        "correction_reason": "公开资料记载，殷夫于1931年1月17日13时40分在东方旅社31号房间参加党的会议时被捕；原表将日期写成1月1日占位，现按公开史料修正到日。",
+        "source_url": "https://df.bjsjw.gov.cn/n299/20210409/i41861.html",
+        "confidence": "high",
+        "manual_review_default": False,
+        "participant_names": {"殷夫"},
+    },
+    "李求实被捕事件": {
+        "standard_event_name": "李求实被捕事件",
+        "corrected_date": "1931-01-17",
+        "date_precision": "日",
+        "historical_location": "上海东方旅社、中山旅社秘密会议",
+        "current_address": "上海市黄浦区汉口路、天津路一带",
+        "corrected_persons": "李求实",
+        "correction_reason": "中国军网资料记载，1931年1月17日李求实（李伟森）与何孟雄、林育南等在上海东方旅社和中山旅社秘密开会，后因叛徒告密被捕；原表把日期统一写成1月1日，现先按可公开核实的日期修正。",
+        "source_url": "https://www.81.cn/yljnt/2013-11/04/content_5630422.htm",
+        "confidence": "medium",
+        "manual_review_default": True,
+        "participant_names": {"李求实"},
+    },
+    "丁玲被捕事件": {
+        "standard_event_name": "丁玲被捕事件",
+        "corrected_date": "1933-05-14",
+        "date_precision": "日",
+        "historical_location": "虹口昆山花园路7号寓所",
+        "current_address": "上海市虹口区昆山路（门牌待复核）",
+        "corrected_persons": "丁玲",
+        "correction_reason": "政协相关报道指出，丁玲1933年5月14日在昆山花园路7号寓所被绑架；原表将日期写成1月1日占位，现按公开可核史料改为具体日。",
+        "source_url": "https://www.icppcc.cn/newsDetail_1059710 ; https://www.ccphistory.org.cn/shds/zxdt100zn/content/115347fd-09db-4528-b823-2d056c333340.html",
+        "confidence": "high",
+        "manual_review_default": False,
+        "participant_names": {"丁玲"},
+    },
     "龙华二十四烈士遇难": {
         "standard_event_name": "龙华二十四烈士遇难",
         "corrected_date": "1931-02-07",
@@ -659,6 +711,14 @@ def main():
                 if entity_name not in {"鲁迅", "柔石", "潘汉年", "蒋光慈", "钱杏邨", "李求实", "殷夫", "艾芜"}:
                     needs_manual_review = "yes"
             elif event_name == "五烈士遇难":
+                participants = rule.get("participant_names", set())
+                if entity_name in participants:
+                    entity_role = "直接参与者"
+                else:
+                    entity_role = "关联人物"
+                    needs_manual_review = "yes"
+                    conflict_flags.append("entity_not_direct_participant")
+            elif event_name in {"冯铿被捕事件", "殷夫被捕事件", "李求实被捕事件", "丁玲被捕事件"}:
                 participants = rule.get("participant_names", set())
                 if entity_name in participants:
                     entity_role = "直接参与者"

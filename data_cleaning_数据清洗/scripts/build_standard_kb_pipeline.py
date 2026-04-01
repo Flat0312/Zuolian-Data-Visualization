@@ -559,6 +559,9 @@ def build_standard_tables(
     for _, row in events_sheet.iterrows():
         original_event_name = text(row.get("Event"))
         event_name = text(row.get("standard_event_name")) or original_event_name
+        entity_role = text(row.get("entity_role_in_event"))
+        if entity_role == "冲突":
+            continue
         event_date = normalize_date(row.get("corrected_date")) or normalize_date(row.get("original_date")) or normalize_date(row.get("Timestamp"))
         historical_location = text(row.get("historical_location")) or text(row.get("Hist_Loc"))
         current_address = text(row.get("current_address")) or text(row.get("Current_Loc"))
@@ -613,7 +616,7 @@ def build_standard_tables(
         participant_candidates: list[tuple[str, str, str]] = []
         entity_id = text(row.get("Entity_ID"))
         entity_name = text(row.get("entity_name"))
-        entity_role = text(row.get("entity_role_in_event")) or "待核"
+        entity_role = entity_role or "待核"
         entity_ids = split_multi_value(entity_id)
         if not entity_ids and entity_id:
             entity_ids = [entity_id]
