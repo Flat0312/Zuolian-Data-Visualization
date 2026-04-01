@@ -10,33 +10,35 @@ __pycache__/
 venv/
 env/
 
+# Node / frontend
+node_modules/
+
 # IDE / Editor
 .idea/
 .vscode/
 *.iml
+*.swp
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Local temp/runtime
+# Local temp / runtime
 .codex_tmp/
+logs/
+cache/
+output/
+dist/
+build/
 *.log
 *.tmp
 *.temp
+*.bak
 
-# Data and generated artifacts (not for source control)
-work_处理中间数据/
-archive_归档/
-output_输出结果/cleaned_data_清洗数据/
-output_输出结果/logs_日志/
-output_输出结果/reports_报告/
-input_输入/backups_备份/
-input_输入/raw_texts_原始文本/
-docs_文档/project_docs_项目文档/
+# Research process artifacts
+research/logs/
+research/intermediate/
+research/notebooks/.ipynb_checkpoints/
 
-# Keep only core published KB data under output
-!output_输出结果/
-!output_输出结果/kb_data_知识库数据/
-!output_输出结果/kb_data_知识库数据/*.csv
-!output_输出结果/kb_data_知识库数据/*.json
+# Generated site output
+docs/

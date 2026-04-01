@@ -1,5 +1,5 @@
 # App requirements
--r knowledge_base_知识库构建/app/requirements.txt
+-r app/frontend/requirements.txt
 
 # Data pipeline requirements
 openpyxl

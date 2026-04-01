@@ -11,9 +11,9 @@ import pandas as pd
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-DATA_DIR = PROJECT_ROOT / "output_输出结果" / "kb_data_知识库数据"
+DATA_DIR = PROJECT_ROOT / "data" / "processed"
 DOCS_DIR = PROJECT_ROOT / "docs"
-APP_ASSETS_DIR = PROJECT_ROOT / "knowledge_base_知识库构建" / "app" / "assets"
+APP_ASSETS_DIR = PROJECT_ROOT / "app" / "frontend" / "assets"
 STATIC_SITE_DIR = PROJECT_ROOT / "static_site"
 
 ASSET_FILES = (
