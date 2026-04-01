@@ -130,6 +130,8 @@ cd data_cleaning_数据清洗/scripts
 python build_standard_kb_pipeline.py
 ```
 
+直接浏览知识库前台不需要配置任何环境变量；只要仓库内的标准数据文件存在，就可以本地启动和查看。
+
 ---
 
 ## ☁️ 在线部署（Render）
@@ -148,7 +150,7 @@ python build_standard_kb_pipeline.py
 
 ## 🔐 环境变量
 
-涉及 LLM 的脚本已移除硬编码密钥，使用环境变量注入：
+直接打开知识库前台不需要环境变量。只有涉及外部模型调用的脚本，才需要通过环境变量注入密钥，例如：
 
 ```bash
 OPENAI_API_KEY=your_api_key
@@ -156,7 +158,7 @@ OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=gpt-4o
 ```
 
-可直接参考 `.env.example`。
+可直接参考 `.env.example`。如果你只是想浏览知识库页面，可以跳过这一步。
 
 ---
 
