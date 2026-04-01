@@ -111,9 +111,16 @@ pip install -r requirements.txt
 
 ### 2. 🖥️ 启动应用
 
+现在支持在仓库根目录一条命令直接启动，不需要再 `cd` 到子目录。
+
 ```bash
-cd knowledge_base_知识库构建/app
 streamlit run app.py
+```
+
+如果你在 Windows PowerShell 下，也可以直接运行：
+
+```powershell
+.\start.ps1
 ```
 
 ### 3. 🔁 可选：重建标准知识库数据
