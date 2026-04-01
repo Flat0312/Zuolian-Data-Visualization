@@ -123,6 +123,24 @@ streamlit run app.py
 .\start.ps1
 ```
 
+### 2.5. 📚 生成静态阅读版（GitHub Pages）
+
+如果你希望仓库像一个可直接在线阅读的网站，而不是必须运行 Streamlit，可以在根目录执行：
+
+```bash
+python build_static_site.py
+```
+
+执行后会生成 `docs/` 目录，内容包括：
+
+- 首页总览
+- 人物档案索引与人物详情页
+- 事件索引与事件详情页
+- 关系索引
+- 前端全文搜索索引
+
+这套页面不依赖 Python 后端，适合直接发布到 GitHub Pages。
+
 ### 3. 🔁 可选：重建标准知识库数据
 
 ```bash
@@ -145,6 +163,30 @@ python build_standard_kb_pipeline.py
 3. 直接应用 `render.yaml` 并部署。
 
 详细说明见 [`DEPLOY_RENDER.md`](DEPLOY_RENDER.md)。
+
+---
+
+## 🌐 在线部署（GitHub Pages 静态阅读版）
+
+仓库现已包含：
+
+- 静态站生成脚本：`build_static_site.py`
+- 静态资源模板：`static_site/`
+- Pages 工作流：`.github/workflows/static-pages.yml`
+
+推荐部署方式：
+
+1. 在仓库中启用 GitHub Pages。
+2. Source 选择 `GitHub Actions`。
+3. 推送到 `main` 后，工作流会自动生成 `docs/` 并发布。
+
+如果你只想本地预览，也可以先运行：
+
+```bash
+python build_static_site.py
+```
+
+然后直接打开 `docs/index.html` 查看页面结构。
 
 ---
 
