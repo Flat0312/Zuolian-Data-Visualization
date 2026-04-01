@@ -21,5 +21,6 @@
 ## 注意事项
 
 - 首次启动会读取仓库内 `output_输出结果/kb_data_知识库数据/` 的 CSV 数据。
+- 只用于浏览知识库前台时，不需要配置任何环境变量。
 - 若后续要接入私有数据或外部 API，请在 Render 的 Environment 里配置变量，不要写死在代码中。
 - 这个项目是 Streamlit，不适合直接部署到 Vercel Python Runtime；若必须使用 Vercel，需要改造成 ASGI/WSGI 应用。
