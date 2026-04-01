@@ -111,7 +111,7 @@ pip install -r requirements.txt
 
 ### 2. 🖥️ 启动应用
 
-现在支持在仓库根目录一条命令直接启动，不需要再 `cd` 到子目录。
+安装完依赖后，只需在仓库根目录执行一条命令，不需要再 `cd` 到子目录。
 
 ```bash
 streamlit run app.py
