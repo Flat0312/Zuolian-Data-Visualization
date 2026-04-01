@@ -10,7 +10,7 @@
 在线阅读：
 [GitHub Pages 静态阅读版](https://flat0312.github.io/Zuolian-Data-Visualization/)
 
-![左联知识库横幅](knowledge_base_知识库构建/app/assets/banner.png)
+![左联知识库横幅](app/frontend/assets/banner.png)
 
 ---
 
@@ -49,24 +49,24 @@
 
 ## 📊 数据快照
 
-当前仓库内的核心知识库数据位于 `output_输出结果/kb_data_知识库数据/`：
+当前仓库内的核心知识库数据位于 `data/processed/`：
 
 | 数据表 | 记录数 |
 | --- | ---: |
 | `persons.csv` | 150 |
 | `person_relations.csv` | 4238 |
-| `events.csv` | 314 |
-| `places.csv` | 78 |
+| `events.csv` | 279 |
+| `places.csv` | 86 |
 | `organizations.csv` | 3 |
 | `org_memberships.csv` | 150 |
-| `event_participants.csv` | 406 |
-| `sources.csv` | 1125 |
+| `event_participants.csv` | 371 |
+| `sources.csv` | 1130 |
 
 ---
 
 ## 🎬 动图演示
 
-![左联知识库动图演示](knowledge_base_知识库构建/app/assets/readme_demo.gif)
+![左联知识库动图演示](app/frontend/assets/readme_demo.gif)
 
 动图展示的是项目核心体验：人物节点、关系连线、事件线索和加载流程的组合视觉。
 
@@ -87,18 +87,17 @@
 
 ```mermaid
 flowchart LR
-    A["input_输入"] --> B["data_cleaning_数据清洗/scripts"]
-    B --> C["work_处理中间数据"]
-    B --> D["output_输出结果/cleaned_data_清洗数据"]
-    D --> E["output_输出结果/kb_data_知识库数据"]
-    E --> F["knowledge_base_知识库构建/app"]
+    A["research/raw_excel + research/raw_texts"] --> B["research/analysis"]
+    B --> C["research/intermediate"]
+    B --> D["data/processed"]
+    D --> E["app/frontend"]
 ```
 
 关键约束：
 
-- 🔒 应用层只读取 `output_输出结果/kb_data_知识库数据/`。
-- 🗂️ `work_处理中间数据/`、`archive_归档/` 不作为生产数据源。
-- ⚙️ 清洗脚本统一从 `input_输入/` 读取，输出到 `output_输出结果/`。
+- 🔒 应用主数据读取 `data/processed/`。
+- 🔒 关系证据页使用 `data/processed/runtime_sources/` 下的运行期证据索引副本，不直接依赖研究过程目录。
+- 🗂️ `research/` 下均视为研究过程资产，不作为主产品目录结构的一部分。
 
 ---
 
@@ -147,7 +146,7 @@ python build_static_site.py
 ### 3. 🔁 可选：重建标准知识库数据
 
 ```bash
-cd data_cleaning_数据清洗/scripts
+cd research/analysis
 python build_standard_kb_pipeline.py
 ```
 
@@ -214,15 +213,11 @@ OPENAI_MODEL=gpt-4o
 
 ```text
 左联知识库项目/
-├─ input_输入/                    # 原始输入数据
-├─ data_cleaning_数据清洗/         # 清洗、提取、验证脚本
-├─ work_处理中间数据/              # 中间产物（默认不入库）
-├─ output_输出结果/
-│  └─ kb_data_知识库数据/          # 唯一生产数据源
-├─ knowledge_base_知识库构建/
-│  └─ app/                        # Streamlit 应用入口
-├─ docs_文档/                     # 项目文档
-└─ archive_归档/                   # 历史文件
+├─ app/
+│  └─ frontend/                   # Streamlit 应用入口
+├─ data/
+│  └─ processed/                  # 运行期标准数据与证据索引
+└─ research/                      # 原始数据、清洗中间表、研究脚本与草稿
 ```
 
 ---
@@ -239,7 +234,7 @@ OPENAI_MODEL=gpt-4o
 
 - ✅ 已完成：仓库产品化重构（README、License、忽略策略、CI 冒烟检查）。
 - ✅ 已完成：API Key 去硬编码，改为环境变量注入。
-- ✅ 已完成：标准知识库数据入库（`kb_data_知识库数据`）。
+- ✅ 已完成：标准知识库数据入库（`data/processed`）。
 - 🔜 下一步：补充真实应用操作录屏并替换当前演示动图。
 - 🔜 下一步：增加“按人物/事件检索”的在线 demo 链接。
 
