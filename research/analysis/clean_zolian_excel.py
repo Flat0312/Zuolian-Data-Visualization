@@ -115,6 +115,7 @@ VERIFIED_EVENT_RULES: Dict[str, Dict[str, Any]] = {
     },
     "李求实被捕事件": {
         "standard_event_name": "李求实被捕事件",
+        "canonical_event_key": "李求实被捕事件|ZLH-020",
         "corrected_date": "1931-01-17",
         "date_precision": "日",
         "historical_location": "上海东方旅社、中山旅社秘密会议",
@@ -195,84 +196,306 @@ ROW_EVENT_OVERRIDES: Dict[int, Dict[str, Any]] = {
         "needs_manual_review": "yes",
     },
     42: {
+        "standard_event_name": "瞿秋白到上海大学任教",
+        "canonical_event_key": "ZLH-003|瞿秋白到上海大学任教|1923-07",
         "corrected_date": "1923-07",
         "date_precision": "月",
-        "correction_reason": "党史资料记载瞿秋白于1923年7月到上海大学任教务长兼社会学系主任，现以其到沪任教时间作为在沪活动锚点。",
+        "historical_location": "上海大学",
+        "current_address": "上海（具体校址待核）",
+        "event_scope": "entity",
+        "correction_reason": "党史资料记载瞿秋白于1923年7月到上海大学任教务长兼社会学系主任，现将该条泛化活动记录改写为可唯一识别的任教事件。",
+        "display_note": "1923年7月，瞿秋白到上海大学任教并主持社会学系工作，当前条目按这一可公开核实的在沪活动节点展示。",
         "source_url": "https://cpc.people.com.cn/BIG5/n1/2024/1006/c443712-40333498.html",
         "confidence": "medium",
         "needs_manual_review": "yes",
     },
     43: {
+        "standard_event_name": "丁玲抵沪就读平民女校",
+        "canonical_event_key": "ZLH-021|丁玲抵沪就读平民女校|1922-02",
         "corrected_date": "1922-02",
         "date_precision": "月",
-        "correction_reason": "澎湃文章《成为“丁玲”之前，和上海的三次际会》记载丁玲于1922年2月到上海平民女校求学，现以其首次抵沪并展开公共交往的时间作为事件锚点。",
+        "historical_location": "平民女校",
+        "current_address": "上海（校址待核）",
+        "event_scope": "entity",
+        "correction_reason": "澎湃文章《成为“丁玲”之前，和上海的三次际会》记载丁玲于1922年2月到上海平民女校求学，现将该条泛化活动记录改写为抵沪入学事件。",
+        "display_note": "1922年2月，丁玲抵沪进入平民女子学校求学，当前条目按这一可核实的上海起点事件展示。",
         "source_url": "https://m.thepaper.cn/newsDetail_forward_28996791",
         "confidence": "medium",
         "needs_manual_review": "yes",
     },
+    60: {
+        "standard_event_name": "瞿秋白长汀被俘",
+        "canonical_event_key": "ZLH-003|瞿秋白长汀被俘|1935-02-24",
+        "corrected_date": "1935-02-24",
+        "date_precision": "日",
+        "historical_location": "福建长汀县水口镇小迳村附近",
+        "current_address": "福建省龙岩市长汀县水口镇小迳村",
+        "event_scope": "entity",
+        "correction_reason": "上海虹口资料与福建党史资料均指出，瞿秋白于1935年2月24日在福建长汀水口镇小迳村附近被俘；原表把该条误写成1934年上海内山书店被捕事件，现改写为可核实的被俘事件。",
+        "display_note": "1935年2月24日，瞿秋白在福建长汀县水口镇小迳村附近突围时被俘，当前条目按公开可核的被俘时间与地点展示。",
+        "source_url": "https://www.shhk.gov.cn/xwzx/002009/002009002/20100105/f83bfbd8-323c-4316-bcea-d15f2082a896.html ; https://www.fjdsfzw.org.cn/2023-12-19/content_133925.html",
+        "confidence": "high",
+        "needs_manual_review": "no",
+    },
     192: {
+        "standard_event_name": "冯铿元宵抵沪",
+        "canonical_event_key": "ZLH-018|冯铿元宵抵沪|1929-02-24",
         "corrected_date": "1929-02-24",
         "date_precision": "日",
-        "correction_reason": "上海党史网记载冯铿于1929年2月24日元宵节抵达上海，现以其抵沪并开始在沪活动的确切日期作为时间锚点。",
+        "historical_location": "上海",
+        "current_address": "上海",
+        "event_scope": "entity",
+        "correction_reason": "上海党史网记载冯铿于1929年2月24日元宵节抵达上海，现将该条泛化社交活动记录改写为抵沪事件。",
+        "display_note": "1929年2月24日，冯铿抵达上海，当前条目按这一明确可核的来沪时间展示。",
         "source_url": "https://www.ccphistory.org.cn/shds/dsxx/content/cd2b9f77-aa37-488f-beb2-4853b6290e42.html",
         "confidence": "high",
         "needs_manual_review": "no",
     },
     194: {
+        "standard_event_name": "楼适夷因支持《文学》月刊被捕",
+        "canonical_event_key": "ZLH-037|楼适夷因支持《文学》月刊被捕|1933-09-17",
         "corrected_date": "1933-09-17",
         "date_precision": "日",
-        "correction_reason": "中国作家网资料记载楼适夷于1933年9月17日因支持《文学》月刊被捕；原表1923/1931日期互相冲突，现按公开可核日期修正。",
-        "source_url": "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820412.html",
+        "historical_location": "上海",
+        "current_address": "上海（具体抓捕地点待核）",
+        "event_scope": "entity",
+        "correction_reason": "中国作家网资料记载楼适夷于1933年9月17日因支持《文学》月刊被捕；原表1923/1931日期互相冲突，现将其改写为单一可识别事件。",
+        "display_note": "1933年9月17日，楼适夷在上海因参与和支持《文学》相关工作被捕，当前条目按公开可核日期展示。",
+        "source_url": "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820381.html",
         "confidence": "high",
         "needs_manual_review": "yes",
     },
     196: {
+        "standard_event_name": "楼适夷因支持《文学》月刊被捕",
+        "canonical_event_key": "ZLH-037|楼适夷因支持《文学》月刊被捕|1933-09-17",
         "corrected_date": "1933-09-17",
         "date_precision": "日",
-        "correction_reason": "中国作家网资料记载楼适夷于1933年9月17日因支持《文学》月刊被捕；原表1923/1931日期互相冲突，现按公开可核日期修正。",
-        "source_url": "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820412.html",
+        "historical_location": "上海",
+        "current_address": "上海（具体抓捕地点待核）",
+        "event_scope": "entity",
+        "correction_reason": "中国作家网资料记载楼适夷于1933年9月17日因支持《文学》月刊被捕；原表1923/1931日期互相冲突，现将其改写为单一可识别事件。",
+        "display_note": "1933年9月17日，楼适夷在上海因参与和支持《文学》相关工作被捕，当前条目按公开可核日期展示。",
+        "source_url": "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820381.html",
         "confidence": "high",
         "needs_manual_review": "yes",
     },
     198: {
+        "standard_event_name": "楼适夷因支持《文学》月刊被捕",
+        "canonical_event_key": "ZLH-037|楼适夷因支持《文学》月刊被捕|1933-09-17",
         "corrected_date": "1933-09-17",
         "date_precision": "日",
-        "correction_reason": "中国作家网资料记载楼适夷于1933年9月17日因支持《文学》月刊被捕；原表1923/1931日期互相冲突，现按公开可核日期修正。",
-        "source_url": "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820412.html",
+        "historical_location": "上海",
+        "current_address": "上海（具体抓捕地点待核）",
+        "event_scope": "entity",
+        "correction_reason": "中国作家网资料记载楼适夷于1933年9月17日因支持《文学》月刊被捕；原表1923/1931日期互相冲突，现将其改写为单一可识别事件。",
+        "display_note": "1933年9月17日，楼适夷在上海因参与和支持《文学》相关工作被捕，当前条目按公开可核日期展示。",
+        "source_url": "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820381.html",
         "confidence": "high",
         "needs_manual_review": "yes",
     },
     200: {
+        "standard_event_name": "楼适夷因支持《文学》月刊被捕",
+        "canonical_event_key": "ZLH-037|楼适夷因支持《文学》月刊被捕|1933-09-17",
         "corrected_date": "1933-09-17",
         "date_precision": "日",
-        "correction_reason": "中国作家网资料记载楼适夷于1933年9月17日因支持《文学》月刊被捕；原表1923/1931日期互相冲突，现按公开可核日期修正。",
-        "source_url": "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820412.html",
+        "historical_location": "上海",
+        "current_address": "上海（具体抓捕地点待核）",
+        "event_scope": "entity",
+        "correction_reason": "中国作家网资料记载楼适夷于1933年9月17日因支持《文学》月刊被捕；原表1923/1931日期互相冲突，现将其改写为单一可识别事件。",
+        "display_note": "1933年9月17日，楼适夷在上海因参与和支持《文学》相关工作被捕，当前条目按公开可核日期展示。",
+        "source_url": "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820381.html",
         "confidence": "high",
         "needs_manual_review": "yes",
     },
     202: {
+        "standard_event_name": "楼适夷因支持《文学》月刊被捕",
+        "canonical_event_key": "ZLH-037|楼适夷因支持《文学》月刊被捕|1933-09-17",
         "corrected_date": "1933-09-17",
         "date_precision": "日",
-        "correction_reason": "中国作家网资料记载楼适夷于1933年9月17日因支持《文学》月刊被捕；原表1923/1931日期互相冲突，现按公开可核日期修正。",
-        "source_url": "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820412.html",
+        "historical_location": "上海",
+        "current_address": "上海（具体抓捕地点待核）",
+        "event_scope": "entity",
+        "correction_reason": "中国作家网资料记载楼适夷于1933年9月17日因支持《文学》月刊被捕；原表1923/1931日期互相冲突，现将其改写为单一可识别事件。",
+        "display_note": "1933年9月17日，楼适夷在上海因参与和支持《文学》相关工作被捕，当前条目按公开可核日期展示。",
+        "source_url": "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820381.html",
         "confidence": "high",
         "needs_manual_review": "yes",
     },
     204: {
+        "standard_event_name": "楼适夷因支持《文学》月刊被捕",
+        "canonical_event_key": "ZLH-037|楼适夷因支持《文学》月刊被捕|1933-09-17",
         "corrected_date": "1933-09-17",
         "date_precision": "日",
-        "correction_reason": "中国作家网资料记载楼适夷于1933年9月17日因支持《文学》月刊被捕；原表1923/1931日期互相冲突，现按公开可核日期修正。",
-        "source_url": "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820412.html",
+        "historical_location": "上海",
+        "current_address": "上海（具体抓捕地点待核）",
+        "event_scope": "entity",
+        "correction_reason": "中国作家网资料记载楼适夷于1933年9月17日因支持《文学》月刊被捕；原表1923/1931日期互相冲突，现将其改写为单一可识别事件。",
+        "display_note": "1933年9月17日，楼适夷在上海因参与和支持《文学》相关工作被捕，当前条目按公开可核日期展示。",
+        "source_url": "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820381.html",
         "confidence": "high",
         "needs_manual_review": "yes",
     },
     243: {
+        "standard_event_name": "丁玲进入上海大学中国文学系",
+        "canonical_event_key": "ZLH-021|丁玲进入上海大学中国文学系|1923-08",
         "corrected_date": "1923-08",
         "date_precision": "月",
-        "correction_reason": "澎湃与上海大学校史资料均记载丁玲于1923年8月进入上海大学中国文学系，现将该条“上海文学活动”锚定到入学月份；原表1922年日期系占位且同名事件存在冲突。",
+        "historical_location": "上海大学中国文学系",
+        "current_address": "上海（具体校址待核）",
+        "event_scope": "entity",
+        "correction_reason": "澎湃与上海大学校史资料均记载丁玲于1923年8月进入上海大学中国文学系，现将该条泛化文学活动记录改写为入学事件。",
+        "display_note": "1923年8月，丁玲进入上海大学中国文学系旁听和学习，当前条目按这一较为明确的文学活动节点展示。",
         "source_url": "https://m.thepaper.cn/newsDetail_forward_28996791 ; https://museum.shu.edu.cn/info/1034/1373.htm",
         "confidence": "medium",
         "needs_manual_review": "yes",
+    },
+    215: {
+        "standard_event_name": "胡风在日本因反日活动被捕",
+        "canonical_event_key": "ZLH-026|胡风在日本因反日活动被捕|1933",
+        "corrected_date": "1933",
+        "date_precision": "年",
+        "historical_location": "日本",
+        "current_address": "日本（具体城市待核）",
+        "event_scope": "entity",
+        "correction_reason": "湖北政协文史资料记载胡风因参加反日与左翼文化活动遭日本政府逮捕并驱逐回国；原表将该条泛写为1933年上海被捕事件，现先改回到可公开核实的国家与事件性质。",
+        "display_note": "1933年，胡风因参与反日与左翼文化活动在日本遭逮捕并被驱逐回国，当前条目按公开可核的年级别事实展示。",
+        "source_url": "https://hbzx.gov.cn/49/2014-09-15/5811.html",
+        "confidence": "medium",
+        "needs_manual_review": "yes",
+    },
+    225: {
+        "standard_event_name": "李求实被捕事件",
+        "canonical_event_key": "李求实被捕事件|ZLH-020",
+        "corrected_date": "1931-01-17",
+        "date_precision": "日",
+        "historical_location": "上海东方旅社、中山旅社秘密会议",
+        "current_address": "上海市黄浦区汉口路、天津路一带",
+        "event_scope": "entity",
+        "correction_reason": "中国军网资料记载，1931年1月17日李求实（李伟森）与何孟雄、林育南等在上海东方旅社和中山旅社秘密开会，后因叛徒告密被捕；原表把日期统一写成1月1日，现先按可公开核实的日期修正。",
+        "display_note": "1931年1月17日，李求实在上海东方旅社和中山旅社秘密会议链条中被捕，当前条目按这一可公开核实的日期展示。",
+        "source_url": "https://www.81.cn/yljnt/2013-11/04/content_5630422.htm",
+        "confidence": "medium",
+        "needs_manual_review": "yes",
+    },
+    226: {
+        "standard_event_name": "艾芜被捕事件",
+        "canonical_event_key": "ZLH-024|艾芜被捕事件|1931",
+        "corrected_date": "1931",
+        "date_precision": "年",
+        "historical_location": "上海",
+        "current_address": "上海（具体被捕地点待考）",
+        "event_scope": "entity",
+        "correction_reason": "原始记录在“上海”“龙华”“龙华淞沪警备司令部”等地点之间冲突，且缺少可公开核实的具体被捕日期，现保守收口为1931年艾芜在上海遭拘押的相关记录。",
+        "display_note": "当前仅能确认 1931 年艾芜在上海有遭拘押相关记录，具体被捕时间和地点待考。",
+        "confidence": "medium",
+        "needs_manual_review": "yes",
+    },
+    227: {
+        "standard_event_name": "艾芜被捕事件",
+        "canonical_event_key": "ZLH-024|艾芜被捕事件|1931",
+        "corrected_date": "1931",
+        "date_precision": "年",
+        "historical_location": "上海",
+        "current_address": "上海（具体被捕地点待考）",
+        "event_scope": "entity",
+        "correction_reason": "原始记录在“上海”“龙华”“龙华淞沪警备司令部”等地点之间冲突，且缺少可公开核实的具体被捕日期，现保守收口为1931年艾芜在上海遭拘押的相关记录。",
+        "display_note": "当前仅能确认 1931 年艾芜在上海有遭拘押相关记录，具体被捕时间和地点待考。",
+        "confidence": "medium",
+        "needs_manual_review": "yes",
+    },
+    228: {
+        "standard_event_name": "艾芜被捕事件",
+        "canonical_event_key": "ZLH-024|艾芜被捕事件|1931",
+        "corrected_date": "1931",
+        "date_precision": "年",
+        "historical_location": "上海",
+        "current_address": "上海（具体被捕地点待考）",
+        "event_scope": "entity",
+        "correction_reason": "原始记录在“上海”“龙华”“龙华淞沪警备司令部”等地点之间冲突，且缺少可公开核实的具体被捕日期，现保守收口为1931年艾芜在上海遭拘押的相关记录。",
+        "display_note": "当前仅能确认 1931 年艾芜在上海有遭拘押相关记录，具体被捕时间和地点待考。",
+        "confidence": "medium",
+        "needs_manual_review": "yes",
+    },
+    229: {
+        "standard_event_name": "沙汀被捕事件",
+        "canonical_event_key": "ZLH-025|沙汀被捕事件|1931",
+        "corrected_date": "1931",
+        "date_precision": "年",
+        "historical_location": "上海",
+        "current_address": "上海（具体被捕地点待考）",
+        "event_scope": "entity",
+        "correction_reason": "原始记录在“上海”“龙华”“龙华淞沪警备司令部”等地点之间冲突，且缺少可公开核实的具体被捕日期，现保守收口为1931年沙汀在上海遭拘押的相关记录。",
+        "display_note": "当前仅能确认 1931 年沙汀在上海有遭拘押相关记录，具体被捕时间和地点待考。",
+        "confidence": "medium",
+        "needs_manual_review": "yes",
+    },
+    230: {
+        "standard_event_name": "沙汀被捕事件",
+        "canonical_event_key": "ZLH-025|沙汀被捕事件|1931",
+        "corrected_date": "1931",
+        "date_precision": "年",
+        "historical_location": "上海",
+        "current_address": "上海（具体被捕地点待考）",
+        "event_scope": "entity",
+        "correction_reason": "原始记录在“上海”“龙华”“龙华淞沪警备司令部”等地点之间冲突，且缺少可公开核实的具体被捕日期，现保守收口为1931年沙汀在上海遭拘押的相关记录。",
+        "display_note": "当前仅能确认 1931 年沙汀在上海有遭拘押相关记录，具体被捕时间和地点待考。",
+        "confidence": "medium",
+        "needs_manual_review": "yes",
+    },
+    231: {
+        "standard_event_name": "沙汀被捕事件",
+        "canonical_event_key": "ZLH-025|沙汀被捕事件|1931",
+        "corrected_date": "1931",
+        "date_precision": "年",
+        "historical_location": "上海",
+        "current_address": "上海（具体被捕地点待考）",
+        "event_scope": "entity",
+        "correction_reason": "原始记录在“上海”“龙华”“龙华淞沪警备司令部”等地点之间冲突，且缺少可公开核实的具体被捕日期，现保守收口为1931年沙汀在上海遭拘押的相关记录。",
+        "display_note": "当前仅能确认 1931 年沙汀在上海有遭拘押相关记录，具体被捕时间和地点待考。",
+        "confidence": "medium",
+        "needs_manual_review": "yes",
+    },
+    185: {
+        "standard_event_name": "柔石在东方旅社31号房间被捕",
+        "canonical_event_key": "ZLH-016|柔石在东方旅社31号房间被捕|1931-01-17",
+        "corrected_date": "1931-01-17",
+        "date_precision": "日",
+        "historical_location": "上海东方旅社31号房间",
+        "current_address": "上海市黄浦区汉口路一带",
+        "event_scope": "entity",
+        "correction_reason": "中国作家网与人民网党史资料均记载，柔石于1931年1月17日下午1时40分在上海东方旅社31号房间参加秘密会议时被捕；原表仅保留1931年和笼统地点，现改写为可公开核实的具体事件。",
+        "display_note": "1931年1月17日下午1时40分，柔石在上海东方旅社31号房间参加秘密会议时被捕，当前条目按公开可核日期和地点展示。",
+        "source_url": "https://www.chinawriter.com.cn/n1/2020/0701/c404019-31765706.html ; https://dangshi.people.com.cn/n1/2018/0208/c85037-29812774.html",
+        "confidence": "high",
+        "needs_manual_review": "no",
+    },
+    186: {
+        "standard_event_name": "柔石在东方旅社31号房间被捕",
+        "canonical_event_key": "ZLH-016|柔石在东方旅社31号房间被捕|1931-01-17",
+        "corrected_date": "1931-01-17",
+        "date_precision": "日",
+        "historical_location": "上海东方旅社31号房间",
+        "current_address": "上海市黄浦区汉口路一带",
+        "event_scope": "entity",
+        "correction_reason": "中国作家网与人民网党史资料均记载，柔石于1931年1月17日下午1时40分在上海东方旅社31号房间参加秘密会议时被捕；原表仅保留1931年和笼统地点，现改写为可公开核实的具体事件。",
+        "display_note": "1931年1月17日下午1时40分，柔石在上海东方旅社31号房间参加秘密会议时被捕，当前条目按公开可核日期和地点展示。",
+        "source_url": "https://www.chinawriter.com.cn/n1/2020/0701/c404019-31765706.html ; https://dangshi.people.com.cn/n1/2018/0208/c85037-29812774.html",
+        "confidence": "high",
+        "needs_manual_review": "no",
+    },
+    400: {
+        "standard_event_name": "宋庆龄在莫利爱路寓所宴请萧伯纳",
+        "canonical_event_key": "ZLH-145|宋庆龄在莫利爱路寓所宴请萧伯纳|1933-02-17",
+        "corrected_date": "1933-02-17",
+        "date_precision": "日",
+        "historical_location": "宋庆龄莫利爱路寓所",
+        "current_address": "上海市徐汇区武康路184号",
+        "event_scope": "entity",
+        "correction_reason": "宋庆龄故居纪念馆资料记载，1933年2月17日宋庆龄在莫利爱路寓所宴请萧伯纳，并与鲁迅、蔡元培等会见合影；原表将地点泛记为孙中山故居，现修正为莫利爱路寓所。",
+        "display_note": "1933年2月17日，宋庆龄在莫利爱路寓所宴请萧伯纳，鲁迅、蔡元培等亦到场会见，当前条目按公开可核日期和地点展示。",
+        "source_url": "https://sswgw.org.cn/wwdc/sqlww/9329.htm ; https://www.51ldb.com/shsldb/xf/content/017d83aaa824c0010000df844d7e124a.htm",
+        "confidence": "high",
+        "needs_manual_review": "no",
     },
 }
 
@@ -289,7 +512,7 @@ VERIFICATION_SOURCES = [
     ("澎湃新闻：成为“丁玲”之前，和上海的三次际会", "https://m.thepaper.cn/newsDetail_forward_28996791"),
     ("上海大学校史馆：历史上的上海大学（1923年）", "https://museum.shu.edu.cn/info/1034/1373.htm"),
     ("人民网党史频道：上海大学与瞿秋白", "https://cpc.people.com.cn/BIG5/n1/2024/1006/c443712-40333498.html"),
-    ("中国作家网：鲁迅帮助狱中的楼适夷", "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820412.html"),
+    ("中国作家网：鲁迅帮助狱中的楼适夷", "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820381.html"),
 ]
 
 
@@ -399,6 +622,215 @@ def contains_any(text: str, keywords: Iterable[str]) -> bool:
     return any(keyword in text for keyword in keywords)
 
 
+def is_generic_activity_event_name(event_name: str) -> bool:
+    if not event_name:
+        return False
+    if contains_any(event_name, ["成立大会", "遇难", "被捕", "秘密会议", "会面", "论战", "集会"]):
+        return False
+    return contains_any(
+        event_name,
+        ["文学活动", "交往活动", "社交活动", "社会活动", "一般活动", "交流活动", "文学交流", "上海活动", "活动"],
+    )
+
+
+def is_generic_arrest_event_name(event_name: str) -> bool:
+    if not event_name:
+        return False
+    return contains_any(event_name, ["被捕事件", "上海被捕事件", "被俘事件", "逮捕事件", "被捕", "逮捕"])
+
+
+def is_generic_visit_event_name(event_name: str) -> bool:
+    if not event_name:
+        return False
+    return contains_any(event_name, ["访华会", "访华"])
+
+
+def should_split_event_by_year(event_name: str) -> bool:
+    if not event_name:
+        return False
+    return (
+        is_generic_activity_event_name(event_name)
+        or is_generic_arrest_event_name(event_name)
+        or is_generic_visit_event_name(event_name)
+        or event_name.endswith("记录")
+    )
+
+
+def should_convert_to_annual_record(event_name: str, date_precision: str) -> bool:
+    if date_precision != "年" or not event_name:
+        return False
+    return (
+        is_generic_activity_event_name(event_name)
+        or is_generic_arrest_event_name(event_name)
+        or is_generic_visit_event_name(event_name)
+    )
+
+
+def normalize_event_name_alias(event_name: str) -> str:
+    cleaned = as_text(event_name)
+    if "内山完造秘密会议" in cleaned:
+        return cleaned.replace("内山完造秘密会议", "内山书店秘密会议")
+    return cleaned
+
+
+def normalize_event_location_aliases(event_name: str, historical_location: str, current_address: str) -> Tuple[str, str, str]:
+    normalized_event = normalize_event_name_alias(event_name)
+    hist = as_text(historical_location)
+    cur = as_text(current_address)
+    if normalized_event.endswith("内山书店秘密会议") and "四川北路2050号" in cur:
+        hist = "内山书店旧址"
+    if "四川北路2050号" in cur and "内山完造" in hist:
+        hist = "内山书店旧址" if "秘密会议" in normalized_event else "内山书店"
+    return normalized_event, hist, cur
+
+
+def strip_entity_prefix(event_name: str, entity_name: str) -> str:
+    cleaned_event = as_text(event_name)
+    cleaned_entity = as_text(entity_name)
+    if cleaned_entity and cleaned_event.startswith(cleaned_entity):
+        return cleaned_event[len(cleaned_entity) :].strip()
+    return cleaned_event
+
+
+def build_annual_record_label(base: str) -> str:
+    cleaned_base = as_text(base)
+    if cleaned_base in {"被捕事件", "逮捕事件"}:
+        return "遭拘押相关记录"
+    if cleaned_base == "被捕":
+        return "被捕相关记录"
+    if cleaned_base.endswith("访华会"):
+        return cleaned_base[:-1] + "相关记录"
+    return cleaned_base if cleaned_base.endswith("记录") else f"{cleaned_base}记录"
+
+
+def describe_annual_record_topic(source_event_name: str, entity_name: str) -> str:
+    base = strip_entity_prefix(source_event_name, entity_name) or source_event_name
+    if base in {"被捕事件", "逮捕事件"}:
+        return "遭拘押"
+    if base == "被捕":
+        return "被捕"
+    if base.endswith("访华会"):
+        return base[:-1]
+    return f"“{base}”"
+
+
+def build_annual_record_name(event_name: str, entity_name: str, event_scope: str, corrected_date: str) -> str:
+    year = corrected_date[:4] if corrected_date else ""
+    if event_scope == "entity" and entity_name:
+        base = strip_entity_prefix(event_name, entity_name) or event_name
+        prefix = f"{entity_name}{year}年" if year else entity_name
+        suffix = build_annual_record_label(base)
+        return f"{prefix}{suffix}"
+    prefix = f"{year}年" if year else ""
+    cleaned_event = normalize_event_name_alias(event_name)
+    return f"{prefix}{build_annual_record_label(cleaned_event)}"
+
+
+def build_annual_record_note(
+    *,
+    entity_name: str,
+    source_event_name: str,
+    corrected_date: str,
+    historical_location: str,
+    current_address: str,
+    event_scope: str,
+) -> str:
+    year = corrected_date[:4] if corrected_date else "相关年份"
+    location = historical_location or current_address or "相关地点"
+    topic = describe_annual_record_topic(source_event_name, entity_name)
+    if event_scope == "entity" and entity_name:
+        return f"当前仅能确认 {year} 年 {entity_name} 在 {location} 有{topic}相关记录，尚不足以定位到单一具体事件。"
+    return f"当前仅能确认 {year} 年在 {location} 存在{topic}相关记录，尚不足以定位到单一具体事件。"
+
+
+def coarsen_annual_record_location(source_event_name: str, historical_location: str, current_address: str) -> Tuple[str, str]:
+    source = normalize_event_name_alias(source_event_name)
+    if "创造社" in source:
+        return "创造社（宝山路）", "闸北区宝山路一带"
+    if "光华书局" in source:
+        return "光华书局（四马路）", "福州路（四马路）"
+    if "明星影片公司" in source:
+        return "明星影片公司", "徐家汇路一带"
+    if is_generic_arrest_event_name(source):
+        return "上海", "上海（具体拘押地点待考）"
+    if is_generic_visit_event_name(source):
+        return "上海", "上海（具体活动地点待考）"
+    return historical_location, current_address
+
+
+def build_default_event_cluster_key(entity_id: str, event_name: str, timestamp: Any) -> str:
+    normalized_event_name = normalize_event_name_alias(event_name)
+    if entity_id and should_split_event_by_year(normalized_event_name):
+        year = extract_year(timestamp)
+        suffix = str(year) if year else "unknown"
+        return f"{entity_id}|{normalized_event_name}|{suffix}"
+    return normalized_event_name
+
+
+def resolve_event_cluster_key(row_num: int, entity_id: str, event_name: str, timestamp: Any) -> str:
+    override = ROW_EVENT_OVERRIDES.get(row_num, {})
+    if override.get("canonical_event_key"):
+        return as_text(override["canonical_event_key"])
+    if override.get("standard_event_name"):
+        return build_default_event_cluster_key(
+            entity_id,
+            as_text(override.get("standard_event_name")),
+            override.get("corrected_date") or timestamp,
+        )
+
+    rule = VERIFIED_EVENT_RULES.get(event_name, {})
+    if rule.get("canonical_event_key"):
+        return as_text(rule["canonical_event_key"])
+    if rule.get("standard_event_name"):
+        return build_default_event_cluster_key(
+            entity_id,
+            as_text(rule.get("standard_event_name")),
+            rule.get("corrected_date") or timestamp,
+        )
+    return build_default_event_cluster_key(entity_id, normalize_event_name_alias(event_name), timestamp)
+
+
+def build_display_note(
+    *,
+    entity_name: str,
+    standard_event_name: str,
+    corrected_date: str,
+    date_precision: str,
+    historical_location: str,
+    current_address: str,
+    correction_reason: str,
+    explicit_note: str,
+) -> str:
+    if explicit_note:
+        return explicit_note
+
+    location = historical_location or current_address or "相关地点"
+    subject = entity_name if entity_name and entity_name in standard_event_name else standard_event_name
+
+    if "原始日期疑似以1月1日填补未知月份和日期" in correction_reason:
+        if date_precision == "年" and corrected_date:
+            return f"当前仅能确认 {corrected_date} 年 {subject} 在 {location} 有相关记录，具体月份和日期待考。"
+        if date_precision == "月" and corrected_date:
+            return f"当前可确认 {subject} 在 {corrected_date} 于 {location} 有相关活动，更精确日期待考。"
+
+    if "同名事件存在时间或地点冲突" in correction_reason:
+        if corrected_date and date_precision == "日":
+            return f"当前条目按已核实的日期 {corrected_date} 展示；原始同名记录在时间或地点上仍存在版本冲突。"
+        if corrected_date and date_precision == "月":
+            return f"当前条目按 {corrected_date} 的月份信息展示；同名记录在具体时间或地点上仍存在分歧。"
+        if corrected_date and date_precision == "年":
+            if standard_event_name.endswith("记录"):
+                return f"当前仅能确认 {corrected_date} 年在 {location} 存在相关年度记录，原始同名条目在时间或地点上仍有分歧。"
+            return f"当前仅能确认 {corrected_date} 年 {subject} 在 {location} 有相关记录，同名条目在时间或地点上仍有分歧。"
+        return "同名记录在时间或地点上存在分歧，当前条目按保守口径展示。"
+
+    if correction_reason:
+        return correction_reason
+    if corrected_date:
+        return f"{subject}于{corrected_date}在{location}有相关记录。"
+    return f"当前仅能确认 {subject} 与 {location} 存在相关记录，具体时间待考。"
+
+
 def is_list_like(text: str) -> bool:
     if not text:
         return False
@@ -479,6 +911,26 @@ def infer_relation_type(relation_type: str, context: str, risk_level: str) -> Tu
 
 def is_personal_activity_event(event_name: str) -> bool:
     return any(keyword in event_name for keyword in ACTIVE_EVENT_KEYWORDS)
+
+
+def infer_event_scope(event_name: str, entity_name: str) -> str:
+    cleaned_event = as_text(event_name)
+    cleaned_entity = as_text(entity_name)
+    if cleaned_event and cleaned_entity and cleaned_entity in cleaned_event:
+        return "entity"
+    return "collective"
+
+
+def build_canonical_event_key(event_name: str, entity_id: str, event_scope: str, timestamp: Any = None) -> str:
+    cleaned_event = normalize_event_name_alias(event_name)
+    cleaned_entity = as_text(entity_id)
+    if event_scope == "entity" and cleaned_entity:
+        if should_split_event_by_year(cleaned_event):
+            year = extract_year(timestamp)
+            suffix = str(year) if year else "unknown"
+            return f"{cleaned_event}|{cleaned_entity}|{suffix}"
+        return f"{cleaned_event}|{cleaned_entity}"
+    return cleaned_event
 
 
 def clone_sheet(wb, source_name: str, target_name: str):
@@ -575,10 +1027,11 @@ def main():
         hist_loc = as_text(ws3.cell(row=row_num, column=map3["hist_loc"] + 1).value)
         cur_loc = as_text(ws3.cell(row=row_num, column=map3["current_loc"] + 1).value)
         entity_id = as_text(ws3.cell(row=row_num, column=map3["entity_id"] + 1).value)
-        event_clusters[event_name]["rows"].append(row_num)
-        event_clusters[event_name]["dates"].add(as_text(timestamp))
-        event_clusters[event_name]["locs"].add((hist_loc, cur_loc))
-        event_clusters[event_name]["entities"].add(entity_id)
+        cluster_key = resolve_event_cluster_key(row_num, entity_id, event_name, timestamp)
+        event_clusters[cluster_key]["rows"].append(row_num)
+        event_clusters[cluster_key]["dates"].add(as_text(timestamp))
+        event_clusters[cluster_key]["locs"].add((hist_loc, cur_loc))
+        event_clusters[cluster_key]["entities"].add(entity_id)
     duplicate_event_clusters = sum(1 for data in event_clusters.values() if len(data["dates"]) > 1 or len(data["locs"]) > 1)
 
     ws2c = clone_sheet(wb, sheet2_name, "Sheet2_corrected")
@@ -613,6 +1066,9 @@ def main():
             "historical_location",
             "current_address",
             "standard_event_name",
+            "event_scope",
+            "canonical_event_key",
+            "display_note",
             "corrected_persons",
             "entity_role_in_event",
             "event_conflict_flags",
@@ -749,9 +1205,16 @@ def main():
         hist_loc = as_text(ws3c.cell(row=row_num, column=map3["hist_loc"] + 1).value)
         current_loc = as_text(ws3c.cell(row=row_num, column=map3["current_loc"] + 1).value)
         event_name = as_text(ws3c.cell(row=row_num, column=map3["event"] + 1).value)
+        normalized_event_name, normalized_hist_loc, normalized_current_loc = normalize_event_location_aliases(
+            event_name,
+            hist_loc,
+            current_loc,
+        )
         original_date = as_text(timestamp)
         original_location = " / ".join([v for v in [hist_loc, current_loc] if v])
-        cluster = event_clusters.get(event_name, {"dates": set(), "locs": set(), "rows": []})
+        raw_event_scope = infer_event_scope(normalized_event_name, entity_name)
+        raw_cluster_key = resolve_event_cluster_key(row_num, entity_id, normalized_event_name, timestamp)
+        cluster = event_clusters.get(raw_cluster_key, {"dates": set(), "locs": set(), "rows": []})
 
         conflict_flags: List[str] = []
         if is_placeholder_jan1(timestamp):
@@ -763,9 +1226,12 @@ def main():
 
         corrected_date = original_date
         date_precision = infer_date_precision(timestamp)
-        historical_location = hist_loc
-        current_address = current_loc
-        standard_event_name = event_name
+        historical_location = normalized_hist_loc
+        current_address = normalized_current_loc
+        standard_event_name = normalized_event_name
+        event_scope = raw_event_scope
+        canonical_event_key = build_canonical_event_key(standard_event_name, entity_id, event_scope, timestamp)
+        display_note = ""
         corrected_persons = ""
         entity_role = "unclear"
         correction_reason = ""
@@ -773,7 +1239,8 @@ def main():
         confidence = "low"
         needs_manual_review = "no"
 
-        rule = VERIFIED_EVENT_RULES.get(event_name)
+        rule = VERIFIED_EVENT_RULES.get(event_name) or VERIFIED_EVENT_RULES.get(normalized_event_name)
+        explicit_canonical_key = False
         if rule:
             standard_event_name = rule.get("standard_event_name") or event_name
             if rule.get("corrected_date") is not None:
@@ -784,6 +1251,12 @@ def main():
                 historical_location = rule["historical_location"]
             if rule.get("current_address"):
                 current_address = rule["current_address"]
+            if rule.get("event_scope"):
+                event_scope = rule["event_scope"]
+            if rule.get("canonical_event_key"):
+                canonical_event_key = rule["canonical_event_key"]
+                explicit_canonical_key = True
+            display_note = rule.get("display_note", display_note)
             corrected_persons = rule.get("corrected_persons", "")
             correction_reason = rule.get("correction_reason", "")
             source_url = rule.get("source_url", "")
@@ -818,15 +1291,30 @@ def main():
             else:
                 entity_role = "待核"
 
-        if row_num in ROW_EVENT_OVERRIDES:
-            override = ROW_EVENT_OVERRIDES[row_num]
+        override = ROW_EVENT_OVERRIDES.get(row_num)
+        if override:
             corrected_date = override.get("corrected_date", corrected_date)
             date_precision = override.get("date_precision", date_precision)
+            standard_event_name = override.get("standard_event_name", standard_event_name)
+            historical_location = override.get("historical_location", historical_location)
+            current_address = override.get("current_address", current_address)
+            corrected_persons = override.get("corrected_persons", corrected_persons)
+            entity_role = override.get("entity_role_in_event", entity_role)
+            event_scope = override.get("event_scope", event_scope)
+            canonical_event_key = override.get("canonical_event_key", canonical_event_key)
+            display_note = override.get("display_note", display_note)
             correction_reason = override.get("correction_reason", correction_reason)
             source_url = override.get("source_url", source_url)
             confidence = override.get("confidence", confidence)
             needs_manual_review = override.get("needs_manual_review", needs_manual_review)
+            if override.get("canonical_event_key"):
+                explicit_canonical_key = True
             conflict_flags.append("row_override_review")
+
+        if not explicit_canonical_key:
+            canonical_event_key = build_canonical_event_key(standard_event_name, entity_id, event_scope, corrected_date or timestamp)
+        if entity_role == "unclear" and event_scope == "entity" and entity_id:
+            entity_role = "直接参与者"
 
         event_year = extract_year(timestamp)
         entity_info = entities.get(entity_id)
@@ -839,7 +1327,7 @@ def main():
             needs_manual_review = "yes"
             entity_role = "冲突"
 
-        if not rule and is_placeholder_jan1(timestamp) and "after_death_conflict" not in conflict_flags:
+        if not rule and not override and is_placeholder_jan1(timestamp) and "after_death_conflict" not in conflict_flags:
             year = extract_year(timestamp)
             corrected_date = str(year) if year else ""
             date_precision = "年" if year else ""
@@ -847,7 +1335,7 @@ def main():
             confidence = "medium"
             needs_manual_review = "yes"
 
-        if not rule and (len(cluster["dates"]) > 1 or len(cluster["locs"]) > 1):
+        if not rule and not override and (len(cluster["dates"]) > 1 or len(cluster["locs"]) > 1):
             needs_manual_review = "yes"
             correction_reason = (correction_reason + "；" if correction_reason else "") + "同名事件存在时间或地点冲突。"
 
@@ -858,14 +1346,47 @@ def main():
         elif corrected_date and re.fullmatch(r"\d{4}-\d{2}-\d{2}", corrected_date):
             date_precision = "日"
 
+        annual_record_source_name = standard_event_name
+        if should_convert_to_annual_record(standard_event_name, date_precision):
+            standard_event_name = build_annual_record_name(standard_event_name, entity_name, event_scope, corrected_date)
+            historical_location, current_address = coarsen_annual_record_location(
+                annual_record_source_name,
+                historical_location,
+                current_address,
+            )
+            if not display_note:
+                display_note = build_annual_record_note(
+                    entity_name=entity_name,
+                    source_event_name=annual_record_source_name,
+                    corrected_date=corrected_date,
+                    historical_location=historical_location,
+                    current_address=current_address,
+                    event_scope=event_scope,
+                )
+            if not explicit_canonical_key:
+                canonical_event_key = build_canonical_event_key(standard_event_name, entity_id, event_scope, corrected_date or timestamp)
+
+        display_note = build_display_note(
+            entity_name=entity_name,
+            standard_event_name=standard_event_name,
+            corrected_date=corrected_date,
+            date_precision=date_precision,
+            historical_location=historical_location,
+            current_address=current_address,
+            correction_reason=correction_reason,
+            explicit_note=display_note,
+        )
+
         row_changed = any(
             [
                 corrected_date != original_date,
                 historical_location != hist_loc,
                 current_address != current_loc,
                 standard_event_name != event_name,
+                canonical_event_key != raw_cluster_key,
                 corrected_persons != "",
                 correction_reason != "",
+                display_note != "",
             ]
         )
         if row_changed:
@@ -885,6 +1406,9 @@ def main():
             "historical_location": historical_location,
             "current_address": current_address,
             "standard_event_name": standard_event_name,
+            "event_scope": event_scope,
+            "canonical_event_key": canonical_event_key,
+            "display_note": display_note,
             "corrected_persons": corrected_persons,
             "entity_role_in_event": entity_role,
             "event_conflict_flags": ",".join(dict.fromkeys(conflict_flags)),

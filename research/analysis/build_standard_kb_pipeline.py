@@ -55,6 +55,10 @@ WEB_TITLE_OVERRIDES = {
     "https://www.shhk.gov.cn/xwzx/002006/20210930/96ecb0ec-79e3-49ef-a097-a89c5a5dbc40.html": "内山书店旧址说明",
     "https://www.shhk.gov.cn/xwzx/002008/002008040/20240425/3e9546e4-0e0f-409d-a0e2-91bc115f8f66.html": "内山书店今址活动页",
     "https://al3tai.nenzhu.com/news-id-2373.html": "鲁迅与柔石看屋转录材料",
+    "https://m.thepaper.cn/newsDetail_forward_28996791": "澎湃新闻：成为“丁玲”之前，和上海的三次际会",
+    "https://museum.shu.edu.cn/info/1034/1373.htm": "上海大学校史馆：历史上的上海大学（1923年）",
+    "https://cpc.people.com.cn/BIG5/n1/2024/1006/c443712-40333498.html": "人民网党史频道：上海大学与瞿秋白",
+    "https://www.chinawriter.com.cn/n1/2020/0813/c404063-31820381.html": "中国作家网：鲁迅帮助狱中的楼适夷",
 }
 
 
@@ -124,6 +128,35 @@ def split_multi_value(value: str) -> list[str]:
 
 def join_values(values: list[str], sep: str = ";") -> str:
     return sep.join(unique_nonempty(values))
+
+
+def is_generic_activity_event_name(event_name: str) -> bool:
+    if not event_name:
+        return False
+    if any(token in event_name for token in ["成立大会", "遇难", "被捕", "秘密会议", "会面", "论战", "集会"]):
+        return False
+    return any(
+        token in event_name
+        for token in ["文学活动", "交往活动", "社交活动", "社会活动", "一般活动", "交流活动", "文学交流", "上海活动", "活动"]
+    )
+
+
+def build_event_key_seed(
+    *,
+    event_name: str,
+    entity_id: str,
+    event_scope: str,
+    event_date: str,
+    explicit_key: str,
+) -> str:
+    if explicit_key:
+        return explicit_key
+    if event_scope == "entity" and entity_id:
+        if is_generic_activity_event_name(event_name):
+            year = event_date[:4] if event_date else "unknown"
+            return f"{event_name}|{entity_id}|{year}"
+        return f"{event_name}|{entity_id}"
+    return event_name
 
 
 def read_csv_if_exists(path: Path) -> pd.DataFrame:
@@ -564,6 +597,15 @@ def build_standard_tables(
         event_date = normalize_date(row.get("corrected_date")) or normalize_date(row.get("original_date")) or normalize_date(row.get("Timestamp"))
         historical_location = text(row.get("historical_location")) or text(row.get("Hist_Loc"))
         current_address = text(row.get("current_address")) or text(row.get("Current_Loc"))
+        event_scope = text(row.get("event_scope")) or ("entity" if text(row.get("Entity_ID")) and text(row.get("Entity_ID")) in event_name else "collective")
+        canonical_event_key = build_event_key_seed(
+            event_name=event_name,
+            entity_id=text(row.get("Entity_ID")),
+            event_scope=event_scope,
+            event_date=event_date,
+            explicit_key=text(row.get("canonical_event_key")),
+        )
+        display_note = text(row.get("display_note")) or text(row.get("correction_reason"))
         source_url = text(row.get("source_url"))
         source_ids = catalog.attach_sources(source_url=source_url, fallback_source_id=raw_workbook_source_id)
         confidence = text(row.get("confidence")) or "medium"
@@ -577,7 +619,7 @@ def build_standard_tables(
                 longitude, latitude = coord_loose
 
         place_id = ensure_place(historical_location, current_address, longitude, latitude, source_ids, confidence)
-        event_key = (event_name, event_date, historical_location, current_address)
+        event_key = (canonical_event_key, event_date, historical_location, current_address)
         event_id = event_lookup.get(event_key)
         if not event_id:
             event_id = f"EVT-{len(event_rows) + 1:05d}"
@@ -586,6 +628,8 @@ def build_standard_tables(
                 {
                     "event_id": event_id,
                     "event_name": event_name,
+                    "event_scope": event_scope,
+                    "canonical_event_key": canonical_event_key,
                     "original_event_names": original_event_name,
                     "event_date": event_date,
                     "date_precision": text(row.get("date_precision")) or infer_date_precision(event_date),
@@ -595,6 +639,7 @@ def build_standard_tables(
                     "longitude": longitude,
                     "latitude": latitude,
                     "source_ids": source_ids,
+                    "display_note": display_note,
                     "correction_reason": text(row.get("correction_reason")),
                     "confidence": confidence,
                     "needs_manual_review": text(row.get("needs_manual_review")) or "no",
@@ -610,6 +655,10 @@ def build_standard_tables(
                     event_row["needs_manual_review"] = "yes"
                 if not event_row["correction_reason"]:
                     event_row["correction_reason"] = text(row.get("correction_reason"))
+                if not event_row.get("display_note"):
+                    event_row["display_note"] = display_note
+                if not event_row.get("canonical_event_key"):
+                    event_row["canonical_event_key"] = canonical_event_key
                 break
 
         participant_candidates: list[tuple[str, str, str]] = []
