@@ -74,6 +74,27 @@ def extract_year(value: object) -> int | None:
     return None
 
 
+def select_featured_events(events: list[dict[str, object]], limit: int = 6) -> list[dict[str, object]]:
+    buckets = [
+        lambda event: text(event.get("date_precision")) in {"日", "月"} and text(event.get("confidence")) != "low",
+        lambda event: text(event.get("date_precision")) in {"日", "月"},
+        lambda event: text(event.get("needs_manual_review")) != "yes",
+        lambda event: True,
+    ]
+    featured: list[dict[str, object]] = []
+    seen: set[str] = set()
+    for matcher in buckets:
+        for event in events:
+            event_id = text(event.get("id"))
+            if not event_id or event_id in seen or not matcher(event):
+                continue
+            featured.append(event)
+            seen.add(event_id)
+            if len(featured) >= limit:
+                return featured
+    return featured
+
+
 def pair_key(person_a_id: str, person_b_id: str) -> str:
     left, right = sorted([person_a_id, person_b_id])
     return f"{left}|{right}"
@@ -468,6 +489,7 @@ def build_event_records(
             "source_ids": unique_ordered(split_ids(row.get("source_ids"))),
             "note": text(row.get("correction_reason"), "暂无备注"),
             "confidence": text(row.get("confidence"), "未标注"),
+            "needs_manual_review": text(row.get("needs_manual_review"), "no"),
         }
         event["search_blob"] = " ".join(
             [
@@ -556,7 +578,7 @@ def render_home_page(
 ) -> str:
     top_people = "".join(person_card(person, f"people/{person['id']}.html") for person in people[:6])
     top_relations = "".join(relation_card(relation, "people/") for relation in relations[:8])
-    featured_events = "".join(event_card(event, f"events/{event['id']}.html") for event in events[:6])
+    featured_events = "".join(event_card(event, f"events/{event['id']}.html") for event in select_featured_events(events))
 
     role_counter = Counter(text(person["role"], "角色待补") for person in people)
     relation_type_counter = Counter()
