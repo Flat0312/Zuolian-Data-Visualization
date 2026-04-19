@@ -194,6 +194,8 @@ def page_shell(
         ("events", "事件索引", f"{prefix}events/index.html"),
         ("relations", "关系索引", f"{prefix}relations/index.html"),
         ("search", "全文搜索", f"{prefix}search/index.html"),
+        ("graph", "关系图谱", f"{prefix}graph/index.html"),
+        ("timeline", "事件时间轴", f"{prefix}timeline/index.html"),
     ]
     nav_html = "".join(
         (
@@ -221,6 +223,7 @@ def page_shell(
         <span class="brand__title">左联知识库</span>
       </a>
       <nav class="site-nav" aria-label="主导航">{nav_html}</nav>
+      <button class="site-nav-toggle" aria-label="展开导航" onclick="this.closest('.site-header__inner').querySelector('.site-nav').classList.toggle('is-open')">☰</button>
     </div>
   </header>
   <main id="main" class="page-main">
@@ -229,7 +232,7 @@ def page_shell(
   <footer class="site-footer">
     <div class="site-footer__inner">
       <p>静态阅读版基于仓库内标准知识库数据自动生成，适合 GitHub Pages 发布。</p>
-      <p>复杂分析与交互地图仍建议使用 Streamlit 应用。</p>
+      <p>复杂分析与交互地图已内置于本站，支持关系图谱与事件时间轴在线浏览。</p>
     </div>
   </footer>
 </body>
@@ -604,8 +607,9 @@ def render_home_page(
         <p class="hero__lead">这一版不依赖 Python 运行环境，直接把标准化 CSV 生成静态页面，适合在线阅读、引用、搜索与 GitHub Pages 发布。</p>
         <div class="hero__actions">
           <a class="button button--primary" href="people/index.html">进入人物档案</a>
+          <a class="button" href="graph/index.html">关系图谱</a>
+          <a class="button" href="timeline/index.html">事件时间轴</a>
           <a class="button" href="search/index.html">全文搜索</a>
-          <a class="button" href="events/index.html">按事件浏览</a>
         </div>
       </div>
       <div class="hero__media">
@@ -624,7 +628,7 @@ def render_home_page(
       <article class="section-panel">
         <div class="section-panel__eyebrow">概览</div>
         <h2>知识库的静态阅读入口</h2>
-        <p>这一版重点解决“在线可读”而不是“完整交互分析”。页面以阅读和跳转为主，复杂网络图与地图筛选仍保留在 Streamlit 应用。</p>
+        <p>这一版支持人物档案、关系图谱、事件时间轴与全文搜索，直接在浏览器中运行，无需 Python 环境。</p>
         <ul class="rank-list">{role_rank}</ul>
       </article>
       <article class="section-panel">
@@ -971,6 +975,270 @@ def build_search_index(
     return records
 
 
+def build_timeline_data(event_records: list[dict]) -> list[dict]:
+    items = []
+    for ev in event_records:
+        date = text(ev.get("event_date") or ev.get("date", ""))
+        if not date:
+            continue
+        year = extract_year(date)
+        if not year:
+            continue
+        items.append({
+            "id": ev["id"],
+            "name": ev["name"],
+            "date": date,
+            "year": year,
+            "location": text(ev.get("historical_location") or ev.get("location", ""), "地点待补"),
+            "participants": [p["name"] for p in ev.get("participants", [])[:4]],
+            "confidence": text(ev.get("confidence", "")),
+        })
+    items.sort(key=lambda x: x["date"])
+    return items
+
+
+def render_timeline_page() -> str:
+    body = """
+<div class="page-hero">
+  <h1 class="page-hero__title">事件时间轴</h1>
+  <p class="page-hero__lead">左联历史事件按时间排列，拖动滑块筛选年份范围，点击事件查看详情。</p>
+</div>
+<div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem">
+  <label style="font-size:.9rem">年份范围：
+    <input id="year-min" type="number" value="1920" min="1900" max="1940"
+      style="width:5rem;padding:.25rem .5rem;border-radius:4px;border:1px solid var(--line)">
+    —
+    <input id="year-max" type="number" value="1940" min="1900" max="1940"
+      style="width:5rem;padding:.25rem .5rem;border-radius:4px;border:1px solid var(--line)">
+  </label>
+  <label style="font-size:.9rem">关键词：
+    <input id="kw-filter" type="text" placeholder="人名/地点/事件名"
+      style="padding:.25rem .5rem;border-radius:4px;border:1px solid var(--line);width:12rem">
+  </label>
+  <span id="tl-stats" style="font-size:.85rem;color:var(--muted)"></span>
+</div>
+<div id="tl-container" style="width:100%;height:65vh;border:1px solid var(--line);border-radius:8px;background:#faf6ef"></div>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script>
+(function(){
+  var chart = echarts.init(document.getElementById('tl-container'));
+  var allItems = [];
+
+  function buildOption(items) {
+    var years = items.map(function(d){ return d.year; });
+    var minY = Math.min.apply(null, years) || 1920;
+    var maxY = Math.max.apply(null, years) || 1940;
+    var data = items.map(function(d, i){
+      return {
+        value: [d.date, i % 8, d.name],
+        id: d.id,
+        name: d.name,
+        location: d.location,
+        participants: d.participants,
+        confidence: d.confidence,
+      };
+    });
+    return {
+      tooltip: {
+        formatter: function(p) {
+          var d = p.data;
+          var parts = [
+            '<b>' + d.name + '</b>',
+            '日期：' + d.value[0],
+            '地点：' + d.location,
+          ];
+          if (d.participants && d.participants.length)
+            parts.push('参与：' + d.participants.join('、'));
+          return parts.join('<br>');
+        }
+      },
+      grid: { left: 60, right: 40, top: 20, bottom: 60 },
+      xAxis: {
+        type: 'category',
+        data: Array.from({length: maxY - minY + 1}, function(_, i){ return String(minY + i); }),
+        axisLabel: { rotate: 45, fontSize: 11 },
+        name: '年份',
+      },
+      yAxis: { show: false, min: -1, max: 9 },
+      dataZoom: [
+        { type: 'slider', xAxisIndex: 0, bottom: 5, height: 20 },
+        { type: 'inside', xAxisIndex: 0 }
+      ],
+      series: [{
+        type: 'scatter',
+        data: data,
+        symbolSize: 10,
+        itemStyle: { color: '#8e2528', opacity: 0.75 },
+        emphasis: { itemStyle: { color: '#536779', opacity: 1 }, scale: 1.5 },
+      }]
+    };
+  }
+
+  function applyFilter() {
+    var minY = parseInt(document.getElementById('year-min').value) || 1920;
+    var maxY = parseInt(document.getElementById('year-max').value) || 1940;
+    var kw = (document.getElementById('kw-filter').value || '').trim().toLowerCase();
+    var filtered = allItems.filter(function(d) {
+      if (d.year < minY || d.year > maxY) return false;
+      if (kw && d.name.toLowerCase().indexOf(kw) < 0 &&
+          d.location.toLowerCase().indexOf(kw) < 0 &&
+          d.participants.join('').toLowerCase().indexOf(kw) < 0) return false;
+      return true;
+    });
+    document.getElementById('tl-stats').textContent = '显示 ' + filtered.length + ' 条事件';
+    chart.setOption(buildOption(filtered), true);
+  }
+
+  fetch('../assets/timeline-data.json').then(function(r){ return r.json(); }).then(function(data){
+    allItems = data;
+    ['year-min','year-max','kw-filter'].forEach(function(id){
+      document.getElementById(id).addEventListener('input', applyFilter);
+    });
+    applyFilter();
+  });
+
+  chart.on('click', function(p){
+    if (p.data && p.data.id) window.location.href = '../events/' + p.data.id + '.html';
+  });
+  window.addEventListener('resize', function(){ chart.resize(); });
+})();
+</script>
+"""
+    return page_shell(
+        title="事件时间轴 · 左联知识库",
+        description="左联历史事件时间轴",
+        active_nav="timeline",
+        body=body,
+        depth=1,
+    )
+
+
+def build_graph_data(people: list[dict], relation_profiles: list[dict]) -> dict:
+    nodes = [
+        {
+            "id": p["id"],
+            "name": p["name"],
+            "value": int(p["pair_total"]),
+            "role": p.get("role", ""),
+        }
+        for p in people
+    ]
+    edges = []
+    seen: set[str] = set()
+    for rel in relation_profiles:
+        a, b = rel["person_a_id"], rel["person_b_id"]
+        key = f"{min(a,b)}|{max(a,b)}"
+        if key in seen:
+            continue
+        seen.add(key)
+        edges.append({
+            "source": a,
+            "target": b,
+            "types": rel["types"][:2],
+            "weight": int(rel.get("weight", 1)),
+        })
+    return {"nodes": nodes, "edges": edges}
+
+
+def render_graph_page() -> str:
+    body = """
+<div class="page-hero">
+  <h1 class="page-hero__title">关系图谱</h1>
+  <p class="page-hero__lead">左联成员人物关系交互网络，点击节点查看人物详情，滚轮缩放，拖拽平移。</p>
+</div>
+<div style="margin-bottom:1rem;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+  <label style="font-size:.9rem">筛选关系类型：
+    <select id="rel-filter" style="margin-left:.4rem;padding:.25rem .5rem;border-radius:4px;border:1px solid var(--line)">
+      <option value="">全部</option>
+      <option>交游</option><option>合作</option><option>同属组织</option>
+      <option>签名联署</option><option>纪念悼念</option><option>待核验</option>
+    </select>
+  </label>
+  <label style="font-size:.9rem">最少关联人数：
+    <input id="min-degree" type="number" min="0" value="0"
+      style="width:4rem;margin-left:.4rem;padding:.25rem .5rem;border-radius:4px;border:1px solid var(--line)">
+  </label>
+  <span id="graph-stats" style="font-size:.85rem;color:var(--muted)"></span>
+</div>
+<div id="graph-container" style="width:100%;height:70vh;border:1px solid var(--line);border-radius:8px;background:#faf6ef"></div>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script>
+(function(){
+  var chart = echarts.init(document.getElementById('graph-container'));
+  var allNodes = [], allEdges = [];
+
+  function buildOption(nodes, edges) {
+    return {
+      tooltip: {
+        formatter: function(p) {
+          if (p.dataType === 'node') return p.data.name + (p.data.role ? ' · ' + p.data.role : '');
+          return (p.data.sourceNode||'') + ' — ' + (p.data.targetNode||'') + '<br>' + (p.data.types||[]).join(' / ');
+        }
+      },
+      series: [{
+        type: 'graph', layout: 'force',
+        roam: true, draggable: true,
+        force: { repulsion: 120, edgeLength: [60, 200], gravity: 0.1 },
+        label: { show: true, fontSize: 11, color: '#2d251d' },
+        lineStyle: { color: '#b09070', opacity: 0.5, width: 1 },
+        itemStyle: { color: '#8e2528', borderColor: '#fff', borderWidth: 1.5 },
+        emphasis: { focus: 'adjacency', lineStyle: { width: 3 } },
+        nodes: nodes,
+        edges: edges,
+        symbolSize: function(val) { return Math.max(14, Math.min(50, 14 + val * 0.25)); }
+      }]
+    };
+  }
+
+  function applyFilter() {
+    var relType = document.getElementById('rel-filter').value;
+    var minDeg = parseInt(document.getElementById('min-degree').value) || 0;
+    var activeEdges = allEdges.filter(function(e) {
+      return !relType || (e.types && e.types.indexOf(relType) >= 0);
+    });
+    var activeIds = new Set();
+    activeEdges.forEach(function(e){ activeIds.add(e.source); activeIds.add(e.target); });
+    var activeNodes = allNodes.filter(function(n){
+      return n.value >= minDeg && (minDeg > 0 ? activeIds.has(n.id) : true);
+    });
+    var nodeIds = new Set(activeNodes.map(function(n){ return n.id; }));
+    var filteredEdges = activeEdges.filter(function(e){
+      return nodeIds.has(e.source) && nodeIds.has(e.target);
+    }).map(function(e){
+      return Object.assign({}, e, {
+        sourceNode: (allNodes.find(function(n){return n.id===e.source;})||{}).name,
+        targetNode: (allNodes.find(function(n){return n.id===e.target;})||{}).name
+      });
+    });
+    document.getElementById('graph-stats').textContent =
+      '显示 ' + activeNodes.length + ' 人 / ' + filteredEdges.length + ' 条关系';
+    chart.setOption(buildOption(activeNodes, filteredEdges), true);
+  }
+
+  fetch('../assets/graph-data.json').then(function(r){ return r.json(); }).then(function(data){
+    allNodes = data.nodes;
+    allEdges = data.edges;
+    document.getElementById('rel-filter').addEventListener('change', applyFilter);
+    document.getElementById('min-degree').addEventListener('input', applyFilter);
+    applyFilter();
+  });
+
+  chart.on('click', function(p){
+    if (p.dataType === 'node') window.location.href = '../people/' + p.data.id + '.html';
+  });
+  window.addEventListener('resize', function(){ chart.resize(); });
+})();
+</script>
+"""
+    return page_shell(
+        title="关系图谱 · 左联知识库",
+        description="左联成员人物关系交互网络图谱",
+        active_nav="graph",
+        body=body,
+        depth=1,
+    )
+
+
 def main() -> None:
     required = [
         "persons.csv",
@@ -1009,6 +1277,14 @@ def main() -> None:
     write_text(DOCS_DIR / "relations" / "index.html", render_relations_index(relation_profiles))
     write_text(DOCS_DIR / "search" / "index.html", render_search_page(len(search_records)))
     write_text(DOCS_DIR / "assets" / "search-index.json", json.dumps(search_records, ensure_ascii=False, indent=2))
+
+    graph_data = build_graph_data(people, relation_profiles)
+    write_text(DOCS_DIR / "assets" / "graph-data.json", json.dumps(graph_data, ensure_ascii=False))
+    write_text(DOCS_DIR / "graph" / "index.html", render_graph_page())
+
+    timeline_data = build_timeline_data(event_records)
+    write_text(DOCS_DIR / "assets" / "timeline-data.json", json.dumps(timeline_data, ensure_ascii=False))
+    write_text(DOCS_DIR / "timeline" / "index.html", render_timeline_page())
 
     for person in people:
         write_text(DOCS_DIR / "people" / f"{person['id']}.html", render_person_detail(person, source_map))

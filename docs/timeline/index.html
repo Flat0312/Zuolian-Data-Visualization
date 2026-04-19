@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>事件时间轴 · 左联知识库</title>
+  <meta name="description" content="左联历史事件时间轴">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script defer src="../assets/site.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="../index.html">
+        <span class="brand__eyebrow">STATIC READER</span>
+        <span class="brand__title">左联知识库</span>
+      </a>
+      <nav class="site-nav" aria-label="主导航"><a class="site-nav__link" href="../index.html">首页</a><a class="site-nav__link" href="../people/index.html">人物档案</a><a class="site-nav__link" href="../events/index.html">事件索引</a><a class="site-nav__link" href="../relations/index.html">关系索引</a><a class="site-nav__link" href="../search/index.html">全文搜索</a><a class="site-nav__link" href="../graph/index.html">关系图谱</a><a class="site-nav__link is-active" href="../timeline/index.html">事件时间轴</a></nav>
+      <button class="site-nav-toggle" aria-label="展开导航" onclick="this.closest('.site-header__inner').querySelector('.site-nav').classList.toggle('is-open')">☰</button>
+    </div>
+  </header>
+  <main id="main" class="page-main">
+    <div class="page-shell">
+<div class="page-hero">
+  <h1 class="page-hero__title">事件时间轴</h1>
+  <p class="page-hero__lead">左联历史事件按时间排列，拖动滑块筛选年份范围，点击事件查看详情。</p>
+</div>
+<div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem">
+  <label style="font-size:.9rem">年份范围：
+    <input id="year-min" type="number" value="1920" min="1900" max="1940"
+      style="width:5rem;padding:.25rem .5rem;border-radius:4px;border:1px solid var(--line)">
+    —
+    <input id="year-max" type="number" value="1940" min="1900" max="1940"
+      style="width:5rem;padding:.25rem .5rem;border-radius:4px;border:1px solid var(--line)">
+  </label>
+  <label style="font-size:.9rem">关键词：
+    <input id="kw-filter" type="text" placeholder="人名/地点/事件名"
+      style="padding:.25rem .5rem;border-radius:4px;border:1px solid var(--line);width:12rem">
+  </label>
+  <span id="tl-stats" style="font-size:.85rem;color:var(--muted)"></span>
+</div>
+<div id="tl-container" style="width:100%;height:65vh;border:1px solid var(--line);border-radius:8px;background:#faf6ef"></div>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script>
+(function(){
+  var chart = echarts.init(document.getElementById('tl-container'));
+  var allItems = [];
+
+  function buildOption(items) {
+    var years = items.map(function(d){ return d.year; });
+    var minY = Math.min.apply(null, years) || 1920;
+    var maxY = Math.max.apply(null, years) || 1940;
+    var data = items.map(function(d, i){
+      return {
+        value: [d.date, i % 8, d.name],
+        id: d.id,
+        name: d.name,
+        location: d.location,
+        participants: d.participants,
+        confidence: d.confidence,
+      };
+    });
+    return {
+      tooltip: {
+        formatter: function(p) {
+          var d = p.data;
+          var parts = [
+            '<b>' + d.name + '</b>',
+            '日期：' + d.value[0],
+            '地点：' + d.location,
+          ];
+          if (d.participants && d.participants.length)
+            parts.push('参与：' + d.participants.join('、'));
+          return parts.join('<br>');
+        }
+      },
+      grid: { left: 60, right: 40, top: 20, bottom: 60 },
+      xAxis: {
+        type: 'category',
+        data: Array.from({length: maxY - minY + 1}, function(_, i){ return String(minY + i); }),
+        axisLabel: { rotate: 45, fontSize: 11 },
+        name: '年份',
+      },
+      yAxis: { show: false, min: -1, max: 9 },
+      dataZoom: [
+        { type: 'slider', xAxisIndex: 0, bottom: 5, height: 20 },
+        { type: 'inside', xAxisIndex: 0 }
+      ],
+      series: [{
+        type: 'scatter',
+        data: data,
+        symbolSize: 10,
+        itemStyle: { color: '#8e2528', opacity: 0.75 },
+        emphasis: { itemStyle: { color: '#536779', opacity: 1 }, scale: 1.5 },
+      }]
+    };
+  }
+
+  function applyFilter() {
+    var minY = parseInt(document.getElementById('year-min').value) || 1920;
+    var maxY = parseInt(document.getElementById('year-max').value) || 1940;
+    var kw = (document.getElementById('kw-filter').value || '').trim().toLowerCase();
+    var filtered = allItems.filter(function(d) {
+      if (d.year < minY || d.year > maxY) return false;
+      if (kw && d.name.toLowerCase().indexOf(kw) < 0 &&
+          d.location.toLowerCase().indexOf(kw) < 0 &&
+          d.participants.join('').toLowerCase().indexOf(kw) < 0) return false;
+      return true;
+    });
+    document.getElementById('tl-stats').textContent = '显示 ' + filtered.length + ' 条事件';
+    chart.setOption(buildOption(filtered), true);
+  }
+
+  fetch('../assets/timeline-data.json').then(function(r){ return r.json(); }).then(function(data){
+    allItems = data;
+    ['year-min','year-max','kw-filter'].forEach(function(id){
+      document.getElementById(id).addEventListener('input', applyFilter);
+    });
+    applyFilter();
+  });
+
+  chart.on('click', function(p){
+    if (p.data && p.data.id) window.location.href = '../events/' + p.data.id + '.html';
+  });
+  window.addEventListener('resize', function(){ chart.resize(); });
+})();
+</script>
+</div>
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>静态阅读版基于仓库内标准知识库数据自动生成，适合 GitHub Pages 发布。</p>
+      <p>复杂分析与交互地图已内置于本站，支持关系图谱与事件时间轴在线浏览。</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>左联知识库静态阅读版</title>
+  <meta name="description" content="适合 GitHub Pages 发布的左联知识库静态阅读站。">
+  <link rel="stylesheet" href="assets/site.css">
+  <script defer src="assets/site.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="index.html">
+        <span class="brand__eyebrow">STATIC READER</span>
+        <span class="brand__title">左联知识库</span>
+      </a>
+      <nav class="site-nav" aria-label="主导航"><a class="site-nav__link is-active" href="index.html">首页</a><a class="site-nav__link" href="people/index.html">人物档案</a><a class="site-nav__link" href="events/index.html">事件索引</a><a class="site-nav__link" href="relations/index.html">关系索引</a><a class="site-nav__link" href="search/index.html">全文搜索</a><a class="site-nav__link" href="graph/index.html">关系图谱</a><a class="site-nav__link" href="timeline/index.html">事件时间轴</a></nav>
+      <button class="site-nav-toggle" aria-label="展开导航" onclick="this.closest('.site-header__inner').querySelector('.site-nav').classList.toggle('is-open')">☰</button>
+    </div>
+  </header>
+  <main id="main" class="page-main">
+    <div class="page-shell">
+    <section class="hero hero--home">
+      <div class="hero__content">
+        <p class="eyebrow">GITHUB PAGES 静态阅读版</p>
+        <h1>把左联人物、关系与事件整理成可浏览的档案站</h1>
+        <p class="hero__lead">这一版不依赖 Python 运行环境，直接把标准化 CSV 生成静态页面，适合在线阅读、引用、搜索与 GitHub Pages 发布。</p>
+        <div class="hero__actions">
+          <a class="button button--primary" href="people/index.html">进入人物档案</a>
+          <a class="button" href="graph/index.html">关系图谱</a>
+          <a class="button" href="timeline/index.html">事件时间轴</a>
+          <a class="button" href="search/index.html">全文搜索</a>
+        </div>
+      </div>
+      <div class="hero__media">
+        <img src="assets/banner.png" alt="左联知识库静态阅读版横幅">
+      </div>
+    </section>
+
+    <section class="metric-grid">
+      <article class="metric-card"><div class="metric-card__label">人物档案</div><div class="metric-card__value">150</div><p class="metric-card__note">可直接进入单人页面阅读</p></article>
+      <article class="metric-card"><div class="metric-card__label">关系对</div><div class="metric-card__value">4,227</div><p class="metric-card__note">聚合为人物对关系卡片</p></article>
+      <article class="metric-card"><div class="metric-card__label">历史事件</div><div class="metric-card__value">262</div><p class="metric-card__note">保留时间、地点与参与者</p></article>
+      <article class="metric-card"><div class="metric-card__label">证据来源</div><div class="metric-card__value">1,142</div><p class="metric-card__note">仅展示可公开说明的来源信息</p></article>
+    </section>
+
+    <section class="section-grid section-grid--two">
+      <article class="section-panel">
+        <div class="section-panel__eyebrow">概览</div>
+        <h2>知识库的静态阅读入口</h2>
+        <p>这一版支持人物档案、关系图谱、事件时间轴与全文搜索，直接在浏览器中运行，无需 Python 环境。</p>
+        <ul class="rank-list"><li><span>普通成员</span><strong>54</strong></li><li><span>骨干成员</span><strong>45</strong></li><li><span>相关人士</span><strong>21</strong></li><li><span>核心领导</span><strong>15</strong></li><li><span>外围联络人</span><strong>15</strong></li></ul>
+      </article>
+      <article class="section-panel">
+        <div class="section-panel__eyebrow">关系类型</div>
+        <h2>目前最常见的关系标签</h2>
+        <p>静态站会优先把高频关系、人际共现与史料证据组织成阅读友好的关系卡片。</p>
+        <ul class="rank-list"><li><span>交游</span><strong>1211</strong></li><li><span>待核验</span><strong>1117</strong></li><li><span>同属组织</span><strong>729</strong></li><li><span>合作</span><strong>338</strong></li><li><span>签名联署</span><strong>195</strong></li><li><span>纪念/悼念</span><strong>156</strong></li></ul>
+      </article>
+    </section>
+
+    <section class="page-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">人物入口</p>
+          <h2>先看连接最密集的人物</h2>
+        </div>
+        <a class="section-link" href="people/index.html">查看全部人物</a>
+      </div>
+      <div class="card-grid"><article class="index-card" data-search="鲁迅 周树人、l.x.、豫才 1881-1936 核心领导 李霁野 郁达夫 郑伯奇 冯雪峰 李小峰 林语堂 陈望道 沈兼士"><a class="index-card__link" href="people/ZLH-001.html"><div class="index-card__header"><h3>鲁迅</h3><span>核心领导</span></div><p class="index-card__summary">周树人、L.X.、豫才</p><div class="index-card__badges"><span class="badge">核心领导</span><span class="badge">1881-1936</span><span class="badge">可靠度 5</span></div><div class="index-card__meta">116 位关联人物 · 26 条关联事件</div></a></article><article class="index-card" data-search="郑伯奇 伯奇、君嘉、席珍 1895-1979 核心领导 鲁迅 冯雪峰 周扬 夏衍 田汉 瞿秋白 茅盾 丁玲"><a class="index-card__link" href="people/ZLH-009.html"><div class="index-card__header"><h3>郑伯奇</h3><span>核心领导</span></div><p class="index-card__summary">伯奇、君嘉、席珍</p><div class="index-card__badges"><span class="badge">核心领导</span><span class="badge">1895-1979</span><span class="badge">可靠度 5</span></div><div class="index-card__meta">109 位关联人物 · 9 条关联事件</div></a></article><article class="index-card" data-search="夏衍 沈端先、黄子布、蔡叔亮、丁一 1900-1995 核心领导 何家槐 冯乃超 冯铿 冯雪峰 叶灵凤 叶紫 吴奚如 周立波"><a class="index-card__link" href="people/ZLH-004.html"><div class="index-card__header"><h3>夏衍</h3><span>核心领导</span></div><p class="index-card__summary">沈端先、黄子布、蔡叔亮、丁一</p><div class="index-card__badges"><span class="badge">核心领导</span><span class="badge">1900-1995</span><span class="badge">可靠度 5</span></div><div class="index-card__meta">106 位关联人物 · 11 条关联事件</div></a></article><article class="index-card" data-search="茅盾 沈雁冰、玄珠、方璧、微明 1896-1981 核心领导 鲁迅 任白戈 何家槐 冯乃超 冯铿 冯雪峰 叶紫 吴奚如"><a class="index-card__link" href="people/ZLH-002.html"><div class="index-card__header"><h3>茅盾</h3><span>核心领导</span></div><p class="index-card__summary">沈雁冰、玄珠、方璧、微明</p><div class="index-card__badges"><span class="badge">核心领导</span><span class="badge">1896-1981</span><span class="badge">可靠度 5</span></div><div class="index-card__meta">105 位关联人物 · 5 条关联事件</div></a></article><article class="index-card" data-search="钱杏邨 阿英、魏如晦、钱谦 1900-1977 核心领导 冯雪峰 周扬 夏衍 洪深 田汉 瞿秋白 茅盾 郑伯奇"><a class="index-card__link" href="people/ZLH-011.html"><div class="index-card__header"><h3>钱杏邨</h3><span>核心领导</span></div><p class="index-card__summary">阿英、魏如晦、钱谦</p><div class="index-card__badges"><span class="badge">核心领导</span><span class="badge">1900-1977</span><span class="badge">可靠度 5</span></div><div class="index-card__meta">105 位关联人物 · 3 条关联事件</div></a></article><article class="index-card" data-search="冯雪峰 画室、洛扬、成休、雪峰 1903-1976 核心领导 鲁迅 丁玲 任钧 何家槐 冯乃超 冯铿 叶以群 叶灵凤"><a class="index-card__link" href="people/ZLH-005.html"><div class="index-card__header"><h3>冯雪峰</h3><span>核心领导</span></div><p class="index-card__summary">画室、洛扬、成休、雪峰</p><div class="index-card__badges"><span class="badge">核心领导</span><span class="badge">1903-1976</span><span class="badge">可靠度 5</span></div><div class="index-card__meta">103 位关联人物 · 11 条关联事件</div></a></article></div>
+    </section>
+
+    <section class="page-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">关系索引</p>
+          <h2>最值得先读的一组关系卡片</h2>
+        </div>
+        <a class="section-link" href="relations/index.html">查看全部关系</a>
+      </div>
+      <div class="relation-grid"><article class="relation-card" id="pair-zlh-001-zlh-071" data-search="鲁迅 李霁野 交游 时空共现 通信 鲁迅日记 1929年6月1日 鲁迅日记 1929年5月20日 鲁迅日记 1929年5月28日 鲁迅日记 1929年10月20日 霁野来访。信，五月二十七日发。霁野来。范文澜来。第二师范学院学生二人来。钱稻"><h3 class="relation-card__title"><a href="people/ZLH-001.html">鲁迅</a> × <a href="people/ZLH-071.html">李霁野</a></h3><p class="relation-card__summary">交游 / 时空共现 / 通信</p><div class="relation-card__meta">3 条关系记录 · 正式证据 3</div><p class="relation-card__excerpt">鲁迅日记 1929年6月1日；鲁迅日记 1929年5月20日</p></article><article class="relation-card" id="pair-zlh-001-zlh-015" data-search="鲁迅 郁达夫 交游 交往 通信 鲁迅日记 1933年3月1日 鲁迅日记 1928年12月28日 鲁迅日记 1929年10月10日 鲁迅日记 1929年11月26日 达夫来访。宋椠《三世相》一本。达夫来，未遇。夜寄母亲信。复静农信。发贺内山嘉"><h3 class="relation-card__title"><a href="people/ZLH-001.html">鲁迅</a> × <a href="people/ZLH-015.html">郁达夫</a></h3><p class="relation-card__summary">交游 / 交往 / 通信</p><div class="relation-card__meta">3 条关系记录 · 正式证据 3</div><p class="relation-card__excerpt">鲁迅日记 1933年3月1日；鲁迅日记 1928年12月28日</p></article><article class="relation-card" id="pair-zlh-001-zlh-009" data-search="鲁迅 郑伯奇 通信 鲁迅日记 1936年7月9日 左联回忆录 第700页 鲁迅日记 1933年9月28日 鲁迅日记 1934年11月17日 收到郑伯奇来信; 的一套创作丛 书 关于北方左联的事情（孙席珍） 再谈北方左联（孙席珍）——一九八○年四月五日在中国作家协会左翼文化运动 座谈会上的发言 北方左翼作家联盟杂忆（杨纤如） 又想起北方左联一事（杨纤如）——"><h3 class="relation-card__title"><a href="people/ZLH-001.html">鲁迅</a> × <a href="people/ZLH-009.html">郑伯奇</a></h3><p class="relation-card__summary">通信</p><div class="relation-card__meta">2 条关系记录 · 正式证据 2</div><p class="relation-card__excerpt">鲁迅日记 1936年7月9日；左联回忆录 第700页</p></article><article class="relation-card" id="pair-zlh-001-zlh-005" data-search="鲁迅 冯雪峰 交往 通信 鲁迅日记 1929年12月26日 鲁迅日记 1929年3月20日 鲁迅日记 1929年4月23日 鲁迅日记 1929年4月27日 雪峰来访。报》两卷。夜柔石来。雪峰来。得方善竟信并《新声》四张，另有《希望》"><h3 class="relation-card__title"><a href="people/ZLH-001.html">鲁迅</a> × <a href="people/ZLH-005.html">冯雪峰</a></h3><p class="relation-card__summary">交往 / 通信</p><div class="relation-card__meta">2 条关系记录 · 正式证据 2</div><p class="relation-card__excerpt">鲁迅日记 1929年12月26日；鲁迅日记 1929年3月20日</p></article><article class="relation-card" id="pair-zlh-001-zlh-124" data-search="鲁迅 李小峰 时空共现 通信 鲁迅日记 1928年11月27日 鲁迅日记 1929年11月23日 鲁迅日记 1929年5月2日 鲁迅日记 1929年7月10日 小峰来访。寄季巿、钦文、淑卿。小峰来并赠《曼殊遗墨》第一册一本。复卜英梵信。"><h3 class="relation-card__title"><a href="people/ZLH-001.html">鲁迅</a> × <a href="people/ZLH-124.html">李小峰</a></h3><p class="relation-card__summary">时空共现 / 通信</p><div class="relation-card__meta">2 条关系记录 · 正式证据 2</div><p class="relation-card__excerpt">鲁迅日记 1928年11月27日；鲁迅日记 1929年11月23日</p></article><article class="relation-card" id="pair-zlh-001-zlh-128" data-search="鲁迅 林语堂 时空共现 通信 鲁迅日记 1929年2月16日 鲁迅日记 1929年7月7日 鲁迅日记 1928年11月24日 鲁迅日记 1928年11月26日 林语堂来访。寄许羡蒙《语丝》。林语堂来。下午往内山书店。晚寄陈望道、汪馥泉信并"><h3 class="relation-card__title"><a href="people/ZLH-001.html">鲁迅</a> × <a href="people/ZLH-128.html">林语堂</a></h3><p class="relation-card__summary">时空共现 / 通信</p><div class="relation-card__meta">2 条关系记录 · 正式证据 2</div><p class="relation-card__excerpt">鲁迅日记 1929年2月16日；鲁迅日记 1929年7月7日</p></article><article class="relation-card" id="pair-zlh-001-zlh-139" data-search="鲁迅 陈望道 时空共现 通信 鲁迅日记 1929年2月6日 鲁迅日记 1929年5月11日 鲁迅日记 1930年2月8日 鲁迅日记 1930年4月24日 望道来访。来。杨骚来。下午雨。望道来。晚雪峰来。"><h3 class="relation-card__title"><a href="people/ZLH-001.html">鲁迅</a> × <a href="people/ZLH-139.html">陈望道</a></h3><p class="relation-card__summary">时空共现 / 通信</p><div class="relation-card__meta">2 条关系记录 · 正式证据 2</div><p class="relation-card__excerpt">鲁迅日记 1929年2月6日；鲁迅日记 1929年5月11日</p></article><article class="relation-card" id="pair-zlh-001-zlh-126" data-search="鲁迅 沈兼士 时空共现 通信 鲁迅日记 1929年5月20日 鲁迅日记 1929年7月28日 鲁迅日记 1932年12月23日 拜访兼士"><h3 class="relation-card__title"><a href="people/ZLH-001.html">鲁迅</a> × <a href="people/ZLH-126.html">沈兼士</a></h3><p class="relation-card__summary">时空共现 / 通信</p><div class="relation-card__meta">2 条关系记录 · 正式证据 2</div><p class="relation-card__excerpt">鲁迅日记 1929年5月20日；鲁迅日记 1929年7月28日</p></article></div>
+    </section>
+
+    <section class="page-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">事件时间线</p>
+          <h2>按时间进入左联活动现场</h2>
+        </div>
+        <a class="section-link" href="events/index.html">查看全部事件</a>
+      </div>
+      <div class="card-grid"><article class="index-card" data-search="丁玲抵沪就读平民女校 1922-02 平民女校 上海（校址待核） 丁玲 1922年2月，丁玲抵沪进入平民女子学校求学，当前条目按这一可核实的上海起点事件展示。"><a class="index-card__link" href="events/EVT-00029.html"><div class="index-card__header"><h3>丁玲抵沪就读平民女校</h3><span>1922-02</span></div><p class="index-card__summary">平民女校 · 丁玲</p><div class="index-card__badges"><span class="badge">1922-02</span><span class="badge">月</span><span class="badge">1 位相关人物</span></div><div class="index-card__meta">1922年2月，丁玲抵沪进入平民女子学校求学，当前条目按这一可核实的上海起点事件展示。</div></a></article><article class="index-card" data-search="瞿秋白到上海大学任教 1923-07 上海大学 上海（具体校址待核） 瞿秋白 1923年7月，瞿秋白到上海大学任教并主持社会学系工作，当前条目按这一可公开核实的在沪活动节点展示。"><a class="index-card__link" href="events/EVT-00028.html"><div class="index-card__header"><h3>瞿秋白到上海大学任教</h3><span>1923-07</span></div><p class="index-card__summary">上海大学 · 瞿秋白</p><div class="index-card__badges"><span class="badge">1923-07</span><span class="badge">月</span><span class="badge">1 位相关人物</span></div><div class="index-card__meta">1923年7月，瞿秋白到上海大学任教并主持社会学系工作，当前条目按这一可公开核实的在沪活动节点展示。</div></a></article><article class="index-card" data-search="丁玲进入上海大学中国文学系 1923-08 上海大学中国文学系 上海（具体校址待核） 丁玲 1923年8月，丁玲进入上海大学中国文学系旁听和学习，当前条目按这一较为明确的文学活动节点展示。"><a class="index-card__link" href="events/EVT-00150.html"><div class="index-card__header"><h3>丁玲进入上海大学中国文学系</h3><span>1923-08</span></div><p class="index-card__summary">上海大学中国文学系 · 丁玲</p><div class="index-card__badges"><span class="badge">1923-08</span><span class="badge">月</span><span class="badge">1 位相关人物</span></div><div class="index-card__meta">1923年8月，丁玲进入上海大学中国文学系旁听和学习，当前条目按这一较为明确的文学活动节点展示。</div></a></article><article class="index-card" data-search="冯铿元宵抵沪 1929-02-24 上海 上海 冯铿 1929年2月24日，冯铿抵达上海，当前条目按这一明确可核的来沪时间展示。"><a class="index-card__link" href="events/EVT-00136.html"><div class="index-card__header"><h3>冯铿元宵抵沪</h3><span>1929-02-24</span></div><p class="index-card__summary">上海 · 冯铿</p><div class="index-card__badges"><span class="badge">1929-02-24</span><span class="badge">日</span><span class="badge">1 位相关人物</span></div><div class="index-card__meta">1929年2月24日，冯铿抵达上海，当前条目按这一明确可核的来沪时间展示。</div></a></article><article class="index-card" data-search="鲁迅与柔石会面 1929-08-29 北四川路一带 四川北路近多伦路 鲁迅 柔石 公开转录材料可支持1930年3月28日与3月31日相关看屋活动；1929年8月29日与1930年3月30日条目仍需回查《鲁迅日记》原文，不宜强行改写。"><a class="index-card__link" href="events/EVT-00002.html"><div class="index-card__header"><h3>鲁迅与柔石会面</h3><span>1929-08-29</span></div><p class="index-card__summary">北四川路一带 · 鲁迅、柔石</p><div class="index-card__badges"><span class="badge">1929-08-29</span><span class="badge">日</span><span class="badge">2 位相关人物</span></div><div class="index-card__meta">公开转录材料可支持1930年3月28日与3月31日相关看屋活动；1929年8月29日与1930年3月30日条目仍需回查《鲁迅日记》原文，不宜强行改写。</div></a></article><article class="index-card" data-search="鲁迅与柔石会面 1929-08-29 北四川路一带 四川北路近多伦路 鲁迅 柔石 公开转录材料可支持1930年3月28日与3月31日相关看屋活动；1929年8月29日与1930年3月30日条目仍需回查《鲁迅日记》原文，不宜强行改写。"><a class="index-card__link" href="events/EVT-00003.html"><div class="index-card__header"><h3>鲁迅与柔石会面</h3><span>1929-08-29</span></div><p class="index-card__summary">北四川路一带 · 鲁迅、柔石</p><div class="index-card__badges"><span class="badge">1929-08-29</span><span class="badge">日</span><span class="badge">2 位相关人物</span></div><div class="index-card__meta">公开转录材料可支持1930年3月28日与3月31日相关看屋活动；1929年8月29日与1930年3月30日条目仍需回查《鲁迅日记》原文，不宜强行改写。</div></a></article></div>
+    </section>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>静态阅读版基于仓库内标准知识库数据自动生成，适合 GitHub Pages 发布。</p>
+      <p>复杂分析与交互地图已内置于本站，支持关系图谱与事件时间轴在线浏览。</p>
+    </div>
+  </footer>
+</body>
+</html>
