@@ -19,12 +19,53 @@ from styles import ACCENT, BORDER, CHART_FONT, INK, MUTED, PAPER, PAPER_LIGHT, P
 
 
 BASE_DIR = Path(__file__).resolve().parent
-GRAPH_DIR = BASE_DIR / "__pycache__"
+GRAPH_DIR = BASE_DIR / ".graph_cache"
 GRAPH_DIR.mkdir(exist_ok=True)
 
 GLOBAL_RELATION_STATE_KEY = "selected_pair_key"
 DEFAULT_PERSON_NETWORK_LIMIT = 12
 DEFAULT_OVERVIEW_PAIR_LIMIT = 28
+
+
+def _network_options(border_width: float = 1.5, smooth_type: str = "cubicBezier", roundness: float = 0.18, font_size: int = 17) -> str:
+    return f"""
+    {{
+        "layout": {{"randomSeed": 26}},
+        "interaction": {{
+            "hover": true,
+            "tooltipDelay": 90,
+            "hideEdgesOnDrag": false,
+            "navigationButtons": false,
+            "keyboard": false
+        }},
+        "physics": {{"enabled": false}},
+        "nodes": {{
+            "shape": "dot",
+            "borderWidth": {border_width},
+            "borderWidthSelected": 2.2,
+            "shadow": false,
+            "font": {{
+                "face": "{CHART_FONT}",
+                "size": {font_size},
+                "color": "{INK}",
+                "strokeWidth": 0
+            }}
+        }},
+        "edges": {{
+            "shadow": false,
+            "selectionWidth": 0,
+            "hoverWidth": 0.3,
+            "smooth": {{"enabled": true, "type": "{smooth_type}", "roundness": {roundness}}},
+            "font": {{
+                "face": "{CHART_FONT}",
+                "size": {font_size - 5},
+                "color": "{INK}",
+                "background": "rgba(247,240,228,0.92)",
+                "strokeWidth": 0
+            }}
+        }}
+    }}
+    """
 
 
 @dataclass(slots=True)
@@ -469,46 +510,7 @@ def render_network(person_name: str, person_id: str, direct_edges: pd.DataFrame,
         st.caption(f"首屏仅显示最强 {len(display_df)} 位关系对象，避免人物局部网络首次进入即过载。")
 
     net = Network(height="560px", width="100%", bgcolor=PAPER_LIGHT, font_color=INK, cdn_resources="in_line")
-    net.set_options(
-        f"""
-        {{
-            "layout": {{"randomSeed": 26}},
-            "interaction": {{
-                "hover": true,
-                "tooltipDelay": 90,
-                "hideEdgesOnDrag": false,
-                "navigationButtons": false,
-                "keyboard": false
-            }},
-            "physics": {{"enabled": false}},
-            "nodes": {{
-                "shape": "dot",
-                "borderWidth": 1.5,
-                "borderWidthSelected": 2.2,
-                "shadow": false,
-                "font": {{
-                    "face": "{CHART_FONT}",
-                    "size": 17,
-                    "color": "{INK}",
-                    "strokeWidth": 0
-                }}
-            }},
-            "edges": {{
-                "shadow": false,
-                "selectionWidth": 0,
-                "hoverWidth": 0.3,
-                "smooth": {{"enabled": true, "type": "cubicBezier", "roundness": 0.18}},
-                "font": {{
-                    "face": "{CHART_FONT}",
-                    "size": 12,
-                    "color": "{INK}",
-                    "background": "rgba(247,240,228,0.92)",
-                    "strokeWidth": 0
-                }}
-            }}
-        }}
-        """
-    )
+    net.set_options(_network_options(border_width=1.5, smooth_type="cubicBezier", roundness=0.18, font_size=17))
     net.add_node(
         person_id,
         label=person_name,
@@ -593,44 +595,7 @@ def render_relation_overview_network(pair_df: pd.DataFrame, limit_pairs: int = D
     max_weighted_degree = max(weighted_degree.values()) if weighted_degree else 1.0
 
     net = Network(height="580px", width="100%", bgcolor=PAPER_LIGHT, font_color=INK, cdn_resources="in_line")
-    net.set_options(
-        f"""
-        {{
-            "layout": {{"randomSeed": 26}},
-            "interaction": {{
-                "hover": true,
-                "tooltipDelay": 90,
-                "hideEdgesOnDrag": false,
-                "navigationButtons": false,
-                "keyboard": false
-            }},
-            "physics": {{"enabled": false}},
-            "nodes": {{
-                "shape": "dot",
-                "borderWidth": 1.4,
-                "font": {{
-                    "face": "{CHART_FONT}",
-                    "size": 16,
-                    "color": "{INK}",
-                    "strokeWidth": 0
-                }}
-            }},
-            "edges": {{
-                "shadow": false,
-                "selectionWidth": 0,
-                "hoverWidth": 0.3,
-                "smooth": {{"enabled": true, "type": "dynamic", "roundness": 0.12}},
-                "font": {{
-                    "face": "{CHART_FONT}",
-                    "size": 11,
-                    "color": "{INK}",
-                    "background": "rgba(247,240,228,0.92)",
-                    "strokeWidth": 0
-                }}
-            }}
-        }}
-        """
-    )
+    net.set_options(_network_options(border_width=1.4, smooth_type="dynamic", roundness=0.12, font_size=16))
 
     for node_id, attrs in graph.nodes(data=True):
         label = str(attrs.get("label", node_id))

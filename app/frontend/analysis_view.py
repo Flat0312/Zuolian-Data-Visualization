@@ -202,6 +202,15 @@ def load_analysis_bundle(
     return build_research_analysis_bundle(nodes_df, edges_df, events_df)
 
 
+def _render_analysis_row(chart_fn, finding_key: str, note_key: str, fallback_note: str, finding_map: dict, chart_notes: dict) -> None:
+    col_chart, col_note = st.columns([1.2, 0.8])
+    with col_chart:
+        chart_fn()
+    with col_note:
+        evidence = finding_map.get(finding_key).evidence if finding_key in finding_map else "图表与样本数据。"
+        render_analysis_note("发现说明", chart_notes.get(note_key, fallback_note), evidence)
+
+
 def render_analysis(
     nodes_df: pd.DataFrame,
     edges_df: pd.DataFrame,
@@ -218,40 +227,22 @@ def render_analysis(
 
     finding_map = {finding.key: finding for finding in research_bundle.findings}
 
-    row1_chart, row1_note = st.columns([1.2, 0.8])
-    with row1_chart:
-        render_bar(
-            research_bundle.strength_ranking.rename(columns={"关系强度": "关系强度"}),
-            "关系强度",
-            "人物",
-            "核心人物关系强度排名",
-            horizontal=True,
-            color=PRIMARY,
-        )
-    with row1_note:
-        evidence = finding_map.get("core_node").evidence if "core_node" in finding_map else "图表与样本数据。"
-        render_analysis_note("发现说明", research_bundle.chart_notes.get("strength", "当前样本尚未形成核心节点判断。"), evidence)
-
-    row2_chart, row2_note = st.columns([1.2, 0.8])
-    with row2_chart:
-        render_bar(research_bundle.relation_distribution, "关系类型", "记录数", "不同关系类型分布", color=ACCENT)
-    with row2_note:
-        evidence = finding_map.get("dominant_relation").evidence if "dominant_relation" in finding_map else "图表与样本数据。"
-        render_analysis_note("发现说明", research_bundle.chart_notes.get("relation", "当前样本尚未形成关系类型判断。"), evidence)
-
-    row3_chart, row3_note = st.columns([1.2, 0.8])
-    with row3_chart:
-        render_stage_chart(research_bundle.stage_counts, "各时期事件数量变化")
-    with row3_note:
-        evidence = finding_map.get("active_period").evidence if "active_period" in finding_map else "图表与样本数据。"
-        render_analysis_note("发现说明", research_bundle.chart_notes.get("period", "当前样本尚未形成时期变化判断。"), evidence)
-
-    row4_chart, row4_note = st.columns([1.2, 0.8])
-    with row4_chart:
-        render_centrality_chart(research_bundle.centrality_compare, "关键人物网络中心性对比")
-    with row4_note:
-        evidence = finding_map.get("bridge_actor").evidence if "bridge_actor" in finding_map else "图表与样本数据。"
-        render_analysis_note("发现说明", research_bundle.chart_notes.get("centrality", "当前样本尚未形成桥梁人物判断。"), evidence)
+    _render_analysis_row(
+        lambda: render_bar(research_bundle.strength_ranking, "关系强度", "人物", "核心人物关系强度排名", horizontal=True, color=PRIMARY),
+        "core_node", "strength", "当前样本尚未形成核心节点判断。", finding_map, research_bundle.chart_notes,
+    )
+    _render_analysis_row(
+        lambda: render_bar(research_bundle.relation_distribution, "关系类型", "记录数", "不同关系类型分布", color=ACCENT),
+        "dominant_relation", "relation", "当前样本尚未形成关系类型判断。", finding_map, research_bundle.chart_notes,
+    )
+    _render_analysis_row(
+        lambda: render_stage_chart(research_bundle.stage_counts, "各时期事件数量变化"),
+        "active_period", "period", "当前样本尚未形成时期变化判断。", finding_map, research_bundle.chart_notes,
+    )
+    _render_analysis_row(
+        lambda: render_centrality_chart(research_bundle.centrality_compare, "关键人物网络中心性对比"),
+        "bridge_actor", "centrality", "当前样本尚未形成桥梁人物判断。", finding_map, research_bundle.chart_notes,
+    )
 
     st.markdown("### 研究发现")
     render_research_finding_cards(research_bundle.findings)

@@ -7,6 +7,7 @@ import pandas as pd
 import streamlit as st
 
 from data_paths import candidate_data_dirs, format_candidate_paths, resolve_data_dir
+from utils import clean_text, split_ids
 
 
 @dataclass(frozen=True, slots=True)
@@ -15,23 +16,6 @@ class LoadedData:
     edges: pd.DataFrame
     events: pd.DataFrame
     data_dir: str
-
-
-def clean_text(value: object, limit: int = 120) -> str:
-    if value is None:
-        return ""
-    if isinstance(value, float) and pd.isna(value):
-        return ""
-    text = " ".join(str(value).split())
-    return text if len(text) <= limit else f"{text[:limit].rstrip()}..."
-
-
-def split_ids(value: object) -> list[str]:
-    if value is None:
-        return []
-    if isinstance(value, float) and pd.isna(value):
-        return []
-    return [item.strip() for item in str(value).split(";") if item.strip()]
 
 
 def match(series: pd.Series, query: str) -> pd.Series:
@@ -60,6 +44,10 @@ def standardized_data_exists(data_dir: Path) -> bool:
         "sources.csv",
     ]
     return all((data_dir / filename).exists() for filename in required)
+
+
+def _fill_from_place(df: pd.DataFrame, col: str, place_map: dict) -> pd.Series:
+    return df[col].where(df[col].astype(str).str.strip() != "", df["place_id"].map(place_map).fillna(""))
 
 
 def load_standardized_views(data_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
@@ -143,26 +131,16 @@ def load_standardized_views(data_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame,
     events["Timestamp"] = events.get("event_date", "")
     events["Hist_Loc"] = events.get("historical_location", "")
     events["Current_Loc"] = events.get("current_address", "")
-    if "place_id" in events.columns:
-        events["Hist_Loc"] = events["Hist_Loc"].where(
-            events["Hist_Loc"].astype(str).str.strip() != "",
-            events["place_id"].map(place_hist_map).fillna(""),
-        )
-        events["Current_Loc"] = events["Current_Loc"].where(
-            events["Current_Loc"].astype(str).str.strip() != "",
-            events["place_id"].map(place_current_map).fillna(""),
-        )
     events["Longitude"] = events.get("longitude", "")
     events["Latitude"] = events.get("latitude", "")
     if "place_id" in events.columns:
-        events["Longitude"] = events["Longitude"].where(
-            events["Longitude"].astype(str).str.strip() != "",
-            events["place_id"].map(place_lon_map).fillna(""),
-        )
-        events["Latitude"] = events["Latitude"].where(
-            events["Latitude"].astype(str).str.strip() != "",
-            events["place_id"].map(place_lat_map).fillna(""),
-        )
+        for col, place_map in [
+            ("Hist_Loc", place_hist_map),
+            ("Current_Loc", place_current_map),
+            ("Longitude", place_lon_map),
+            ("Latitude", place_lat_map),
+        ]:
+            events[col] = _fill_from_place(events, col, place_map)
     events["Event"] = events.get("event_name", "")
 
     required_columns = [

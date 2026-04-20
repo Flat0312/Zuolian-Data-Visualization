@@ -9,13 +9,14 @@ from typing import Any
 
 import pandas as pd
 
+from utils import clean_text, split_ids
+
 DATE_CN_RE = re.compile(r"((?:18|19|20)\d{2})年(\d{1,2})月(\d{1,2})日")
 DATE_ISO_RE = re.compile(r"((?:18|19|20)\d{2})-(\d{1,2})-(\d{1,2})(?:\s+\d{1,2}:\d{1,2}:\d{1,2})?")
 YEAR_MONTH_CN_RE = re.compile(r"((?:18|19|20)\d{2})年(\d{1,2})月")
 YEAR_CN_RE = re.compile(r"((?:18|19|20)\d{2})年")
 YEAR_RANGE_RE = re.compile(r"((?:18|19|20)\d{2})\s*[-—–~～至到]+\s*((?:18|19|20)\d{2})年?")
-PAGE_HEADER_RE = re.compile(r"第\s*(\d+)\s*页")
-PAGE_CITATION_RE = re.compile(r"第\s*(\d+)\s*页")
+PAGE_RE = re.compile(r"第\s*(\d+)\s*页")
 LEFT_WING_SOURCE_TITLES = {"左联词典", "左联史", "左联回忆录"}
 LEFT_WING_PERIOD_LABEL = "左联时期（1930-03-02 至 1936年初）"
 LEFT_WING_PERIOD_START = "1930-03-02"
@@ -29,10 +30,7 @@ def canonical_pair_key(person_a_id: str, person_b_id: str) -> str:
     return "__".join(sorted((str(person_a_id), str(person_b_id))))
 
 
-def _clean(value: object) -> str:
-    if value is None or (isinstance(value, float) and pd.isna(value)):
-        return ""
-    return " ".join(str(value).replace("\r", " ").split())
+_clean = clean_text
 
 
 def _unique(values: list[str]) -> list[str]:
@@ -217,7 +215,7 @@ def _parse_paged_txt(path: Path) -> dict[int, str]:
     if not path.exists():
         return {}
     for raw_line in path.read_text(encoding="utf-8").splitlines():
-        match = PAGE_HEADER_RE.search(raw_line)
+        match = PAGE_RE.search(raw_line)
         if match:
             current_page = int(match.group(1))
             pages.setdefault(current_page, [])
@@ -261,7 +259,7 @@ def _extract_time_hint_from_citation_pages(base_dir: Path, citation_ref: str) ->
         for source_title, pages in page_index.items():
             if source_title not in citation:
                 continue
-            page_match = PAGE_CITATION_RE.search(citation)
+            page_match = PAGE_RE.search(citation)
             if not page_match:
                 continue
             page_number = int(page_match.group(1))

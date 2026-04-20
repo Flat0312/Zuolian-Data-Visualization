@@ -11,7 +11,6 @@ from event_view import load_historical_map_bundle, render_events
 from relation_view import (
     GLOBAL_RELATION_STATE_KEY,
     build_pair_profile_index,
-    filter_edges_for_display,
     load_relation_detail_bundle,
     render_home,
     render_people,
@@ -51,16 +50,6 @@ def sync_page_from_widget() -> None:
 
 def visible_edges(data: LoadedData) -> pd.DataFrame:
     return data.edges[data.edges["Display_Status"].astype(str) != "hidden"].copy()
-
-
-def relation_details_for_selection(
-    nodes_df: pd.DataFrame,
-    edges_df: pd.DataFrame,
-    selected_pair_key: str | None,
-) -> dict:
-    if not selected_pair_key:
-        return {}
-    return load_relation_detail_bundle(nodes_df, edges_df)
 
 
 def pair_summary_from_profiles(pair_profiles: dict) -> pd.DataFrame:
@@ -133,12 +122,13 @@ def main() -> None:
     page = render_sidebar(data, visible_edges_df)
     selected_pair_key = st.session_state.get(GLOBAL_RELATION_STATE_KEY)
 
+    pair_profiles = build_pair_profile_index(visible_edges_df)
+    relation_details = load_relation_detail_bundle(data.nodes, visible_edges_df) if selected_pair_key else {}
+
     if page == "首页":
         page_loading_hint = st.empty()
         page_loading_hint.info("正在准备首页关系索引...")
-        pair_profiles = build_pair_profile_index(visible_edges_df)
         home_pairs = pair_summary_from_profiles(pair_profiles)
-        relation_details = relation_details_for_selection(data.nodes, visible_edges_df, selected_pair_key)
         page_loading_hint.empty()
         render_home(
             nodes_df=data.nodes,
@@ -153,8 +143,6 @@ def main() -> None:
         return
 
     if page == "人物档案":
-        pair_profiles = build_pair_profile_index(visible_edges_df)
-        relation_details = relation_details_for_selection(data.nodes, visible_edges_df, selected_pair_key)
         historical_event_frame, historical_event_index, historical_geojson = load_historical_map_bundle(
             Path(data.data_dir),
             data.nodes,
@@ -175,8 +163,6 @@ def main() -> None:
         return
 
     if page == "关系总览":
-        pair_profiles = build_pair_profile_index(visible_edges_df)
-        relation_details = relation_details_for_selection(data.nodes, visible_edges_df, selected_pair_key)
         render_relations(
             edges_df=visible_edges_df,
             pair_profiles=pair_profiles,

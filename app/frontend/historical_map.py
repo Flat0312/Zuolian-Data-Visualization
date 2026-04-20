@@ -8,16 +8,7 @@ from typing import Any
 
 import pandas as pd
 
-
-def _clean(value: object) -> str:
-    if value is None or (isinstance(value, float) and pd.isna(value)):
-        return ""
-    return " ".join(str(value).replace("\r", " ").split())
-
-
-def _split_ids(value: object) -> list[str]:
-    text = _clean(value)
-    return [item.strip() for item in text.split(";") if item.strip()]
+from utils import clean_text as _clean, split_ids as _split_ids
 
 
 def _to_float(value: object) -> float | None:

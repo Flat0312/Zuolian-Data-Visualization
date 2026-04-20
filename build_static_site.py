@@ -27,13 +27,17 @@ ASSET_FILES = (
 )
 
 
-def text(value: object, fallback: str = "") -> str:
+def text(value: object, fallback: str = "", limit: int = 0) -> str:
     if value is None:
         return fallback
     if isinstance(value, float) and pd.isna(value):
         return fallback
     cleaned = " ".join(str(value).split())
-    return cleaned or fallback
+    if not cleaned:
+        return fallback
+    if limit and len(cleaned) > limit:
+        return f"{cleaned[:limit].rstrip()}..."
+    return cleaned
 
 
 def split_ids(value: object) -> list[str]:
@@ -978,7 +982,7 @@ def build_search_index(
 def build_timeline_data(event_records: list[dict]) -> list[dict]:
     items = []
     for ev in event_records:
-        date = text(ev.get("event_date") or ev.get("date", ""))
+        date = text(ev.get("date", ""))
         if not date:
             continue
         year = extract_year(date)
