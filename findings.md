@@ -1,0 +1,41 @@
+# Findings - 左联知识库
+
+> 记录当前可复用的数据观察。历史快照与阶段细节见 `research/drafts/reports/`。
+
+## 当前数据快照
+
+| 表 | 行数 |
+| --- | ---: |
+| `persons.csv` | 162 |
+| `person_relations.csv` | 4238 |
+| `events.csv` | 150 |
+| `places.csv` | 41 |
+| `organizations.csv` | 36 |
+| `org_memberships.csv` | 150 |
+| `org_membership_evidences.csv` | 581 |
+| `fact_evidences.csv` | 594 |
+| `event_participants.csv` | 228 |
+| `sources.csv` | 1153 |
+
+## 已确认观察
+
+- 组织身份已从人物角色自动推断改为证据驱动判定：45 名正式成员、77 名候选人物、28 名相关人物。
+- 组织身份事实级证据覆盖率为 100%，但事件存在覆盖率仅 2.7%，人物生卒年和角色仍缺少事实级证据。
+- 4238 条人物关系中，1974 条为 critical 风险，关系研究结论必须结合人工审核与证据等级解释。
+- 网络包含 41 个连通分量；最大连通分量为 57 人。中心性结果可能受到资料收集偏差影响，不能直接等同于历史重要性。
+- 事件与地点审核队列共 165 条，说明现有数据可用于研究探索，但仍需要持续人工复核。
+
+## 关键路径
+
+- 应用入口：`app.py` -> `app/frontend/app.py`
+- 研究主数据：`data/processed/`
+- 展示发布数据：`data/publish/`
+- 数据构建与分析脚本：`research/analysis/`
+- 阶段报告与审核队列：`research/drafts/reports/`
+- 静态站生成器：`build_static_site.py`
+
+## 待验证问题
+
+- 人工审核后的关系总体准确率与各风险层准确率。
+- 正式成员、相关人物和候选人物在网络位置上的差异是否具有稳健性。
+- 降低低等级来源权重后，中心性与社区发现结论是否稳定。

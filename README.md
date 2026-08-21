@@ -30,6 +30,13 @@
 2. 让数据可被程序稳定读取（唯一生产数据源，统一字段约束）。
 3. 用 Streamlit 提供研究导向的交互界面（人物档案、关系总览、事件地图、统计分析）。
 
+组织身份采用证据台账驱动判定。`org_membership_evidences.csv` 保存可定位材料，
+`org_memberships.csv` 保存由证据规则生成的正式成员、相关人士、候选与争议结论；
+人物角色不再自动等同于左联正式成员身份。
+
+`fact_evidences.csv` 是跨领域事实证据总表。它记录具体事实的主体、谓词、来源、
+定位与摘录；实体表中的 `source_ids` 仅表示关联来源，不等同于具体事实已经获得证实。
+
 如果你希望这个项目像一个完整产品而不是一次性脚本集合，这个仓库就是对应的工程版本。
 
 ---
@@ -53,14 +60,28 @@
 
 | 数据表 | 记录数 |
 | --- | ---: |
-| `persons.csv` | 150 |
+| `persons.csv` | 162 |
 | `person_relations.csv` | 4238 |
-| `events.csv` | 279 |
-| `places.csv` | 86 |
-| `organizations.csv` | 3 |
+| `events.csv` | 150 |
+| `places.csv` | 41 |
+| `organizations.csv` | 36 |
 | `org_memberships.csv` | 150 |
-| `event_participants.csv` | 371 |
-| `sources.csv` | 1130 |
+| `org_membership_evidences.csv` | 581 |
+| `fact_evidences.csv` | 594 |
+| `event_participants.csv` | 228 |
+| `sources.csv` | 1153 |
+
+---
+
+## 🎨 设计语言
+
+界面采用 **Notion × Claude 混合风格**：
+
+- **Notion 暖色极简**：纯净暖白底色 `#FAFAF8`，极细边框，大留白，衬线正文营造阅读感。
+- **Claude 赭石强调**：主色 `#C87941` 贯穿交互元素（选中态、链接、指标数字），沉稳而不沉闷。
+- **双字体体系**：正文使用 Noto Serif SC（衬线，阅读舒适），UI 标签使用 Inter（无衬线，信息清晰）。
+
+静态站（GitHub Pages）与 Streamlit 应用共享同一套设计令牌。
 
 ---
 
@@ -108,22 +129,26 @@ flowchart LR
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ### 2. 🖥️ 启动应用
 
-安装完依赖后，只需在仓库根目录执行一条命令，不需要再 `cd` 到子目录。
+安装完依赖后，在仓库根目录直接运行：
 
 ```bash
-streamlit run app.py
+python -m streamlit run app.py
 ```
 
-如果你在 Windows PowerShell 下，也可以直接运行：
+启动成功后，浏览器打开 `http://localhost:8501`。
+
+如果系统已安装 PowerShell 7，且允许执行本地 PowerShell 脚本，也可以运行：
 
 ```powershell
-.\start.ps1
+pwsh ./tasks.ps1 run
 ```
+
+若提示“`pwsh` 无法识别”或“禁止运行脚本”，请使用上面的 `python -m streamlit run app.py`，无需修改系统执行策略。
 
 ### 2.5. 📚 生成静态阅读版（GitHub Pages）
 
@@ -151,6 +176,13 @@ python build_standard_kb_pipeline.py
 ```
 
 直接浏览知识库前台不需要配置任何环境变量；只要仓库内的标准数据文件存在，就可以本地启动和查看。
+
+### 4. ✅ 测试与基线检查
+
+```bash
+python -m ruff check app.py build_static_site.py kb_schema.py app research/analysis
+python -m pytest
+```
 
 ---
 
@@ -230,13 +262,15 @@ OPENAI_MODEL=gpt-4o
 
 ---
 
-## 🗓️ 近期进展与下一步
+## 🗓️ 当前进展与收尾重点
 
-- ✅ 已完成：仓库产品化重构（README、License、忽略策略、CI 冒烟检查）。
-- ✅ 已完成：API Key 去硬编码，改为环境变量注入。
-- ✅ 已完成：标准知识库数据入库（`data/processed`）。
-- 🔜 下一步：补充真实应用操作录屏并替换当前演示动图。
-- 🔜 下一步：增加“按人物/事件检索”的在线 demo 链接。
+- ✅ 已完成：证据驱动的组织身份重建、事实证据层、研究层与发布层分离。
+- ✅ 已完成：事件地点质量治理、人物关系分层抽样和基础网络分析。
+- ✅ 已完成：标准知识库、Streamlit 应用与 GitHub Pages 静态阅读版。
+- 🔜 收尾重点：完成 400 条人物关系人工判定，并生成准确率与错误分析。
+- 🔜 收尾重点：形成至少 3 项可复核研究发现，完成答辩 PPT 与 5 分钟演示脚本。
+
+详细状态、验收命令和剩余任务见 [`task_plan.md`](task_plan.md)。
 
 ---
 
