@@ -7,7 +7,7 @@ on:
     branches: ["main"]
 
 jobs:
-  compile:
+  quality:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,5 +18,17 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Bytecode compile
-        run: python -m compileall .
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Lint
+        shell: pwsh
+        run: ./tasks.ps1 lint
+
+      - name: Test
+        shell: pwsh
+        run: ./tasks.ps1 test
+
+      - name: Build static site
+        shell: pwsh
+        run: ./tasks.ps1 build-static

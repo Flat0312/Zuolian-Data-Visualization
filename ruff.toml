@@ -1,0 +1,25 @@
+﻿# Ruff configuration for 左联知识库
+target-version = "py312"
+line-length = 120
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "W",    # pycodestyle warnings
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "SIM108", # ternary operator (readability preference)
+]
+
+[lint.per-file-ignores]
+"research/analysis/*" = ["E741"]  # ambiguous variable names in research scripts
+
+[format]
+quote-style = "preserve"
+indent-style = "space"
