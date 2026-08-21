@@ -18,7 +18,19 @@ ignore = [
 ]
 
 [lint.per-file-ignores]
-"research/analysis/*" = ["E741"]  # ambiguous variable names in research scripts
+"research/analysis/*" = [
+    "E741",   # ambiguous variable names in research scripts
+    "B905",   # zip without strict= (historical research scripts, not in runtime path)
+    "UP031",  # printf-style formatting (historical)
+    "E402",   # module import not at top (sys.path setup in scripts)
+    "F841",   # unused variable (historical)
+    "E701",   # multiple statements on one line (historical)
+    "E722",   # bare except (historical)
+    "B007",   # unused loop control variable (historical)
+    "SIM103", # needless bool (historical)
+    "SIM105", # suppressible exception (historical)
+    "SIM118", # in dict keys (historical)
+]
 
 [format]
 quote-style = "preserve"

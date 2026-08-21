@@ -9,12 +9,13 @@ write_back_to_xlsx.py
 """
 
 import re
-import zipfile
 import xml.etree.ElementTree as ET
-import pandas as pd
+import zipfile
 from pathlib import Path
+
+import pandas as pd
 from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 # ────────────────────────────────────────────────────────────
@@ -43,9 +44,8 @@ def cell_value(elem) -> str:
 
 
 def read_sheet_xml(xlsx_path: Path, sheet_xml: str) -> pd.DataFrame:
-    with zipfile.ZipFile(xlsx_path) as z:
-        with z.open(sheet_xml) as f:
-            root = ET.parse(f).getroot()
+    with zipfile.ZipFile(xlsx_path) as z, z.open(sheet_xml) as f:
+        root = ET.parse(f).getroot()
 
     rows = []
     for row_elem in root.findall(".//main:sheetData/main:row", _NS):

@@ -15,12 +15,13 @@ extract_context.py
 ════════════════════════════════════════════════════════════
 """
 
-import re
 import json
-import zipfile
+import re
 import xml.etree.ElementTree as ET
-import pandas as pd
+import zipfile
 from pathlib import Path
+
+import pandas as pd
 
 # ────────────────────────────────────────────────────────────
 # 路径配置
@@ -111,9 +112,8 @@ def cell_value(elem) -> str:
 
 
 def read_sheet1(xlsx_path: Path) -> pd.DataFrame:
-    with zipfile.ZipFile(xlsx_path) as z:
-        with z.open("xl/worksheets/sheet1.xml") as f:
-            root = ET.parse(f).getroot()
+    with zipfile.ZipFile(xlsx_path) as z, z.open("xl/worksheets/sheet1.xml") as f:
+        root = ET.parse(f).getroot()
     rows = root.findall(".//main:sheetData/main:row", _NS)
     headers = [cell_value(c) for c in rows[0].findall("main:c", _NS)]
     data = []

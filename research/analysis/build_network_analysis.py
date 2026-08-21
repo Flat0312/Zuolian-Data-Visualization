@@ -1,8 +1,10 @@
 """Phase 6: Social network analysis."""
 from __future__ import annotations
-import pandas as pd
-from pathlib import Path
+
 import json
+from pathlib import Path
+
+import pandas as pd
 
 DATA_DIR = Path(r"D:/1大创/左联知识库项目/data/processed")
 REPORT_DIR = Path(r"D:/1大创/左联知识库项目/research/drafts/reports")

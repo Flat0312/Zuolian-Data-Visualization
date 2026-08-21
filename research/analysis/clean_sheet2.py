@@ -15,10 +15,11 @@ clean_sheet2.py
 """
 
 import re
-import zipfile
 import xml.etree.ElementTree as ET
-import pandas as pd
+import zipfile
 from pathlib import Path
+
+import pandas as pd
 
 # ─────────────────────────────────────────────
 # 0. 路径配置
@@ -48,9 +49,8 @@ def read_sheet_xml(xlsx_path: Path, sheet_xml_path: str) -> pd.DataFrame:
         v = cell_elem.find("main:v", NS)
         return v.text if v is not None else ""
 
-    with zipfile.ZipFile(xlsx_path, "r") as z:
-        with z.open(sheet_xml_path) as f:
-            root = ET.parse(f).getroot()
+    with zipfile.ZipFile(xlsx_path, "r") as z, z.open(sheet_xml_path) as f:
+        root = ET.parse(f).getroot()
 
     rows_data = []
     for row_elem in root.findall(".//main:sheetData/main:row", NS):

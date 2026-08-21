@@ -10,7 +10,6 @@ from pathlib import Path
 import fitz
 from rapidocr_onnxruntime import RapidOCR
 
-
 PAGE_SOURCES = {"左联史", "左联词典"}
 
 RELATION_HINTS = {
@@ -87,7 +86,7 @@ class ProjectPaths:
     memoir_cache_json: Path
 
     @classmethod
-    def discover(cls, root: Path) -> "ProjectPaths":
+    def discover(cls, root: Path) -> ProjectPaths:
         research_dir = root / "research"
         raw_text_dir = research_dir / "raw_texts"
         extracted_dir = research_dir / "intermediate" / "extracted"

@@ -4,12 +4,11 @@ import argparse
 import json
 import shutil
 from collections import Counter, defaultdict
+from collections.abc import Iterable
 from html import escape
 from pathlib import Path
-from typing import Iterable
 
 import pandas as pd
-
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 DATA_DIR = PROJECT_ROOT / "data" / "publish"

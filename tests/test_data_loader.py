@@ -17,7 +17,8 @@ def test_load_data_raises_contract_error_for_invalid_standard_data(sandbox_tmp_p
     sources.loc[0, "evidence_strength"] = ""
     sources.to_csv(sources_path, index=False, encoding="utf-8-sig")
 
-    from data_loader import DataContractError, load_data
+    from data_loader import load_data
+    from kb_schema import DataContractError
 
     with pytest.raises(DataContractError) as exc_info:
         load_data(app_dir)

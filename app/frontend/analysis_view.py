@@ -5,7 +5,6 @@ from html import escape
 import altair as alt
 import pandas as pd
 import streamlit as st
-
 from relation_view import filter_edges_for_display
 from research_findings import ResearchFinding, build_research_analysis_bundle
 from styles import ACCENT, BORDER, CHART_FONT, INK, MUTED, PAPER_LIGHT, PRIMARY, RULE, UMBER

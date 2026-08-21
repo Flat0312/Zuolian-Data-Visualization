@@ -1,5 +1,6 @@
-import pandas as pd
 import re
+
+import pandas as pd
 
 # ── 1. 加载数据 ──
 INPUT = '数据/输出结果/《左联相关档案资源目录》.xlsx'
@@ -123,18 +124,19 @@ print(f"去重: {before_dedup} -> {len(df)}")
 df['序号'] = range(1, len(df) + 1)
 
 # ── 8. 统计结果 ──
-print(f"\n=== 处理后统计 ===")
+print("\n=== 处理后统计 ===")
 print(f"总行数: {len(df)}")
-print(f"\nRelation_Type 分布:")
+print("\nRelation_Type 分布:")
 print(df['Relation_Type'].value_counts().to_string())
-print(f"\nWeight 分布:")
+print("\nWeight 分布:")
 print(df['Weight'].value_counts().sort_index().to_string())
 
 # ── 9. 保存 ──
-from openpyxl import load_workbook
-
 # 先复制原文件
 import shutil
+
+from openpyxl import load_workbook
+
 shutil.copy2(INPUT, OUTPUT)
 
 # 用 openpyxl 打开并替换 Sheet2

@@ -9,14 +9,12 @@ import networkx as nx
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
-from pyvis.network import Network
-
 from data_loader import clean_text, match, show, split_ids
 from event_view import render_event_detail, render_event_map
 from historical_map import HistoricalEvent
+from pyvis.network import Network
 from relation_evidence import RelationDetail, build_relation_detail_index, canonical_pair_key
-from styles import ACCENT, BORDER, CHART_FONT, INK, MUTED, PAPER, PAPER_LIGHT, PRIMARY, UMBER, asset_uri
-
+from styles import ACCENT, BORDER, CHART_FONT, INK, PAPER, PAPER_LIGHT, PRIMARY, UMBER
 
 BASE_DIR = Path(__file__).resolve().parent
 GRAPH_DIR = BASE_DIR / ".graph_cache"
@@ -219,8 +217,8 @@ def _resolved_llm_reason(row: pd.Series) -> str:
 
 
 def _resolved_llm_confidence(row: pd.Series) -> float | None:
-    for field in ("llm_confidence", "LLM_Confidence", "confidence"):
-        confidence = _parse_confidence(row.get(field))
+    for field_name in ("llm_confidence", "LLM_Confidence", "confidence"):
+        confidence = _parse_confidence(row.get(field_name))
         if confidence is not None:
             return confidence
     return None
@@ -831,7 +829,7 @@ def render_relation_detail_panel(
 
     evidence_types = [item.relation_type for item in detail.evidence_samples if item.relation_type]
     evidence_strengths = list(
-        dict.fromkeys([(item.evidence_strength or "未标注") for item in detail.evidence_samples if item.evidence_strength or "未标注"])
+        dict.fromkeys([(item.evidence_strength or "未标注") for item in detail.evidence_samples])
     )
     evidence_filter_options = list(dict.fromkeys(relation_types + evidence_types))
     control_a, control_b, control_c = st.columns([1.1, 1.0, 0.9])
@@ -935,7 +933,7 @@ def render_home(
         ("03 空间扩展", "事件地图", "查看活动地点、事件聚集与空间迁移线索。", "进入事件地图"),
         ("04 结项总结", "统计分析", "把关系结构和事件阶段收束为研究发现。", "进入统计分析"),
     ]
-    for column, (kicker, target_page, body, button_label) in zip(st.columns(4), route_specs):
+    for column, (kicker, target_page, body, button_label) in zip(st.columns(4), route_specs, strict=False):
         with column:
             st.markdown(
                 f"""

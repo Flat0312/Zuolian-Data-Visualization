@@ -4,7 +4,6 @@ import runpy
 import sys
 from pathlib import Path
 
-
 APP_DIR = Path(__file__).resolve().parent / "app" / "frontend"
 APP_ENTRY = APP_DIR / "app.py"
 

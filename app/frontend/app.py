@@ -4,8 +4,6 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
-
-from kb_schema import DataContractError
 from analysis_view import render_analysis
 from data_loader import LoadedData, load_data
 from event_view import load_historical_map_bundle, render_events
@@ -19,6 +17,7 @@ from relation_view import (
 )
 from styles import BASE_DIR, apply_style
 
+from kb_schema import DataContractError
 
 PAGE_STATE_KEY = "page_nav"
 PAGE_WIDGET_KEY = "page_nav_widget"

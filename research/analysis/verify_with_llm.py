@@ -2,11 +2,12 @@
 左联知识图谱数据可靠性验证脚本
 通过 GPT-4 API 对 Sheet2（关系）和 Sheet3（时空）数据进行事实核查
 """
-import pandas as pd
 import json
-import time
-import re
 import os
+import re
+import time
+
+import pandas as pd
 from openai import OpenAI
 
 # ══════════════════════════════════════════════════════════

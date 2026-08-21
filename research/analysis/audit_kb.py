@@ -4,13 +4,11 @@ import argparse
 import sys
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from kb_schema import REQUIRED_DATA_FILES, issues_to_frame, validate_data_dir
-
 
 DEFAULT_DATA_DIR = PROJECT_ROOT / "data" / "processed"
 DEFAULT_REPORT_DIR = PROJECT_ROOT / "research" / "drafts" / "reports"

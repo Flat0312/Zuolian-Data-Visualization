@@ -10,7 +10,6 @@ from typing import Any
 
 import pandas as pd
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 KB_DIR = PROJECT_ROOT / "data" / "processed"
 OUTPUT_FILE = KB_DIR / "event_evidences.json"
@@ -385,7 +384,7 @@ def title_hit(variants: list[str], candidate_norm: str) -> bool:
 
 
 def make_evidence_id(event_id: str, source_id: str, match_rule: str) -> str:
-    digest = hashlib.sha1(f"{event_id}|{source_id}|{match_rule}".encode("utf-8")).hexdigest()[:10]
+    digest = hashlib.sha1(f"{event_id}|{source_id}|{match_rule}".encode()).hexdigest()[:10]
     return f"EVI-{digest.upper()}"
 
 

@@ -8,10 +8,11 @@ correct_relations.py
 ────────────────────────────────────────────────────────────
 """
 
-import zipfile
 import xml.etree.ElementTree as ET
-import pandas as pd
+import zipfile
 from pathlib import Path
+
+import pandas as pd
 
 # ─────────────────────────────────────────────
 # 路径配置
@@ -36,9 +37,8 @@ def read_sheet_xml(xlsx_path: Path, sheet_xml_path: str) -> pd.DataFrame:
         v = cell_elem.find("main:v", NS)
         return v.text if v is not None else ""
 
-    with zipfile.ZipFile(xlsx_path, "r") as z:
-        with z.open(sheet_xml_path) as f:
-            root = ET.parse(f).getroot()
+    with zipfile.ZipFile(xlsx_path, "r") as z, z.open(sheet_xml_path) as f:
+        root = ET.parse(f).getroot()
 
     rows_data = []
     for row_elem in root.findall(".//main:sheetData/main:row", NS):
@@ -160,7 +160,7 @@ df_relations["Relation_Type"] = df_relations["Relation_Type"].apply(
 after_bare_kinship  = (df_relations["Relation_Type"].str.strip() == "亲属").sum()
 after_weak_kinship  = (df_relations["Relation_Type"].str.strip() == "弱关联-亲属").sum()
 
-print(f"\n[修正统计]")
+print("\n[修正统计]")
 print(f"  裸写「亲属」修正：{before_bare_kinship} -> {after_bare_kinship} 条")
 print(f"  「弱关联-亲属」保留：{before_weak_kinship} -> {after_weak_kinship} 条")
 print(f"  裸写「组织隶属」补全为「强关联-组织隶属」：{before_bare_org} 条")

@@ -1,6 +1,7 @@
-import pandas as pd
 import re
 from collections import OrderedDict
+
+import pandas as pd
 
 # ══════════════════════════════════════════════════════════
 # 配置
@@ -193,7 +194,7 @@ for idx, row in df2.iterrows():
 
     for date in dates:
         for loc in locs:
-            loc_info = LOCATION_DB.get(loc, None)
+            loc_info = LOCATION_DB.get(loc)
             if loc_info:
                 current = loc_info['current']
                 coord = loc_info['coord']
@@ -239,17 +240,17 @@ print(f"去重后: {len(combined_df)} 行")
 # ══════════════════════════════════════════════════════════
 # 统计
 # ══════════════════════════════════════════════════════════
-print(f"\n=== 统计 ===")
+print("\n=== 统计 ===")
 print(f"总行数: {len(combined_df)}")
 print(f"涉及实体数: {combined_df['Entity_ID'].nunique()}")
-print(f"\n时间分布:")
+print("\n时间分布:")
 combined_df['_year'] = combined_df['Timestamp'].str[:4]
 print(combined_df['_year'].value_counts().sort_index().to_string())
-print(f"\n地点分布 (前15):")
+print("\n地点分布 (前15):")
 print(combined_df['Hist_Loc'].value_counts().head(15).to_string())
-print(f"\n事件类型分布:")
+print("\n事件类型分布:")
 print(combined_df['Event'].value_counts().to_string())
-print(f"\n实体分布 (前10):")
+print("\n实体分布 (前10):")
 id_to_name = dict(zip(df1['Entity_ID'], df1['True_Name']))
 entity_counts = combined_df['Entity_ID'].value_counts().head(10)
 for eid, cnt in entity_counts.items():
@@ -268,10 +269,12 @@ if warnings:
 # 保存
 # ══════════════════════════════════════════════════════════
 import shutil
+
 if INPUT != OUTPUT:
     shutil.copy2(INPUT, OUTPUT)
 
 from openpyxl import load_workbook
+
 wb = load_workbook(OUTPUT)
 if 'Sheet3' in wb.sheetnames:
     del wb['Sheet3']

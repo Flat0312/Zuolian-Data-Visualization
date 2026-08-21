@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-
 from utils import clean_text, split_ids
 
 DATE_CN_RE = re.compile(r"((?:18|19|20)\d{2})年(\d{1,2})月(\d{1,2})日")
@@ -347,7 +346,7 @@ class EvidenceRecord:
     evidence_strength: str = "未标注"
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "EvidenceRecord":
+    def from_dict(cls, data: dict[str, Any]) -> EvidenceRecord:
         return cls(
             evidence_id=_clean(data.get("evidence_id")),
             relation_type=_clean(data.get("relation_type")),
@@ -387,7 +386,7 @@ class RelationDetail:
         return len(self.evidence_samples)
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "RelationDetail":
+    def from_dict(cls, data: dict[str, Any]) -> RelationDetail:
         relation = cls(
             relation_id=_clean(data.get("relation_id")) or canonical_pair_key(data.get("person_a_id", ""), data.get("person_b_id", "")),
             pair_key=_clean(data.get("pair_key")) or canonical_pair_key(data.get("person_a_id", ""), data.get("person_b_id", "")),

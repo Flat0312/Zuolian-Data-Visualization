@@ -5,10 +5,10 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
-
-from kb_schema import DataContractError, REQUIRED_DATA_FILES, ensure_valid_data_dir
 from data_paths import candidate_data_dirs, format_candidate_paths, resolve_data_dir
 from utils import clean_text, split_ids
+
+from kb_schema import REQUIRED_DATA_FILES, ensure_valid_data_dir
 
 
 @dataclass(frozen=True, slots=True)

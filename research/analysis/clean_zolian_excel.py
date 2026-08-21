@@ -3,15 +3,15 @@ from __future__ import annotations
 import csv
 import re
 from collections import defaultdict
+from collections.abc import Iterable
 from copy import copy
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font
-
 
 TARGET_BASENAME = "《左联相关档案资源目录》.xlsx"
 OUTPUT_BASENAME = "《左联相关档案资源目录》_修正版.xlsx"
@@ -61,7 +61,7 @@ KINSHIP_KEYWORDS = ["妻", "夫人", "丈夫", "母", "父", "子", "女", "兄"
 TEACH_KEYWORDS = ["老师", "先生", "学生", "授业", "师从", "弟子", "讲课", "指导"]
 ACTIVE_EVENT_KEYWORDS = ["文学活动", "上海文学活动", "被捕事件", "被捕", "秘密会议", "成立大会", "活动", "交流会", "会面"]
 
-VERIFIED_EVENT_RULES: Dict[str, Dict[str, Any]] = {
+VERIFIED_EVENT_RULES: dict[str, dict[str, Any]] = {
     "左联成立大会": {
         "standard_event_name": "中国左翼作家联盟成立大会",
         "corrected_date": "1930-03-02",
@@ -178,7 +178,7 @@ VERIFIED_EVENT_RULES: Dict[str, Dict[str, Any]] = {
     },
 }
 
-ROW_EVENT_OVERRIDES: Dict[int, Dict[str, Any]] = {
+ROW_EVENT_OVERRIDES: dict[int, dict[str, Any]] = {
     7: {
         "corrected_date": "",
         "date_precision": "",
@@ -520,8 +520,8 @@ VERIFICATION_SOURCES = [
 class EntityInfo:
     entity_id: str
     name: str
-    birth_year: Optional[int]
-    death_year: Optional[int]
+    birth_year: int | None
+    death_year: int | None
     role: str
 
 
@@ -542,7 +542,7 @@ def find_input_file(cwd: Path) -> Path:
     raise FileNotFoundError(f"未找到输入文件：{TARGET_BASENAME}")
 
 
-def map_sheet_name(sheet_names: Iterable[str], aliases: List[str]) -> str:
+def map_sheet_name(sheet_names: Iterable[str], aliases: list[str]) -> str:
     alias_set = {normalize_header(a) for a in aliases}
     for name in sheet_names:
         if normalize_header(name) in alias_set:
@@ -550,9 +550,9 @@ def map_sheet_name(sheet_names: Iterable[str], aliases: List[str]) -> str:
     raise KeyError(f"未找到匹配 sheet：{aliases}")
 
 
-def map_columns(headers: List[Any], alias_map: Dict[str, List[str]]) -> Dict[str, int]:
+def map_columns(headers: list[Any], alias_map: dict[str, list[str]]) -> dict[str, int]:
     normalized_headers = {normalize_header(h): idx for idx, h in enumerate(headers)}
-    result: Dict[str, int] = {}
+    result: dict[str, int] = {}
     for logical_field, aliases in alias_map.items():
         found = None
         for alias in aliases:
@@ -566,7 +566,7 @@ def map_columns(headers: List[Any], alias_map: Dict[str, List[str]]) -> Dict[str
     return result
 
 
-def parse_birth_death(text: Any) -> Tuple[Optional[int], Optional[int]]:
+def parse_birth_death(text: Any) -> tuple[int | None, int | None]:
     if text is None:
         return None, None
     m = re.match(r"^\s*(\d{4}|\?)\s*-\s*(\d{4}|\?)\s*$", str(text))
@@ -585,7 +585,7 @@ def as_text(value: Any) -> str:
     return str(value).strip()
 
 
-def extract_year(value: Any) -> Optional[int]:
+def extract_year(value: Any) -> int | None:
     if value is None:
         return None
     if isinstance(value, datetime):
@@ -673,7 +673,7 @@ def normalize_event_name_alias(event_name: str) -> str:
     return cleaned
 
 
-def normalize_event_location_aliases(event_name: str, historical_location: str, current_address: str) -> Tuple[str, str, str]:
+def normalize_event_location_aliases(event_name: str, historical_location: str, current_address: str) -> tuple[str, str, str]:
     normalized_event = normalize_event_name_alias(event_name)
     hist = as_text(historical_location)
     cur = as_text(current_address)
@@ -743,7 +743,7 @@ def build_annual_record_note(
     return f"当前仅能确认 {year} 年在 {location} 存在{topic}相关记录，尚不足以定位到单一具体事件。"
 
 
-def coarsen_annual_record_location(source_event_name: str, historical_location: str, current_address: str) -> Tuple[str, str]:
+def coarsen_annual_record_location(source_event_name: str, historical_location: str, current_address: str) -> tuple[str, str]:
     source = normalize_event_name_alias(source_event_name)
     if "创造社" in source:
         return "创造社（宝山路）", "闸北区宝山路一带"
@@ -845,9 +845,9 @@ def has_ocr_noise(text: str) -> bool:
     return any(re.search(pattern, text) for pattern in patterns)
 
 
-def relation_risk_assessment(relation_type: str, context: str) -> Tuple[int, str, List[str]]:
+def relation_risk_assessment(relation_type: str, context: str) -> tuple[int, str, list[str]]:
     score = 0
-    reasons: List[str] = []
+    reasons: list[str] = []
     if relation_type in {"组织隶属", "亲属关系", "师生关系"}:
         score += 45
         reasons.append("人物-人物关系使用强证据型关系标签")
@@ -878,7 +878,7 @@ def relation_risk_assessment(relation_type: str, context: str) -> Tuple[int, str
     return score, "low", reasons
 
 
-def infer_relation_type(relation_type: str, context: str, risk_level: str) -> Tuple[str, str, str, str]:
+def infer_relation_type(relation_type: str, context: str, risk_level: str) -> tuple[str, str, str, str]:
     text = context or ""
     if relation_type == "组织隶属":
         if contains_any(text, COMM_KEYWORDS):
@@ -941,9 +941,9 @@ def clone_sheet(wb, source_name: str, target_name: str):
     return ws
 
 
-def append_headers(ws, headers: List[str]) -> Dict[str, int]:
+def append_headers(ws, headers: list[str]) -> dict[str, int]:
     start_col = ws.max_column + 1
-    positions: Dict[str, int] = {}
+    positions: dict[str, int] = {}
     for offset, header in enumerate(headers):
         col = start_col + offset
         ws.cell(row=1, column=col, value=header)
@@ -956,7 +956,7 @@ def write_value(ws, row_num: int, col_idx: int, value: Any):
     ws.cell(row=row_num, column=col_idx, value=value)
 
 
-def add_log(logs: List[Dict[str, Any]], **kwargs):
+def add_log(logs: list[dict[str, Any]], **kwargs):
     if as_text(kwargs["original_value"]) == as_text(kwargs["new_value"]):
         return
     logs.append(
@@ -983,8 +983,8 @@ def create_aux_sheet(wb, title: str):
     return wb.create_sheet(title)
 
 
-def build_entity_map(ws, mapping: Dict[str, int]) -> Dict[str, EntityInfo]:
-    entities: Dict[str, EntityInfo] = {}
+def build_entity_map(ws, mapping: dict[str, int]) -> dict[str, EntityInfo]:
+    entities: dict[str, EntityInfo] = {}
     for row in ws.iter_rows(min_row=2, values_only=True):
         entity_id = as_text(row[mapping["entity_id"]])
         if not entity_id:
@@ -1020,7 +1020,7 @@ def main():
     map3 = map_columns(headers3, SHEET3_COLS)
     entities = build_entity_map(ws1, map1)
 
-    event_clusters: Dict[str, Dict[str, Any]] = defaultdict(lambda: {"rows": [], "dates": set(), "locs": set(), "entities": set()})
+    event_clusters: dict[str, dict[str, Any]] = defaultdict(lambda: {"rows": [], "dates": set(), "locs": set(), "entities": set()})
     for row_num in range(2, ws3.max_row + 1):
         event_name = as_text(ws3.cell(row=row_num, column=map3["event"] + 1).value)
         timestamp = ws3.cell(row=row_num, column=map3["timestamp"] + 1).value
@@ -1079,8 +1079,8 @@ def main():
         ],
     )
 
-    logs: List[Dict[str, Any]] = []
-    review_rows: List[Dict[str, Any]] = []
+    logs: list[dict[str, Any]] = []
+    review_rows: list[dict[str, Any]] = []
     sheet2_auto_corrected_rows, sheet2_manual_review_rows = set(), set()
     sheet3_auto_corrected_rows, sheet3_manual_review_rows = set(), set()
     high_risk_relation_count = 0
@@ -1216,7 +1216,7 @@ def main():
         raw_cluster_key = resolve_event_cluster_key(row_num, entity_id, normalized_event_name, timestamp)
         cluster = event_clusters.get(raw_cluster_key, {"dates": set(), "locs": set(), "rows": []})
 
-        conflict_flags: List[str] = []
+        conflict_flags: list[str] = []
         if is_placeholder_jan1(timestamp):
             conflict_flags.append("placeholder_jan1")
         if len(cluster["dates"]) > 1:
@@ -1267,15 +1267,7 @@ def main():
                 entity_role = "待核"
                 if entity_name not in {"鲁迅", "柔石", "潘汉年", "蒋光慈", "钱杏邨", "李求实", "殷夫", "艾芜"}:
                     needs_manual_review = "yes"
-            elif event_name == "五烈士遇难":
-                participants = rule.get("participant_names", set())
-                if entity_name in participants:
-                    entity_role = "直接参与者"
-                else:
-                    entity_role = "关联人物"
-                    needs_manual_review = "yes"
-                    conflict_flags.append("entity_not_direct_participant")
-            elif event_name in {"冯铿被捕事件", "殷夫被捕事件", "李求实被捕事件", "丁玲被捕事件"}:
+            elif event_name == "五烈士遇难" or event_name in {"冯铿被捕事件", "殷夫被捕事件", "李求实被捕事件", "丁玲被捕事件"}:
                 participants = rule.get("participant_names", set())
                 if entity_name in participants:
                     entity_role = "直接参与者"

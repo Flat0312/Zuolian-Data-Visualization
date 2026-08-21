@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
 """
 从《左联词典》和《左联史》TXT文件中提取人际关系数据并追加到Sheet2
 按页分割文本，对每页进行人物共现分析
 """
 
-import openpyxl
 import re
 from collections import defaultdict
 from itertools import combinations
+
+import openpyxl
 
 # ===== 人物映射表（复用自 extract_zuolian.py）=====
 
@@ -236,10 +236,10 @@ def split_pages(text):
     # 第 X 页
     # ────────────────────────────────────────
     pattern = r'第\s*(\d+)\s*页'
-    
+
     # 找到所有页标记
     page_markers = list(re.finditer(pattern, text))
-    
+
     for i, marker in enumerate(page_markers):
         page_num = int(marker.group(1))
         start = marker.end()
@@ -251,18 +251,18 @@ def split_pages(text):
                 end = sep_pos
         else:
             end = len(text)
-        
+
         page_text = text[start:end].strip()
         if page_text:
             pages.append((page_num, page_text))
-    
+
     return pages
 
 
 def find_persons_in_text(text):
     """在文本中查找所有人物，返回 {entity_id: [matched_name, ...]}"""
     found = defaultdict(set)
-    
+
     for name, entity_id in PERSON_MAP.items():
         # 跳过过短的名字（容易误匹配）
         if len(name) < 2:
@@ -270,19 +270,19 @@ def find_persons_in_text(text):
         # 跳过已知的易误匹配名字
         if name in SHORT_NAMES_TO_EXCLUDE and len(name) <= 2:
             continue
-        
+
         # 用空格分隔的OCR文本需要特殊处理
         # 尝试原始匹配
         if name in text:
             found[entity_id].add(name)
             continue
-        
+
         # 尝试字之间有空格的匹配（OCR特征：字之间插入空格）
         if len(name) >= 2:
             spaced_name = r'\s*'.join(re.escape(c) for c in name)
             if re.search(spaced_name, text):
                 found[entity_id].add(name)
-    
+
     return found
 
 
@@ -290,30 +290,30 @@ def extract_context(text, name1, name2, max_len=80):
     """提取两个人名之间的上下文"""
     # 清理OCR空格
     clean_text = re.sub(r'\s+', '', text)
-    
+
     pos1 = clean_text.find(name1)
     pos2 = clean_text.find(name2)
-    
+
     if pos1 == -1 or pos2 == -1:
         return clean_text[:max_len]
-    
+
     start = min(pos1, pos2)
     end = max(pos1 + len(name1), pos2 + len(name2))
-    
+
     ctx_start = max(0, start - 15)
     ctx_end = min(len(clean_text), end + 15)
     context = clean_text[ctx_start:ctx_end]
-    
+
     if len(context) > max_len:
         context = context[:max_len]
-    
+
     return context
 
 
 def determine_relation(text, source_id, target_id):
     """根据页面文本内容判断关系类型和权重"""
     clean = re.sub(r'\s+', '', text)
-    
+
     # 组织隶属
     org_kw = ["左联", "左翼作家联盟", "执委", "常委", "党团", "盟员", "入盟",
               "加入", "成员", "大会", "成立", "组织", "领导"]
@@ -330,35 +330,35 @@ def determine_relation(text, source_id, target_id):
     # 会面
     meet_kw = ["会见", "见面", "拜访", "访问", "来访", "会晤", "相见", "造访",
                "看望", "座谈", "宴"]
-    
+
     for kw in family_kw:
         if kw in clean:
             return "强关联-亲属", 5
-    
+
     for kw in org_kw:
         if kw in clean:
             return "强关联-组织隶属", 4
-    
+
     for kw in debate_kw:
         if kw in clean:
             return "弱关联-论战", 3
-    
+
     for kw in coop_kw:
         if kw in clean:
             return "弱关联-合作", 3
-    
+
     for kw in comm_kw:
         if kw in clean:
             return "弱关联-通信", 3
-    
+
     for kw in meet_kw:
         if kw in clean:
             return "弱关联-时空共现", 3
-    
+
     # 默认：如果都是核心成员，认为是组织关系
     if source_id in LEFT_LEAGUE_CORE and target_id in LEFT_LEAGUE_CORE:
         return "强关联-组织隶属", 3
-    
+
     return "弱关联-时空共现", 2
 
 
@@ -388,45 +388,45 @@ def load_existing_pairs(excel_path):
 def process_text_file(filepath, source_label, existing_pairs):
     """处理一个TXT文件，提取所有页内共现关系"""
     print(f"\n读取 {filepath}...")
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, encoding='utf-8') as f:
         text = f.read()
-    
+
     pages = split_pages(text)
     print(f"  共分割为 {len(pages)} 页")
-    
+
     # 收集所有关系 key=(src, tgt) sorted pair
     all_rels = {}  # key -> {relation_type, contexts, evidence_refs, weight}
-    
+
     pages_with_persons = 0
     total_pairs = 0
-    
+
     for page_num, page_text in pages:
         persons = find_persons_in_text(page_text)
-        
+
         if len(persons) < 2:
             continue
-        
+
         pages_with_persons += 1
         entity_ids = list(persons.keys())
-        
+
         # 生成所有两两组合
         for id1, id2 in combinations(sorted(entity_ids), 2):
             if id1 == id2:
                 continue
-            
+
             key = (id1, id2)
-            
+
             # 获取匹配到的名字
             name1 = list(persons[id1])[0]
             name2 = list(persons[id2])[0]
-            
+
             # 提取上下文
             context = extract_context(page_text, name1, name2)
             evidence = f"{source_label} 第{page_num}页"
-            
-            # 判断关系类型  
+
+            # 判断关系类型
             rel_type, weight = determine_relation(page_text, id1, id2)
-            
+
             if key in all_rels:
                 rel = all_rels[key]
                 # 合并：追加证据，取最高权重和最强关系
@@ -445,16 +445,16 @@ def process_text_file(filepath, source_label, existing_pairs):
                     'weight': weight
                 }
                 total_pairs += 1
-    
+
     print(f"  找到 {pages_with_persons} 页包含2+个实体")
     print(f"  提取到 {total_pairs} 对关系")
-    
+
     # 过滤掉已存在的关系
     new_rels = {}
     for (src, tgt), data in all_rels.items():
         if (src, tgt) not in existing_pairs and (tgt, src) not in existing_pairs:
             new_rels[(src, tgt)] = data
-    
+
     print(f"  去除已有后剩余 {len(new_rels)} 对新关系")
     return new_rels
 
@@ -463,34 +463,34 @@ def main():
     excel_path = r'd:\1大创\大创数据收集1.xlsx'
     cidian_path = r'd:\1大创\左联词典.txt'
     shi_path = r'd:\1大创\左联史.txt'
-    
+
     print("=" * 60)
     print("从《左联词典》和《左联史》提取人际关系数据")
     print("=" * 60)
-    
+
     # 1. 加载已有数据
     print("\n[1/4] 加载Sheet2现有数据...")
     existing_pairs, max_seq = load_existing_pairs(excel_path)
     print(f"  现有关系对: {len(existing_pairs) // 2} 条")
     print(f"  当前最大序号: {max_seq}")
-    
+
     # 2. 处理左联词典
     print("\n[2/4] 处理《左联词典》...")
     cidian_rels = process_text_file(cidian_path, "左联词典", existing_pairs)
-    
+
     # 更新existing_pairs以避免词典和史的重复
     for key in cidian_rels:
         existing_pairs.add(key)
         existing_pairs.add((key[1], key[0]))
-    
+
     # 3. 处理左联史
     print("\n[3/4] 处理《左联史》...")
     shi_rels = process_text_file(shi_path, "左联史", existing_pairs)
-    
+
     # 合并两本书的结果
     all_new_rels = {}
     all_new_rels.update(cidian_rels)
-    
+
     for key, data in shi_rels.items():
         if key in all_new_rels:
             # 合并
@@ -502,37 +502,37 @@ def main():
                 old['relation_type'] = data['relation_type']
         else:
             all_new_rels[key] = data
-    
+
     print(f"\n合计新关系: {len(all_new_rels)} 条")
-    
+
     if not all_new_rels:
         print("没有新关系可以添加。")
         return
-    
+
     # 4. 写入Excel
     print("\n[4/4] 写入Excel Sheet2...")
     wb = openpyxl.load_workbook(excel_path)
     sheet = wb['Sheet2']
-    
+
     # 找到已有数据的末尾行
     last_row = sheet.max_row
-    
+
     seq = max_seq
     added = 0
-    
+
     for (src, tgt), data in sorted(all_new_rels.items()):
         seq += 1
         row = last_row + 1 + added
-        
+
         # 格式化上下文和证据
         context_str = "; ".join(data['contexts'][:3])
         if len(context_str) > 200:
             context_str = context_str[:200]
-        
+
         evidence_str = "; ".join(data['evidence_refs'][:5])
         if len(evidence_str) > 200:
             evidence_str = evidence_str[:200]
-        
+
         sheet.cell(row=row, column=1, value=seq)
         sheet.cell(row=row, column=2, value=src)
         sheet.cell(row=row, column=3, value=tgt)
@@ -540,14 +540,14 @@ def main():
         sheet.cell(row=row, column=5, value=context_str)
         sheet.cell(row=row, column=6, value=evidence_str)
         sheet.cell(row=row, column=7, value=data['weight'])
-        
+
         added += 1
-    
+
     wb.save(excel_path)
     print(f"\n✓ 成功追加 {added} 条新关系到 Sheet2")
     print(f"  序号范围: {max_seq + 1} ~ {seq}")
     print(f"  保存到: {excel_path}")
-    
+
     # 统计
     print("\n" + "=" * 60)
     print("关系类型分布:")
@@ -556,7 +556,7 @@ def main():
         type_count[data['relation_type']] += 1
     for rt, cnt in sorted(type_count.items(), key=lambda x: -x[1]):
         print(f"  {rt}: {cnt}")
-    
+
     print("\n涉及实体频次（前20）:")
     entity_count = defaultdict(int)
     for (src, tgt) in all_new_rels:
@@ -565,19 +565,19 @@ def main():
     for eid, cnt in sorted(entity_count.items(), key=lambda x: -x[1])[:20]:
         name = ID_TO_NAME.get(eid, eid)
         print(f"  {name} ({eid}): {cnt} 次")
-    
+
     # 检查原先孤立的实体是否被覆盖
     print("\n新覆盖的实体（之前在Sheet2中无记录）:")
     original_entities = set()
     for (s, t) in existing_pairs:
         original_entities.add(s)
         original_entities.add(t)
-    
+
     new_entities = set()
     for (s, t) in all_new_rels:
         new_entities.add(s)
         new_entities.add(t)
-    
+
     newly_covered = new_entities - original_entities
     for eid in sorted(newly_covered):
         name = ID_TO_NAME.get(eid, eid)

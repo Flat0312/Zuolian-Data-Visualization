@@ -11,12 +11,12 @@ llm_weight_decouple.py
 ════════════════════════════════════════════════════════════
 """
 
-import re
-import time
 import json
 import os
-import zipfile
+import re
+import time
 import xml.etree.ElementTree as ET
+import zipfile
 from pathlib import Path
 
 import pandas as pd
@@ -74,9 +74,8 @@ def read_xlsx_sheet(xlsx_path: Path, sheet_xml: str) -> pd.DataFrame:
     用 zipfile + ElementTree 直接解析 xlsx 内部 sheet XML。
     完全绕过 openpyxl 对 sharedStrings.xml 的依赖。
     """
-    with zipfile.ZipFile(xlsx_path, "r") as z:
-        with z.open(sheet_xml) as f:
-            root = ET.parse(f).getroot()
+    with zipfile.ZipFile(xlsx_path, "r") as z, z.open(sheet_xml) as f:
+        root = ET.parse(f).getroot()
 
     rows_data = []
     for row_elem in root.findall(".//main:sheetData/main:row", _NS):

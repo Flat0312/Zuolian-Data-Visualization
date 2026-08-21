@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
-
-from utils import clean_text as _clean, split_ids as _split_ids
+from utils import clean_text as _clean
+from utils import split_ids as _split_ids
 
 
 def _to_float(value: object) -> float | None:
@@ -42,9 +41,9 @@ def _significance(category: str, people: list[str], location_name: str) -> str:
     if "成立" in category or "会议" in category:
         return f"该事件把 {location_name} 标定为左联组织化的重要空间节点，可用于重建网络形成的历史现场。"
     if "逮捕" in category or "牺牲" in category:
-        return f"该事件揭示了左联网络遭遇压迫的关键时刻，有助于理解人物关系从文化合作转向政治风险的轨迹。"
+        return "该事件揭示了左联网络遭遇压迫的关键时刻，有助于理解人物关系从文化合作转向政治风险的轨迹。"
     if "通信" in category or "交往" in category:
-        return f"该事件体现人物之间的联络与流动，可补充左联关系网络在日常层面的连接机制。"
+        return "该事件体现人物之间的联络与流动，可补充左联关系网络在日常层面的连接机制。"
     if people:
         return f"该事件把 {location_name} 与 {len(people)} 位相关人物联系起来，有助于分析左联网络在空间上的聚合方式。"
     return f"该事件为 {location_name} 的左联活动提供了时空锚点。"
@@ -63,7 +62,7 @@ class EventEvidence:
     match_rule: str = ""
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "EventEvidence":
+    def from_dict(cls, data: dict[str, Any]) -> EventEvidence:
         return cls(
             evidence_id=_clean(data.get("evidence_id")) or _clean(data.get("id")),
             event_id=_clean(data.get("event_id")),
@@ -106,7 +105,7 @@ class RelatedPerson:
     relation: str = ""
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "RelatedPerson":
+    def from_dict(cls, data: dict[str, Any]) -> RelatedPerson:
         return cls(
             person_id=_clean(data.get("person_id")),
             name=_clean(data.get("name")) or _clean(data.get("participant_name")),

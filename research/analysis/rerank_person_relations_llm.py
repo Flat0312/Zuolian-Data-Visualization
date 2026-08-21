@@ -14,7 +14,6 @@ import pandas as pd
 import requests
 from openai import OpenAI
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 KB_DIR = PROJECT_ROOT / "data" / "processed"
 REPORT_DIR = PROJECT_ROOT / "research" / "drafts" / "reports"

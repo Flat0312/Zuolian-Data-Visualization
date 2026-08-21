@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
 """
 从鲁迅日记中提取人际关系数据并写入Excel
 更新版 - 修正日期格式和关系类型分类
 """
 
-import openpyxl
 import re
+
+import openpyxl
 
 # 人物对照表 - 包含所有别名映射
 PERSON_MAP = {
@@ -95,10 +95,10 @@ def extract_from_line(line, year, month, day):
     relationships = []
     date_str = f"{year}-{month:02d}-{day:02d}"
     evidence_ref = f"鲁迅日记 {year}年{month}月{day}日"
-    
+
     # 已匹配的人物(避免重复)
     found = set()
-    
+
     def get_relation_type(target_id, base_type):
         """根据人物ID确定关系类型"""
         # 许广平 - 亲属关系
@@ -114,7 +114,7 @@ def extract_from_line(line, year, month, day):
         if base_type == "时空共现":
             return "弱关联-时空共现", 2
         return "弱关联-通信", 2
-    
+
     # 1. 会面/时空共现类 - "XXX来" 或 "XXX来访"
     for m in re.finditer(r'([^\s。，、：]+?)(?:来访|来(?!信|稿|函))', line):
         name = m.group(1).strip()
@@ -134,7 +134,7 @@ def extract_from_line(line, year, month, day):
                         'date': date_str,
                         'weight': weight
                     })
-    
+
     # 2. 通信类 - "得XXX信"
     for m in re.finditer(r'得([^\s。，、：]+?)信', line):
         name = m.group(1).strip()
@@ -153,7 +153,7 @@ def extract_from_line(line, year, month, day):
                         'date': date_str,
                         'weight': weight
                     })
-    
+
     # 3. 通信类 - "寄XXX信" 或 "复XXX信"
     for m in re.finditer(r'(?:寄|复)([^\s。，、：]+?)信', line):
         name = m.group(1).strip()
@@ -172,7 +172,7 @@ def extract_from_line(line, year, month, day):
                         'date': date_str,
                         'weight': weight
                     })
-    
+
     # 4. 合作/宴请类 - 同席/晚餐/午餐
     for m in re.finditer(r'(?:同|与|邀|偕)([^\s。，、：]+?)(?:至|往|赴|在).{0,15}(?:午餐|夜餐|晚餐|午饭|夜饭|晚饭|饮茗)', line):
         name = m.group(1).strip()
@@ -192,7 +192,7 @@ def extract_from_line(line, year, month, day):
                         'date': date_str,
                         'weight': min(5, weight + 1)
                     })
-    
+
     # 5. 拜访类 - "访XXX"
     for m in re.finditer(r'访([^\s。，、：]+?)(?:$|，|。|于|未遇)', line):
         name = m.group(1).strip()
@@ -211,7 +211,7 @@ def extract_from_line(line, year, month, day):
                         'date': date_str,
                         'weight': weight
                     })
-    
+
     return relationships
 
 
@@ -219,70 +219,70 @@ def main():
     # 读取日记文本
     diary_path = r'd:\1大创\日记全编：全2册 (鲁迅 著) (Z-Library).txt'
     excel_path = r'd:\1大创\大创数据收集1.xlsx'
-    
-    with open(diary_path, 'r', encoding='utf-8') as f:
+
+    with open(diary_path, encoding='utf-8') as f:
         lines = f.readlines()
-    
+
     all_relationships = []
-    
+
     # 解析日记
     current_year = None
     current_month = None
     current_day = None
-    
+
     month_names = {
         '一月': 1, '二月': 2, '三月': 3, '四月': 4, '五月': 5, '六月': 6,
         '七月': 7, '八月': 8, '九月': 9, '十月': 10, '十一月': 11, '十二月': 12
     }
-    
+
     for line in lines:
         line = line.strip()
         if not line:
             continue
-        
+
         # 检测年份 - "日记十六（1927年）"
         year_match = re.search(r'日记.+（(\d{4})年）', line)
         if year_match:
             current_year = int(year_match.group(1))
             print(f"进入 {current_year} 年")
             continue
-        
+
         # 检测月份 - 单独一行的月份
         if line in month_names:
             current_month = month_names[line]
             continue
-        
+
         # 检测日期 - "一日　晴。..."
         day_match = re.match(r'^([一二三四五六七八九十廿卅]+日)\s*(.+)$', line)
         if day_match and current_year and current_month:
             day_str = day_match.group(1)
             content = day_match.group(2)
             current_day = parse_day(day_str)
-            
+
             if current_day:
                 # 提取关系
                 rels = extract_from_line(content, current_year, current_month, current_day)
                 all_relationships.extend(rels)
-    
+
     print(f"\n总共提取到 {len(all_relationships)} 条关系")
-    
+
     # 统计已识别和未识别的
     identified = [r for r in all_relationships if r['target_id'] != 'UNKNOWN']
     print(f"已匹配ID: {len(identified)} 条")
-    
+
     # 加载Excel并写入Sheet2
     wb = openpyxl.load_workbook(excel_path)
     sheet = wb['Sheet2']
-    
+
     # 清除旧数据(保留表头)
     for row in range(2, sheet.max_row + 1):
         for col in range(1, 8):
             sheet.cell(row=row, column=col, value=None)
-    
+
     # 写入新数据
     row_num = 2
     seq = 1
-    
+
     for rel in identified:
         sheet.cell(row=row_num, column=1, value=seq)  # 序号
         sheet.cell(row=row_num, column=2, value='ZLH-001')  # Source_ID (鲁迅)
@@ -291,10 +291,10 @@ def main():
         sheet.cell(row=row_num, column=5, value=rel['context'])  # Context
         sheet.cell(row=row_num, column=6, value=rel['evidence_ref'])  # Evidence_Ref
         sheet.cell(row=row_num, column=7, value=rel['weight'])  # Weight
-        
+
         row_num += 1
         seq += 1
-    
+
     # 保存
     wb.save(excel_path)
     print(f"\n成功写入 {seq - 1} 条关系数据到 Sheet2")

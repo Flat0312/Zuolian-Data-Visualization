@@ -6,7 +6,6 @@ from typing import Any
 import networkx as nx
 import pandas as pd
 
-
 STAGE_DEFINITIONS: list[tuple[str, int, int]] = [
     ("萌芽与汇流（1922-1927）", 1922, 1927),
     ("组织化推进（1928-1931）", 1928, 1931),

@@ -10,12 +10,13 @@ fix_sheet2.py
 ════════════════════════════════════════════════════════════
 """
 import re
-import zipfile
 import xml.etree.ElementTree as ET
-import pandas as pd
+import zipfile
 from pathlib import Path
+
+import pandas as pd
 from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 INPUT_CSV   = Path(r"d:\1大创\context_extracted.csv")
@@ -52,9 +53,8 @@ def cell_value(elem) -> str:
     return v.text if v is not None else ""
 
 def read_sheet1(xlsx_path: Path) -> pd.DataFrame:
-    with zipfile.ZipFile(xlsx_path) as z:
-        with z.open("xl/worksheets/sheet1.xml") as f:
-            root = ET.parse(f).getroot()
+    with zipfile.ZipFile(xlsx_path) as z, z.open("xl/worksheets/sheet1.xml") as f:
+        root = ET.parse(f).getroot()
     rows = root.findall(".//main:sheetData/main:row", _NS)
     headers = [cell_value(c) for c in rows[0].findall("main:c", _NS)]
     data = []

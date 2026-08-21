@@ -7,9 +7,8 @@ from pathlib import Path
 import folium
 import pandas as pd
 import streamlit as st
-from streamlit_folium import st_folium
-
 from historical_map import HistoricalEvent, build_historical_events, events_to_frame
+from streamlit_folium import st_folium
 from styles import ACCENT, BORDER, CHART_FONT, INK, MUTED, PAPER_LIGHT, PRIMARY
 
 
