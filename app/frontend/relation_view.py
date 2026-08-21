@@ -27,6 +27,55 @@ DEFAULT_PERSON_NETWORK_LIMIT = 12
 DEFAULT_OVERVIEW_PAIR_LIMIT = 28
 
 
+def membership_profile_for_person(
+    person_id: str,
+    memberships: pd.DataFrame,
+    evidences: pd.DataFrame,
+) -> dict[str, object]:
+    if memberships.empty or "person_id" not in memberships.columns:
+        return {
+            "membership_type": "",
+            "status_label": "未收录组织关系",
+            "confidence": "",
+            "decision_rule": "",
+            "needs_manual_review": "yes",
+            "evidence_count": 0,
+            "evidence": [],
+        }
+    matches = memberships[memberships["person_id"].astype(str) == str(person_id)]
+    if matches.empty:
+        return {
+            "membership_type": "",
+            "status_label": "未收录组织关系",
+            "confidence": "",
+            "decision_rule": "",
+            "needs_manual_review": "yes",
+            "evidence_count": 0,
+            "evidence": [],
+        }
+    row = matches.iloc[0]
+    evidence_rows = []
+    if not evidences.empty and "person_id" in evidences.columns:
+        selected = evidences[evidences["person_id"].astype(str) == str(person_id)]
+        evidence_rows = selected.to_dict("records")
+    status_labels = {
+        "confirmed_member": "正式成员",
+        "related_person": "相关人士",
+        "candidate": "成员身份待核",
+        "disputed": "成员身份存在争议",
+    }
+    membership_type = str(row.get("membership_type", "")).strip()
+    return {
+        "membership_type": membership_type,
+        "status_label": status_labels.get(membership_type, show(row.get("membership_role", ""), "未标注")),
+        "confidence": str(row.get("confidence", "")).strip(),
+        "decision_rule": str(row.get("decision_rule", "")).strip(),
+        "needs_manual_review": str(row.get("needs_manual_review", "")).strip(),
+        "evidence_count": len(evidence_rows),
+        "evidence": evidence_rows,
+    }
+
+
 def _network_options(border_width: float = 1.5, smooth_type: str = "cubicBezier", roundness: float = 0.18, font_size: int = 17) -> str:
     return f"""
     {{
@@ -243,30 +292,24 @@ def _render_network_html(net: Network, cache_name: str, height: int) -> None:
             html, body {{
                 margin: 0;
                 padding: 0;
-                background:
-                    linear-gradient(180deg, rgba(247,239,226,.96), rgba(239,226,198,.98)),
-                    url("{asset_uri("paper_texture.png")}") center/220px repeat;
+                background: #FAFAF8;
                 font-family: {CHART_FONT};
             }}
             #mynetwork {{
                 width: 100% !important;
                 height: {height}px !important;
                 border: 1px solid {BORDER};
-                background:
-                    radial-gradient(circle at 50% 45%, rgba(255,250,241,.62) 0, rgba(243,232,210,.78) 72%, rgba(229,212,183,.92) 100%),
-                    url("{asset_uri("paper_texture.png")}") center/220px repeat;
-                box-shadow:
-                    inset 0 0 0 1px rgba(255,248,236,.82),
-                    inset 0 0 26px rgba(117,90,60,.06);
+                border-radius: 8px;
+                background: #FFFFFF;
             }}
             .vis-tooltip {{
                 padding: .6rem .75rem;
                 border: 1px solid {BORDER};
-                border-radius: 0;
-                background: rgba(248,242,231,.98);
+                border-radius: 4px;
+                background: #FFFFFF;
                 color: {INK};
                 font: 14px/1.65 {CHART_FONT};
-                box-shadow: none;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
                 max-width: 280px;
             }}
         </style>
@@ -787,14 +830,24 @@ def render_relation_detail_panel(
         return
 
     evidence_types = [item.relation_type for item in detail.evidence_samples if item.relation_type]
+    evidence_strengths = list(
+        dict.fromkeys([(item.evidence_strength or "未标注") for item in detail.evidence_samples if item.evidence_strength or "未标注"])
+    )
     evidence_filter_options = list(dict.fromkeys(relation_types + evidence_types))
-    selected_evidence_types = st.multiselect(
+    control_a, control_b, control_c = st.columns([1.1, 1.0, 0.9])
+    selected_evidence_types = control_a.multiselect(
         "按关系类型筛选证据摘录",
         options=evidence_filter_options,
         default=evidence_filter_options,
         key=f"{widget_prefix}_evidence_types",
     )
-    sort_mode = st.selectbox(
+    selected_strengths = control_b.multiselect(
+        "按证据强度筛选",
+        options=evidence_strengths,
+        default=evidence_strengths,
+        key=f"{widget_prefix}_strengths",
+    )
+    sort_mode = control_c.selectbox(
         "证据时间顺序",
         ["按时间升序", "按时间降序"],
         key=f"{widget_prefix}_sort",
@@ -804,7 +857,8 @@ def render_relation_detail_panel(
     filtered_evidences = [
         item
         for item in detail.evidence_samples
-        if not selected_evidence_types or item.relation_type in selected_evidence_types
+        if (not selected_evidence_types or item.relation_type in selected_evidence_types)
+        and (not selected_strengths or (item.evidence_strength or "未标注") in selected_strengths)
     ]
     filtered_evidences.sort(key=lambda item: (item.sort_date == "", item.sort_date or item.source_date, item.source_title))
     if sort_mode == "按时间降序":
@@ -827,6 +881,7 @@ def render_relation_detail_panel(
                     <div class="evidence-meta">
                         原始文献标题或档案来源：{escape(item.source_title or "来源待补")}<br>
                         日期：{escape(item.source_date or "时间待补")}<br>
+                        证据强度：{escape(item.evidence_strength or "未标注")}<br>
                         页码 / 卷次 / 期号 / 出处编号：{escape(item.citation_ref or "待补")}<br>
                         支持说明：{escape(item.support_note or "待补")}
                     </div>
@@ -947,6 +1002,8 @@ def render_people(
     nodes_df: pd.DataFrame,
     edges_df: pd.DataFrame,
     events_df: pd.DataFrame,
+    memberships_df: pd.DataFrame,
+    membership_evidences_df: pd.DataFrame,
     pair_profiles: dict[str, PairProfile],
     relation_details: dict[str, RelationDetail],
     historical_event_frame: pd.DataFrame,
@@ -978,6 +1035,11 @@ def render_people(
     selected_name = st.selectbox("选择人物", candidates["Label"].tolist(), key="people_selected_name")
     person = nodes_df[nodes_df["Label"] == selected_name].iloc[0]
     direct_all, person_events = person_views(str(person["Id"]), edges_df, events_df)
+    membership_profile = membership_profile_for_person(
+        str(person["Id"]),
+        memberships_df,
+        membership_evidences_df,
+    )
     show_review = st.checkbox("显示推断辅助关系", value=False, key=f"people_show_review_{person['Id']}")
     direct = filter_edges_for_display(direct_all, include_review=show_review)
     direct_summary = build_person_relation_summary(str(person["Label"]), direct)
@@ -1008,6 +1070,32 @@ def render_people(
             _navigate_to_page("关系总览", page_state_key, page_pending_key)
         if button_b.button("进入事件地图", key=f"people_go_events_{person['Id']}", width="stretch"):
             _navigate_to_page("事件地图", page_state_key, page_pending_key)
+
+    st.markdown("### 左联组织身份")
+    org_a, org_b, org_c = st.columns(3)
+    org_a.metric("身份结论", str(membership_profile["status_label"]))
+    org_b.metric("证据数量", int(membership_profile["evidence_count"]))
+    org_c.metric("置信度", show(membership_profile["confidence"], "待核"))
+    if membership_profile["membership_type"] == "confirmed_member":
+        st.caption("该结论满足一条 A 级来源或两条独立 B 级来源的证据规则。")
+    elif membership_profile["membership_type"] == "related_person":
+        st.caption("当前仅确认与左联存在关联，不表述为正式成员。")
+    elif membership_profile["membership_type"] == "disputed":
+        st.warning("现有来源存在冲突，该身份结论仍需人工审核。")
+    else:
+        st.info("当前证据不足以确认正式成员身份，作为研究候选线索保留。")
+    with st.expander("查看组织身份证据", expanded=False):
+        evidence_rows = membership_profile["evidence"]
+        if not evidence_rows:
+            st.caption("当前暂无可定位的组织身份材料。")
+        else:
+            evidence_frame = pd.DataFrame(evidence_rows)
+            display_columns = [
+                column
+                for column in ["evidence_support", "source_work", "source_level", "locator", "quote", "review_status"]
+                if column in evidence_frame.columns
+            ]
+            st.dataframe(evidence_frame[display_columns], width="stretch", hide_index=True)
 
     tab_network, tab_evidence, tab_timeline = st.tabs(["关系网络", "关系详情", "事件轨迹"])
     with tab_network:

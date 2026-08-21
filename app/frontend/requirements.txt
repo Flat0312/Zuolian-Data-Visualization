@@ -1,7 +1,7 @@
-streamlit
-pandas
-altair
-plotly
-pyvis
-folium
-streamlit-folium
+streamlit>=1.37
+pandas>=2.2
+altair>=5.2
+plotly>=5.20
+pyvis>=0.3.2
+folium>=0.17
+streamlit-folium>=0.22

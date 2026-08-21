@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from kb_schema import DataContractError
 from analysis_view import render_analysis
 from data_loader import LoadedData, load_data
 from event_view import load_historical_map_bundle, render_events
@@ -79,8 +80,8 @@ def pair_summary_from_profiles(pair_profiles: dict) -> pd.DataFrame:
 def render_sidebar(data: LoadedData, visible_edges_df) -> str:
     with st.sidebar:
         st.markdown("## 左联知识库")
-        st.caption("以人物关系网络为核心的数字人文成果展示")
-        if st.button("刷新最新数据", width="stretch"):
+        st.caption("人物关系网络 · 数字人文")
+        if st.button("刷新数据", width="stretch"):
             st.cache_data.clear()
             st.session_state[GLOBAL_RELATION_STATE_KEY] = None
             st.rerun()
@@ -98,7 +99,7 @@ def render_sidebar(data: LoadedData, visible_edges_df) -> str:
         )
         current_page = st.session_state.get(PAGE_STATE_KEY, "首页")
         st.markdown("---")
-        st.caption(f"人物 {len(data.nodes)} | 关系 {len(visible_edges_df)} | 事件 {len(data.events)}")
+        st.caption(f"{len(data.nodes)} 人物 · {len(visible_edges_df)} 关系 · {len(data.events)} 事件")
     return current_page
 
 
@@ -107,10 +108,22 @@ def main() -> None:
     apply_style()
     initialize_session_state()
 
+    data_mode_label = st.sidebar.radio(
+        "数据模式",
+        ["公开模式", "研究模式"],
+        horizontal=True,
+        help="公开模式隐藏候选与争议组织身份；研究模式保留全部研究数据。",
+    )
+    data_mode = "public" if data_mode_label == "公开模式" else "research"
     loading_hint = st.empty()
     loading_hint.info("正在加载数据与视图资源，请稍候...")
     try:
-        data = load_data(BASE_DIR)
+        data = load_data(BASE_DIR, data_mode)
+    except DataContractError as exc:
+        loading_hint.empty()
+        st.error("标准数据校验未通过，前台已停止加载。请先修复缺失文件、缺失列或悬挂引用。")
+        st.code(str(exc))
+        return
     except Exception as exc:
         loading_hint.empty()
         st.error("页面初始化失败，请刷新后重试。若在微信内打开，建议选择“在浏览器打开”。")
@@ -152,6 +165,8 @@ def main() -> None:
             nodes_df=data.nodes,
             edges_df=visible_edges_df,
             events_df=data.events,
+            memberships_df=data.memberships,
+            membership_evidences_df=data.membership_evidences,
             pair_profiles=pair_profiles,
             relation_details=relation_details,
             historical_event_frame=historical_event_frame,

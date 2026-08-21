@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from kb_schema import DataContractError, REQUIRED_DATA_FILES, ensure_valid_data_dir
 from data_paths import candidate_data_dirs, format_candidate_paths, resolve_data_dir
 from utils import clean_text, split_ids
 
@@ -15,6 +16,9 @@ class LoadedData:
     nodes: pd.DataFrame
     edges: pd.DataFrame
     events: pd.DataFrame
+    memberships: pd.DataFrame
+    membership_evidences: pd.DataFrame
+    fact_evidences: pd.DataFrame
     data_dir: str
 
 
@@ -33,17 +37,12 @@ def show(value: object, fallback: str = "未标注") -> str:
 
 @st.cache_data(show_spinner=False)
 def standardized_data_exists(data_dir: Path) -> bool:
-    required = [
-        "persons.csv",
-        "organizations.csv",
-        "places.csv",
-        "events.csv",
-        "person_relations.csv",
-        "org_memberships.csv",
-        "event_participants.csv",
-        "sources.csv",
-    ]
-    return all((data_dir / filename).exists() for filename in required)
+    return all((data_dir / filename).exists() for filename in REQUIRED_DATA_FILES)
+
+
+@st.cache_data(show_spinner=False)
+def has_any_standardized_data(data_dir: Path) -> bool:
+    return any((data_dir / filename).exists() for filename in REQUIRED_DATA_FILES)
 
 
 def _fill_from_place(df: pd.DataFrame, col: str, place_map: dict) -> pd.Series:
@@ -180,17 +179,27 @@ def load_legacy_views(data_dir: Path, base_dir: Path) -> tuple[pd.DataFrame, pd.
 
 
 @st.cache_data(show_spinner=False)
-def load_data(base_dir: Path | None = None) -> LoadedData:
+def load_data(base_dir: Path | None = None, data_mode: str = "research") -> LoadedData:
     resolved_base_dir = (base_dir or Path(__file__).resolve().parent).resolve()
-    data_dir = resolve_data_dir(resolved_base_dir)
-    if standardized_data_exists(data_dir):
+    data_dir = resolve_data_dir(resolved_base_dir, mode=data_mode)
+    if has_any_standardized_data(data_dir):
+        ensure_valid_data_dir(data_dir)
         nodes, edges, events = load_standardized_views(data_dir)
+        memberships = pd.read_csv(data_dir / "org_memberships.csv").fillna("")
+        membership_evidences = pd.read_csv(data_dir / "org_membership_evidences.csv").fillna("")
+        fact_evidences = pd.read_csv(data_dir / "fact_evidences.csv").fillna("")
     else:
         nodes, edges, events = load_legacy_views(data_dir, resolved_base_dir)
+        memberships = pd.DataFrame()
+        membership_evidences = pd.DataFrame()
+        fact_evidences = pd.DataFrame()
 
     nodes = nodes.copy()
     edges = edges.copy()
     events = events.copy()
+    memberships = memberships.copy()
+    membership_evidences = membership_evidences.copy()
+    fact_evidences = fact_evidences.copy()
 
     nodes["search_text"] = (
         nodes["Label"].astype(str)
@@ -270,4 +279,12 @@ def load_data(base_dir: Path | None = None) -> LoadedData:
         + events["Subjects"].astype(str)
     )
 
-    return LoadedData(nodes=nodes, edges=edges, events=events, data_dir=str(data_dir))
+    return LoadedData(
+        nodes=nodes,
+        edges=edges,
+        events=events,
+        memberships=memberships,
+        membership_evidences=membership_evidences,
+        fact_evidences=fact_evidences,
+        data_dir=str(data_dir),
+    )

@@ -24,6 +24,7 @@ LEFT_WING_PERIOD_END_DISPLAY = "1936年初"
 LEFT_WING_PERIOD_END_SORT = "1936-02-01"
 HISTORICAL_YEAR_MIN = 1925
 HISTORICAL_YEAR_MAX = 1937
+EVIDENCE_STRENGTH_ORDER = {"一手": 0, "二手": 1, "转引": 2, "推断": 3, "未标注": 4}
 
 
 def canonical_pair_key(person_a_id: str, person_b_id: str) -> str:
@@ -289,6 +290,32 @@ def _infer_source_title(citation_ref: str) -> str:
     return title or first or "来源待补"
 
 
+@lru_cache(maxsize=1)
+def _load_source_strength_index(base_dir_text: str) -> dict[str, str]:
+    base_dir = Path(base_dir_text)
+    project_root = base_dir.parents[1]
+    sources_path = project_root / "data" / "processed" / "sources.csv"
+    if not sources_path.exists():
+        return {}
+    frame = pd.read_csv(sources_path, encoding="utf-8-sig").fillna("")
+    if any(column not in frame.columns for column in ("source_id", "evidence_strength")):
+        return {}
+    return {
+        str(row["source_id"]).strip(): str(row["evidence_strength"]).strip() or "未标注"
+        for _, row in frame.iterrows()
+        if str(row["source_id"]).strip()
+    }
+
+
+def _resolve_evidence_strength(base_dir: Path, source_ids: object) -> str:
+    strength_index = _load_source_strength_index(str(base_dir.resolve()))
+    strengths = [strength_index.get(source_id, "未标注") for source_id in split_ids(source_ids)]
+    strengths = [strength for strength in strengths if strength]
+    if not strengths:
+        return "未标注"
+    return min(strengths, key=lambda item: EVIDENCE_STRENGTH_ORDER.get(item, 99))
+
+
 def _support_note(person_a_name: str, person_b_name: str, relation_type: str) -> str:
     relation = _clean(relation_type)
     if "通信" in relation:
@@ -317,6 +344,7 @@ class EvidenceRecord:
     display_start: str = ""
     display_end: str = ""
     time_precision: str = ""
+    evidence_strength: str = "未标注"
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "EvidenceRecord":
@@ -334,6 +362,7 @@ class EvidenceRecord:
             display_start=_clean(data.get("display_start")),
             display_end=_clean(data.get("display_end")),
             time_precision=_clean(data.get("time_precision")),
+            evidence_strength=_clean(data.get("evidence_strength")) or "未标注",
         )
 
 
@@ -440,6 +469,7 @@ def _row_to_evidence(
         display_start=time_hint.start_display,
         display_end=time_hint.end_display,
         time_precision=time_hint.precision,
+        evidence_strength=_resolve_evidence_strength(base_dir, row.get("source_ids")),
     )
 
 
