@@ -215,3 +215,54 @@ def test_promoted_origin_ids_unique_in_production():
     batch2 = [r["origin_evidence_id"] for r in rows if r["origin_evidence_id"].startswith("FE-EVP2-")]
     assert len(batch1) == 12 and len(set(batch1)) == 12
     assert len(batch2) == 2 and len(set(batch2)) == 2
+
+
+def test_batch2_merge_from_old_baseline_schema_clean_and_src1165_referenced(tmp_path, monkeypatch):
+    """从旧基线（剥离第二批全部痕迹）合并后：schema 0错误、≤13警告、SRC-1165已被事件引用。"""
+    data_dir = tmp_path / "data" / "processed"
+    drafts_dir = tmp_path / "research" / "drafts" / "reports"
+    shutil.copytree(PROD_DATA, data_dir)
+    drafts_dir.mkdir(parents=True)
+    for name in BATCH2_DRAFT_FILES:
+        shutil.copyfile(PROD_DRAFTS / name, drafts_dir / name)
+
+    pilot_rows = _read_rows(drafts_dir / "phase2_batch2_longhua_roster_sources.csv")
+    pilot_urls = {r["source_url"] for r in pilot_rows if r["source_url"]}
+
+    sources = _read_rows(data_dir / "sources.csv")
+    dropped_ids = {r["source_id"] for r in sources if r["source_url"] in pilot_urls}
+    _write_rows(data_dir / "sources.csv", [r for r in sources if r["source_url"] not in pilot_urls])
+
+    evidences = [
+        r for r in _read_rows(data_dir / "fact_evidences.csv")
+        if not r["origin_evidence_id"].startswith("FE-EVP2-")
+    ]
+    _write_rows(data_dir / "fact_evidences.csv", evidences)
+
+    events = _read_rows(data_dir / "events.csv")
+    for row in events:
+        if row["event_id"] == "EVT-00148":
+            row["source_ids"] = ";".join(
+                s for s in row["source_ids"].split(";") if s and s not in dropped_ids
+            )
+    _write_rows(data_dir / "events.csv", events)
+
+    module = _load_module("merge_longhua_roster")
+    _configure_batch2(monkeypatch, module, data_dir, drafts_dir)
+    module.main()
+
+    from kb_schema import validate_data_dir
+
+    result = validate_data_dir(data_dir)
+    assert len(result.errors) == 0, result.errors[:3]
+    assert len(result.warnings) <= 13, [str(w) for w in result.warnings]
+
+    evt148 = next(r for r in _read_rows(data_dir / "events.csv") if r["event_id"] == "EVT-00148")
+    attached = set(evt148["source_ids"].split(";"))
+    assert "SRC-1165" in attached, evt148["source_ids"]
+    roster_formal_id = next(
+        r["source_id"]
+        for r in _read_rows(data_dir / "sources.csv")
+        if r["source_url"] in pilot_urls and "名录" in r["title"]
+    )
+    assert roster_formal_id in attached, evt148["source_ids"]

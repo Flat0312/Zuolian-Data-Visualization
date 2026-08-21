@@ -10,6 +10,8 @@
 
 **最终验收**：pytest 48 passed（>43，0 skipped）；Ruff 三文件 All checks passed；schema 0 errors / 13 warnings（未超基线）；生产数据保持 608/1165/150，origin 编号 12+2 各自唯一；工作树仅含白名单文件改动。
 
+**补充修复：来源挂接**：修复 merge_longhua_roster.py 从旧基线合并时交叉核对来源不挂接事件的缺陷（第二批合并时曾以手工补挂掩盖）。根因有二：事件挂接只收集证据引用的来源，遗漏无证据直接引用的 SRC-1165；且注册循环原地改写 row["source_id"] 致批次映射查空。改为留存试点ID清单、按批次全量挂接。新增第6项测试"旧基线合并后 schema 0错误、≤13警告、SRC-1165已引用"，TDD 先红后绿验证。最终 pytest 49 passed，Ruff 全绿，schema 0 err/13 warn，生产 EVT-00148 挂接含 SRC-1164;SRC-1165。
+
 ## 2026-08-21 - 版权合规、仓库基线重建与事件证据合并转正
 
 **版权合规：**

@@ -91,6 +91,8 @@ def main() -> None:
         return formal_id
 
     # 1. 注册尚未入库的试点来源（URL已存在则复用正式ID）
+    # 注意：注册会原地改写 row["source_id"]，须先留存试点ID清单供批次挂接使用。
+    pilot_source_ids = [r["source_id"] for r in pilot_sources]
     registered_sources = 0
     for row in pilot_sources:
         if row["source_id"] in reuse_map:
@@ -105,10 +107,13 @@ def main() -> None:
         src_rows.append(row)
         registered_sources += 1
 
+    # 本批全部注册来源（含无证据直接引用的交叉核对来源）都必须挂接到目标事件，
+    # 否则 schema 会报 orphan_source 警告。
+    batch_event_sources = {reuse_map[pid] for pid in pilot_source_ids if pid in reuse_map}
+
     # 2. 合并待转正证据
     taken_ids = {r["evidence_id"] for r in ev_rows}
     merged_count = 0
-    new_sources_for_event: set[str] = set()
     for row in pending:
         row["source_id"] = resolve_source_id(row["source_id"], "")
         original_id = row["evidence_id"]
@@ -119,14 +124,13 @@ def main() -> None:
         row["reviewer_note"] = f"{MERGE_NOTE}（原编号{original_id}）。{row['reviewer_note']}"
         ev_rows.append(row)
         merged_count += 1
-        new_sources_for_event.add(row["source_id"])
 
     # 3. 事件表更新（追加均带去重/标记检查）
     for row in evt_rows:
         if row["event_id"] != "EVT-00148":
             continue
         current = [s for s in row["source_ids"].split(";") if s]
-        row["source_ids"] = ";".join(current + sorted(s for s in new_sources_for_event if s not in current))
+        row["source_ids"] = ";".join(current + sorted(s for s in batch_event_sources if s not in current))
         note_append = (
             "2026-08-21 名录口径：官方名录确认23位烈士姓名、另1位佚名烈士，"
             "合葬墓碑刻名22人；名单用字从陵园官网“汤仕佺”。"
