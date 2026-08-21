@@ -11,6 +11,11 @@ from typing import Any
 
 import pandas as pd
 
+try:
+    from research.analysis.rebuild_org_memberships import rebuild_org_memberships
+except ModuleNotFoundError:
+    from rebuild_org_memberships import rebuild_org_memberships
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 RESEARCH_DIR = PROJECT_ROOT / "research"
@@ -37,7 +42,6 @@ PIPELINE_LOG = LOG_DIR / "standard_pipeline.log"
 
 CLEAN_SCRIPT = RESEARCH_DIR / "analysis" / "clean_zolian_excel.py"
 
-DIRECT_MEMBER_ROLES = {"核心领导", "骨干成员", "普通成员"}
 RELATED_MEMBER_ROLES = {"外围联络人", "相关人士"}
 
 LOCAL_SOURCE_PATHS = {
@@ -77,6 +81,12 @@ def normalize_date(value: Any) -> str:
     if raw.endswith(" 00:00:00"):
         raw = raw[:10]
     return raw
+
+
+def initial_membership_decision_for_role(role: str) -> tuple[str, str, str]:
+    if role in RELATED_MEMBER_ROLES:
+        return "related_person", "medium", "yes"
+    return "candidate", "low", "yes"
 
 
 def infer_date_precision(value: str) -> str:
@@ -524,28 +534,21 @@ def build_standard_tables(
         if not role:
             continue
         membership_id = f"MEM-{len(membership_rows) + 1:05d}"
-        if role in DIRECT_MEMBER_ROLES:
-            membership_type = "member"
-            confidence = "high"
-            needs_manual_review = "no"
-        else:
-            membership_type = "related" if role in RELATED_MEMBER_ROLES else "contextual"
-            confidence = "medium"
-            needs_manual_review = "yes"
-            review_additions.append(
-                {
-                    "queue_id": "",
-                    "source_sheet": "persons",
-                    "record_type": "org_membership",
-                    "record_key": f"ORG-001|{row['person_id']}",
-                    "issue_summary": f"角色“{role}”并不自动等同于正式成员，已按关联组织记录保留。",
-                    "confidence": confidence,
-                    "source_ids": raw_workbook_source_id,
-                    "source_url": "",
-                    "evidence_ref_used": "",
-                    "suggested_action": "人工确认是否保留为正式组织成员。",
-                }
-            )
+        membership_type, confidence, needs_manual_review = initial_membership_decision_for_role(role)
+        review_additions.append(
+            {
+                "queue_id": "",
+                "source_sheet": "persons",
+                "record_type": "org_membership",
+                "record_key": f"ORG-001|{row['person_id']}",
+                "issue_summary": f"角色“{role}”不能自动证明正式成员身份，已按证据待核关系保留。",
+                "confidence": confidence,
+                "source_ids": raw_workbook_source_id,
+                "source_url": "",
+                "evidence_ref_used": "",
+                "suggested_action": "使用组织成员证据台账确认身份。",
+            }
+        )
         membership_rows.append(
             {
                 "membership_id": membership_id,
@@ -1066,6 +1069,7 @@ def main() -> None:
     write_csv(event_participants_df, KB_DIR / "event_participants.csv")
     sources_df = pd.DataFrame(catalog.rows).sort_values("source_id").reset_index(drop=True)
     write_csv(sources_df, KB_DIR / "sources.csv")
+    rebuild_org_memberships(KB_DIR, KB_DIR / "runtime_sources")
     write_csv(review_queue_df, REVIEW_QUEUE_CSV)
     write_csv(correction_log_df, CORRECTION_LOG_CSV)
 
