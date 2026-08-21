@@ -1,4 +1,4 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
 *.pyo
@@ -9,6 +9,9 @@ __pycache__/
 .venv/
 venv/
 env/
+.pytest_tmp/
+pytest-cache-files-*/
+.pytest_cache_local/
 
 # Node / frontend
 node_modules/
@@ -25,20 +28,33 @@ Thumbs.db
 
 # Local temp / runtime
 .codex_tmp/
+.test_sandbox/
+.workbuddy/
 logs/
 cache/
 output/
 dist/
 build/
+~$*.xlsx
 *.log
 *.tmp
 *.temp
 *.bak
+
+# Local data backups (never commit)
+data/backup_*/
 
 # Research process artifacts
 research/logs/
 research/intermediate/
 research/notebooks/.ipynb_checkpoints/
 
+# Copyrighted raw source texts - keep local only, never push to public repo
+# Register metadata/page locators/short quotes instead; see research/drafts/reports/
+research/raw_texts/
+
 # Generated site output
 docs/
+
+# Streamlit graph cache
+.graph_cache/
