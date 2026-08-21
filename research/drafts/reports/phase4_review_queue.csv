@@ -3,10 +3,9 @@ event,EVT-00029,丁玲抵沪就读平民女校,标记为需人工复核;,medium,
 event,EVT-00028,瞿秋白到上海大学任教,标记为需人工复核;,medium,月,yes
 event,EVT-00150,丁玲进入上海大学中国文学系,标记为需人工复核;,medium,月,yes
 event,EVT-00013,1927年创造社文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
-event,EVT-00120,上海文学论战,低置信度; 仅有年份精度;,low,年,no
+event,EVT-00120,上海文学论战,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,年,no
 event,EVT-00061,冯雪峰1927年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00060,冯雪峰1927年参与创造社活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
-event,EVT-00119,创造社文学论战,低置信度; 仅有年份精度;,low,年,no
 event,EVT-00049,夏衍1927年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00048,夏衍1927年参与创造社活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00092,郑伯奇1927年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
@@ -24,14 +23,14 @@ event,EVT-00110,阳翰笙1928年上海文学活动记录,标记为需人工复�
 event,EVT-00010,鲁迅1928年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00101,1929年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00100,1929年太阳社文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
-event,EVT-00236,《生活》周刊创刊,低置信度; 仅有年份精度;,low,年,no
+event,EVT-00236,《生活》周刊创刊,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,日,no
 event,EVT-00235,何家槐1929年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00132,柔石1929年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00179,穆木天1929年中华艺术大学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00122,郁达夫1929年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
-event,EVT-00019,鲁迅拜访内山书店,标记为需人工复核; 低置信度;,low,日,yes
-event,EVT-00016,鲁迅与内山完造通信,标记为需人工复核; 低置信度;,low,日,yes
-event,EVT-00020,鲁迅拜访内山书店,标记为需人工复核; 低置信度;,low,日,yes
+event,EVT-00019,鲁迅拜访内山书店,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,日,no
+event,EVT-00016,鲁迅与内山完造通信,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,日,no
+event,EVT-00020,鲁迅拜访内山书店,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,日,no
 event,EVT-00002,鲁迅与柔石会面,标记为需人工复核;,medium,日,yes
 event,EVT-00003,鲁迅与柔石会面,标记为需人工复核;,medium,日,yes
 event,EVT-00017,鲁迅与内山完造通信,标记为需人工复核; 低置信度;,low,日,yes
@@ -46,9 +45,8 @@ event,EVT-00023,鲁迅光华书局抗议,低置信度; 仅有年份精度;,low,�
 event,EVT-00022,鲁迅商务印书馆抗议,低置信度; 仅有年份精度;,low,年,no
 event,EVT-00004,鲁迅与柔石会面,标记为需人工复核;,medium,日,yes
 event,EVT-00005,鲁迅与柔石会面,标记为需人工复核;,medium,日,yes
-event,EVT-00006,鲁迅与柔石会面,标记为需人工复核; 低置信度;,low,日,yes
-event,EVT-00007,鲁迅与柔石会面,标记为需人工复核; 低置信度;,low,日,yes
-event,EVT-00256,鲁迅五十寿辰集会,低置信度;,low,日,no
+event,EVT-00006,鲁迅与柔石会面,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,日,no
+event,EVT-00256,鲁迅五十寿辰集会,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,日,no
 event,EVT-00041,1931年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00225,1931年上海社会活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00201,1931年左联新年文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
@@ -59,8 +57,8 @@ event,EVT-00064,内山书店秘密会议,标记为需人工复核; 仅有年份�
 event,EVT-00115,冯乃超1931年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00224,叶以群内山书店秘密会议,低置信度; 仅有年份精度;,low,年,no
 event,EVT-00167,吴奚如1931年上海文艺活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
-event,EVT-00187,左联秘密会议,低置信度; 仅有年份精度;,low,年,no
-event,EVT-00188,左联虹口秘密会议,低置信度; 仅有年份精度;,low,年,no
+event,EVT-00187,左联秘密会议,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,日,no
+event,EVT-00188,左联虹口秘密会议,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,月,no
 event,EVT-00170,徐懋庸1931年上海文艺活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00154,沙汀1931年上海文学交流记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00147,沙汀1931年遭拘押相关记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
@@ -78,12 +76,12 @@ event,EVT-00126,郁达夫内山书店秘密会议,标记为需人工复核; 低�
 event,EVT-00127,郁达夫虹口秘密会议,低置信度; 仅有年份精度;,low,年,no
 event,EVT-00111,阳翰笙复旦大学演讲,低置信度; 仅有年份精度;,low,年,no
 event,EVT-00012,鲁迅1931年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
-event,EVT-00257,东方旅社文学集会,低置信度;,low,日,no
+event,EVT-00257,东方旅社文学集会,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,日,no
 event,EVT-00145,李求实被捕事件,标记为需人工复核;,medium,日,yes
 event,EVT-00008,左联五烈士遇难,标记为需人工复核;,high,日,yes
 event,EVT-00148,龙华二十四烈士遇难,标记为需人工复核;,medium,日,yes
-event,EVT-00018,鲁迅与内山完造通信,标记为需人工复核; 低置信度;,low,日,yes
-event,EVT-00258,《北斗》创刊,低置信度;,low,日,no
+event,EVT-00018,鲁迅与内山完造通信,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,日,no
+event,EVT-00258,《北斗》创刊,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,high,日,no
 event,EVT-00215,1932年上海文学交流会记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00071,1932年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00203,1932年左联新年文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
@@ -114,7 +112,7 @@ event,EVT-00035,徐懋庸1934年上海文学活动记录,标记为需人工复�
 event,EVT-00030,瞿秋白1934年光华书局文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00114,阳翰笙上海签名抗议,低置信度; 仅有年份精度;,low,年,no
 event,EVT-00015,鲁迅1934年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
-event,EVT-00261,《太白》创刊,低置信度;,low,日,no
+event,EVT-00261,《太白》创刊,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,high,日,no
 event,EVT-00239,何家槐1935年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00063,冯雪峰1935年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00168,吴奚如1935年上海文艺活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
@@ -125,7 +123,7 @@ event,EVT-00171,徐懋庸1935年上海文艺活动记录,标记为需人工复�
 event,EVT-00082,田汉1935年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00166,聂绀弩1935年上海文艺活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00240,邹韬奋1935年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
-event,EVT-00262,《避暑录话》创刊,低置信度;,low,日,no
+event,EVT-00262,《避暑录话》创刊,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,日,no
 event,EVT-00189,1936年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00191,1936年上海社会活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00095,1936年内山书店文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
