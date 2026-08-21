@@ -1,0 +1,69 @@
+{
+  "generated_at": "2026-08-21T05:25:40.892096+00:00",
+  "source_dir": "D:\\1大创\\左联知识库项目\\data\\processed",
+  "publish_dir": "D:\\1大创\\左联知识库项目\\data\\publish",
+  "rules": {
+    "public_membership_types": [
+      "confirmed_member",
+      "related_person"
+    ],
+    "public_relation_statuses": [
+      "formal"
+    ],
+    "candidate_and_disputed_memberships": "excluded"
+  },
+  "tables": {
+    "persons.csv": {
+      "input": 162,
+      "output": 162,
+      "filtered": 0
+    },
+    "organizations.csv": {
+      "input": 36,
+      "output": 36,
+      "filtered": 0
+    },
+    "places.csv": {
+      "input": 41,
+      "output": 41,
+      "filtered": 0
+    },
+    "events.csv": {
+      "input": 150,
+      "output": 150,
+      "filtered": 0
+    },
+    "person_relations.csv": {
+      "input": 4238,
+      "output": 4238,
+      "filtered": 0
+    },
+    "org_memberships.csv": {
+      "input": 150,
+      "output": 73,
+      "filtered": 77
+    },
+    "org_membership_evidences.csv": {
+      "input": 581,
+      "output": 438,
+      "filtered": 143
+    },
+    "fact_evidences.csv": {
+      "input": 594,
+      "output": 451,
+      "filtered": 143
+    },
+    "event_participants.csv": {
+      "input": 228,
+      "output": 228,
+      "filtered": 0
+    },
+    "sources.csv": {
+      "input": 1153,
+      "output": 1153,
+      "filtered": 0
+    }
+  },
+  "schema_errors": 0,
+  "schema_warnings": 37
+}

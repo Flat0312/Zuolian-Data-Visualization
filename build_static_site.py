@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 from collections import Counter, defaultdict
@@ -11,7 +12,7 @@ import pandas as pd
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-DATA_DIR = PROJECT_ROOT / "data" / "processed"
+DATA_DIR = PROJECT_ROOT / "data" / "publish"
 DOCS_DIR = PROJECT_ROOT / "docs"
 APP_ASSETS_DIR = PROJECT_ROOT / "app" / "frontend" / "assets"
 STATIC_SITE_DIR = PROJECT_ROOT / "static_site"
@@ -332,6 +333,13 @@ def write_text(path: Path, content: str) -> None:
 
 def load_frame(filename: str) -> pd.DataFrame:
     return pd.read_csv(DATA_DIR / filename, encoding="utf-8-sig").fillna("")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="构建左联知识库静态阅读站点。")
+    parser.add_argument("--data-dir", type=Path, default=DATA_DIR, help="标准数据目录")
+    parser.add_argument("--output-dir", type=Path, default=DOCS_DIR, help="静态站输出目录")
+    return parser.parse_args()
 
 
 def cleanup_output() -> None:
@@ -1244,6 +1252,11 @@ def render_graph_page() -> str:
 
 
 def main() -> None:
+    global DATA_DIR, DOCS_DIR
+    args = parse_args()
+    DATA_DIR = args.data_dir.resolve()
+    DOCS_DIR = args.output_dir.resolve()
+
     required = [
         "persons.csv",
         "person_relations.csv",
