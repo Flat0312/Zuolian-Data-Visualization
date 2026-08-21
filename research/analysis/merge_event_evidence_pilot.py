@@ -1,18 +1,14 @@
-# -*- coding: utf-8 -*-
 """把 phase2 事件证据补证试点的人工审核通过项合并进生产数据。
+
+幂等保证：
+- 以 fact_evidences.origin_evidence_id 识别已转正证据；全部已转正时早退不写盘；
+- 已转正证据携带的正式 source_id 会复用给同批剩余证据，来源注册前先按 URL 查重；
+- 注记类字段追加前均做标记检查，重复执行不产生重复文本或新 ID。
 
 前置条件：
 - research/drafts/reports/phase2_event_evidence_pilot_sources.csv 中 10 个有效来源
   （SRC-EVP-005 已确认失效，不合并）已完成网页逐条核验；
 - 项目负责人已确认两项决策：EVT-00029 日期降为 1922；EVT-00143 保留"被捕"并加注记。
-
-动作：
-1. sources.csv 追加 SRC-1154..SRC-1163（跳过失效来源）。
-2. fact_evidences.csv 追加 12 条 FE-EVI-* 正式证据（review_status=reviewed，
-   origin_evidence_id 保留原 FE-EVP-* 编号）。
-3. events.csv 更新 10 个事件的 source_ids；EVT-00029 日期降级；
-   EVT-00143 加术语注记；EVT-00260 置信度 low->medium。
-4. P1 草稿中 FE-SUP-0137 标记为被本试点替代，不合并。
 """
 
 from __future__ import annotations
@@ -31,6 +27,7 @@ P1_SUPPLEMENT = DRAFTS / "phase1_p1_evidence_supplement.csv"
 
 DEPRECATED_SOURCES = {"SRC-EVP-005"}
 MERGE_NOTE = "2026-08-21 合并转正：网页逐条核验通过（AI辅助），项目负责人确认合并"
+P1_REJECT_MARKER = "由补证试点对应证据"
 
 
 def read_csv(path: Path) -> tuple[list[str], list[dict[str, str]]]:
@@ -46,11 +43,6 @@ def write_csv(path: Path, fieldnames: list[str], rows: list[dict[str, str]]) -> 
         writer.writerows(rows)
 
 
-def next_source_id(existing: list[str]) -> str:
-    numbers = [int(s.split("-")[1]) for s in existing if s.startswith("SRC-")]
-    return f"SRC-{max(numbers) + 1:04d}"
-
-
 def formal_evidence_id(row: dict[str, str], taken: set[str]) -> str:
     basis = "|".join(
         row[key] for key in ("subject_type", "subject_id", "predicate", "object_value", "source_id")
@@ -63,37 +55,80 @@ def formal_evidence_id(row: dict[str, str], taken: set[str]) -> str:
     return candidate
 
 
+def build_source_reuse_map(
+    already_merged: list[dict[str, str]],
+    production_rows: list[dict[str, str]],
+) -> dict[str, str]:
+    """从已转正证据回推试点来源的正式ID，并用URL兜底查重。"""
+    reuse: dict[str, str] = {}
+    origin_index = {r["origin_evidence_id"]: r for r in production_rows if r["origin_evidence_id"]}
+    for row in already_merged:
+        merged_row = origin_index.get(row["evidence_id"])
+        if merged_row is not None:
+            reuse[row["source_id"]] = merged_row["source_id"]
+    return reuse
+
+
 def main() -> None:
     src_fields, src_rows = read_csv(DATA / "sources.csv")
     ev_fields, ev_rows = read_csv(DATA / "fact_evidences.csv")
     evt_fields, evt_rows = read_csv(DATA / "events.csv")
 
-    pilot_src_fields, pilot_sources = read_csv(PILOT_SOURCES)
-    pilot_ev_fields, pilot_evidences = read_csv(PILOT_EVIDENCES)
+    _, pilot_sources = read_csv(PILOT_SOURCES)
+    _, pilot_evidences = read_csv(PILOT_EVIDENCES)
 
-    # 1. 来源合并：跳过失效来源，分配正式 ID
+    origin_index = {r["origin_evidence_id"]: r for r in ev_rows if r["origin_evidence_id"]}
+    already_merged = [r for r in pilot_evidences if r["evidence_id"] in origin_index]
+    pending = [r for r in pilot_evidences if r["evidence_id"] not in origin_index]
+
+    if not pending:
+        print(f"无新增：{len(already_merged)} 条试点证据均已转正，跳过写入。")
+        return
+
+    # 来源复用映射：已转正证据回推 + 生产表URL兜底
+    reuse_map = build_source_reuse_map(already_merged, ev_rows)
+    url_index = {r["source_url"]: r["source_id"] for r in src_rows if r["source_url"]}
     existing_src_ids = {r["source_id"] for r in src_rows}
-    id_map: dict[str, str] = {}
-    for row in pilot_sources:
-        if row["source_id"] in DEPRECATED_SOURCES:
-            continue
-        formal_id = next_source_id([r["source_id"] for r in src_rows])
-        while formal_id in existing_src_ids:
-            formal_id = next_source_id([r["source_id"] for r in src_rows] + list(id_map.values()))
-        id_map[row["source_id"]] = formal_id
-        row["source_id"] = formal_id
-        row["needs_manual_review"] = "no"
-        row["review_note"] = f"{row['review_note']}{MERGE_NOTE}。".replace("。。", "。")
-        src_rows.append(row)
-        existing_src_ids.add(formal_id)
 
-    # 2. 证据合并：生成正式 ID，标记 reviewed，保留原编号
+    def allocate_source_id() -> str:
+        numbers = [int(s.split("-")[1]) for s in existing_src_ids if s.startswith("SRC-")]
+        formal_id = f"SRC-{max(numbers) + 1:04d}"
+        while formal_id in existing_src_ids:
+            numbers.append(max(numbers) + 1)
+            formal_id = f"SRC-{max(numbers) + 1:04d}"
+        existing_src_ids.add(formal_id)
+        return formal_id
+
+    def resolve_source_id(pilot_source_id: str, source_url: str) -> str:
+        if pilot_source_id not in reuse_map:
+            reuse_map[pilot_source_id] = (
+                url_index.get(source_url) if source_url else None
+            ) or allocate_source_id()
+            if source_url:
+                url_index[source_url] = reuse_map[pilot_source_id]
+        return reuse_map[pilot_source_id]
+
+    # 1. 注册尚未入库的试点来源（跳过失效来源；URL已存在则复用正式ID）
+    registered_sources = 0
+    for row in pilot_sources:
+        if row["source_id"] in DEPRECATED_SOURCES or row["source_id"] in reuse_map:
+            continue
+        if row["source_url"] and row["source_url"] in url_index:
+            reuse_map[row["source_id"]] = url_index[row["source_url"]]
+            continue
+        row["source_id"] = resolve_source_id(row["source_id"], row["source_url"])
+        row["needs_manual_review"] = "no"
+        if MERGE_NOTE not in row["review_note"]:
+            row["review_note"] = f"{row['review_note']}{MERGE_NOTE}。".replace("。。", "。")
+        src_rows.append(row)
+        registered_sources += 1
+
+    # 2. 合并待转正证据
     taken_ids = {r["evidence_id"] for r in ev_rows}
     event_source_updates: dict[str, set[str]] = {}
     merged_count = 0
-    for row in pilot_evidences:
-        old_source = row["source_id"]
-        row["source_id"] = id_map[old_source]
+    for row in pending:
+        row["source_id"] = resolve_source_id(row["source_id"], "")
         original_id = row["evidence_id"]
         row["evidence_id"] = formal_evidence_id(row, taken_ids)
         taken_ids.add(row["evidence_id"])
@@ -104,7 +139,7 @@ def main() -> None:
         merged_count += 1
         event_source_updates.setdefault(row["subject_id"], set()).add(row["source_id"])
 
-    # 3. 事件表更新
+    # 3. 事件表更新（所有追加均带去重/标记检查）
     decisions = {
         "EVT-00029": {
             "event_date": "1922",
@@ -127,14 +162,12 @@ def main() -> None:
         },
     }
 
-    updated_events = []
     for row in evt_rows:
         eid = row["event_id"]
         extra_sources = event_source_updates.get(eid)
         if extra_sources:
             current = [s for s in row["source_ids"].split(";") if s]
-            merged = current + sorted(s for s in extra_sources if s not in current)
-            row["source_ids"] = ";".join(merged)
+            row["source_ids"] = ";".join(current + sorted(s for s in extra_sources if s not in current))
         if eid in decisions:
             rule = decisions[eid]
             for key in ("event_date", "date_precision", "confidence", "needs_manual_review"):
@@ -150,17 +183,14 @@ def main() -> None:
                 row["display_note"] = f"{row['display_note']}{rule['display_note_append']}"
             if rule.get("correction_reason_append") and rule["correction_reason_append"] not in row["correction_reason"]:
                 row["correction_reason"] = f"{row['correction_reason']}{rule['correction_reason_append']}"
-            updated_events.append(eid)
-        elif extra_sources:
-            updated_events.append(eid)
 
-    # 4. P1 草稿去重标记
+    # 4. P1 草稿去重标记（带标记检查）
     p1_fields, p1_rows = read_csv(P1_SUPPLEMENT)
     for row in p1_rows:
-        if row["evidence_id"] == "FE-SUP-0137":
+        if row["evidence_id"] == "FE-SUP-0137" and P1_REJECT_MARKER not in row["reviewer_note"]:
             row["review_status"] = "rejected"
             row["reviewer_note"] = (
-                "2026-08-21 决策：无定位无摘录，由补证试点对应证据"
+                f"2026-08-21 决策：无定位无摘录，{P1_REJECT_MARKER}"
                 "（含明确定位与短摘录）替代，本条废弃不合并。" + row["reviewer_note"]
             )
 
@@ -169,10 +199,8 @@ def main() -> None:
     write_csv(DATA / "events.csv", evt_fields, evt_rows)
     write_csv(P1_SUPPLEMENT, p1_fields, p1_rows)
 
-    print(f"sources: +{len(id_map)} -> {len(src_rows)}")
+    print(f"sources: +{registered_sources} -> {len(src_rows)}")
     print(f"fact_evidences: +{merged_count} -> {len(ev_rows)}")
-    print(f"events updated: {sorted(set(updated_events))}")
-    print("id_map:", id_map)
 
 
 if __name__ == "__main__":

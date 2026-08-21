@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
 """把 phase2 第二批补证（龙华二十四烈士名录）合并进生产数据。
 
-前置条件：两个来源已完成网页核验，项目负责人确认"23姓名+1佚名"展示口径。
+幂等保证：
+- 以 fact_evidences.origin_evidence_id 识别已转正证据；全部已转正时早退不写盘；
+- 已转正证据携带的正式 source_id 会复用给同批剩余证据，来源注册前先按 URL 查重；
+- 事件注记与 source_ids 追加均带去重检查，重复执行不产生重复文本或新 ID。
 
-动作：
-1. sources.csv 追加 SRC-1164（澎湃政务号"龙华英烈"）、SRC-1165（陵园官网英烈名录）。
-2. fact_evidences.csv 追加 2 条 FE-EVI-* 证据（review_status=reviewed）。
-3. events.csv 更新 EVT-00148：source_ids 追加；display_note 写明名单确认口径。
+前置条件：两个来源已完成网页核验，项目负责人确认"23姓名+1佚名"展示口径。
 """
 
 from __future__ import annotations
@@ -37,15 +36,6 @@ def write_csv(path: Path, fieldnames: list[str], rows: list[dict[str, str]]) -> 
         writer.writerows(rows)
 
 
-def next_source_id(existing: set[str]) -> str:
-    numbers = [int(s.split("-")[1]) for s in existing if s.startswith("SRC-")]
-    candidate = f"SRC-{max(numbers) + 1:04d}"
-    while candidate in existing:
-        numbers.append(max(numbers) + 1)
-        candidate = f"SRC-{max(numbers) + 1:04d}"
-    return candidate
-
-
 def formal_evidence_id(row: dict[str, str], taken: set[str]) -> str:
     basis = "|".join(
         row[key] for key in ("subject_type", "subject_id", "predicate", "object_value", "source_id")
@@ -63,25 +53,64 @@ def main() -> None:
     ev_fields, ev_rows = read_csv(DATA / "fact_evidences.csv")
     evt_fields, evt_rows = read_csv(DATA / "events.csv")
 
-    pilot_src_fields, pilot_sources = read_csv(PILOT_SOURCES)
-    pilot_ev_fields, pilot_evidences = read_csv(PILOT_EVIDENCES)
+    _, pilot_sources = read_csv(PILOT_SOURCES)
+    _, pilot_evidences = read_csv(PILOT_EVIDENCES)
 
+    origin_index = {r["origin_evidence_id"]: r for r in ev_rows if r["origin_evidence_id"]}
+    already_merged = [r for r in pilot_evidences if r["evidence_id"] in origin_index]
+    pending = [r for r in pilot_evidences if r["evidence_id"] not in origin_index]
+
+    if not pending:
+        print(f"无新增：{len(already_merged)} 条试点证据均已转正，跳过写入。")
+        return
+
+    # 来源复用映射：已转正证据回推 + 生产表URL兜底
+    reuse_map: dict[str, str] = {}
+    for row in already_merged:
+        merged_row = origin_index[row["evidence_id"]]
+        reuse_map[row["source_id"]] = merged_row["source_id"]
+    url_index = {r["source_url"]: r["source_id"] for r in src_rows if r["source_url"]}
     existing_src_ids = {r["source_id"] for r in src_rows}
-    id_map: dict[str, str] = {}
-    for row in pilot_sources:
-        formal_id = next_source_id(existing_src_ids)
-        id_map[row["source_id"]] = formal_id
-        row["source_id"] = formal_id
-        row["needs_manual_review"] = "no"
-        row["review_note"] = f"{row['review_note']}{MERGE_NOTE}。".replace("。。", "。")
-        src_rows.append(row)
-        existing_src_ids.add(formal_id)
 
+    def resolve_source_id(pilot_source_id: str, source_url: str) -> str:
+        if pilot_source_id not in reuse_map:
+            reuse_map[pilot_source_id] = (
+                url_index.get(source_url) if source_url else None
+            ) or allocate_source_id()
+            if source_url:
+                url_index[source_url] = reuse_map[pilot_source_id]
+        return reuse_map[pilot_source_id]
+
+    def allocate_source_id() -> str:
+        numbers = [int(s.split("-")[1]) for s in existing_src_ids if s.startswith("SRC-")]
+        formal_id = f"SRC-{max(numbers) + 1:04d}"
+        while formal_id in existing_src_ids:
+            numbers.append(max(numbers) + 1)
+            formal_id = f"SRC-{max(numbers) + 1:04d}"
+        existing_src_ids.add(formal_id)
+        return formal_id
+
+    # 1. 注册尚未入库的试点来源（URL已存在则复用正式ID）
+    registered_sources = 0
+    for row in pilot_sources:
+        if row["source_id"] in reuse_map:
+            continue
+        if row["source_url"] and row["source_url"] in url_index:
+            reuse_map[row["source_id"]] = url_index[row["source_url"]]
+            continue
+        row["source_id"] = resolve_source_id(row["source_id"], row["source_url"])
+        row["needs_manual_review"] = "no"
+        if MERGE_NOTE not in row["review_note"]:
+            row["review_note"] = f"{row['review_note']}{MERGE_NOTE}。".replace("。。", "。")
+        src_rows.append(row)
+        registered_sources += 1
+
+    # 2. 合并待转正证据
     taken_ids = {r["evidence_id"] for r in ev_rows}
     merged_count = 0
     new_sources_for_event: set[str] = set()
-    for row in pilot_evidences:
-        row["source_id"] = id_map[row["source_id"]]
+    for row in pending:
+        row["source_id"] = resolve_source_id(row["source_id"], "")
         original_id = row["evidence_id"]
         row["evidence_id"] = formal_evidence_id(row, taken_ids)
         taken_ids.add(row["evidence_id"])
@@ -92,6 +121,7 @@ def main() -> None:
         merged_count += 1
         new_sources_for_event.add(row["source_id"])
 
+    # 3. 事件表更新（追加均带去重/标记检查）
     for row in evt_rows:
         if row["event_id"] != "EVT-00148":
             continue
@@ -108,9 +138,8 @@ def main() -> None:
     write_csv(DATA / "fact_evidences.csv", ev_fields, ev_rows)
     write_csv(DATA / "events.csv", evt_fields, evt_rows)
 
-    print(f"sources: +{len(id_map)} -> {len(src_rows)}")
+    print(f"sources: +{registered_sources} -> {len(src_rows)}")
     print(f"fact_evidences: +{merged_count} -> {len(ev_rows)}")
-    print("id_map:", id_map)
 
 
 if __name__ == "__main__":
