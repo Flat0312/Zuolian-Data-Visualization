@@ -135,4 +135,4 @@ FE-SUP-0133,person,ZLH-120,person_birth_year,夏征农生于1904年,SRC-SUP-01,�
 FE-SUP-0134,person,ZLH-120,person_death_year,夏征农卒于2008年,SRC-SUP-01,中国大百科全书·中国文学卷（待核卷页）,,support,B,pending,AI提议补充卒年证据；请人工比对权威来源后转正,
 FE-SUP-0135,person,ZLH-120,person_role,夏征农左联角色：普通成员,SRC-SUP-01,中国大百科全书·中国文学卷（待核卷页）,,support,B,pending,AI提议补充角色证据（组织分类角色）；请人工核对后转正,
 FE-SUP-0136,event,EVT-00001,event_occurrence,中国左翼作家联盟成立大会（1930-03-02）,SRC-1118;SRC-1119,公开权威史料（待核具体出处）,,support,B,pending,AI提议补充事件存在证据；来源已在 events.csv 登记，请人工确认 locator 后转正,
-FE-SUP-0137,event,EVT-00008,event_occurrence,左联五烈士遇难（1931-02-07）,SRC-1123;SRC-1124;SRC-1143;SRC-1144,公开权威史料（待核具体出处）,,support,B,pending,AI提议补充事件存在证据；来源已在 events.csv 登记，请人工确认 locator 后转正,
+FE-SUP-0137,event,EVT-00008,event_occurrence,左联五烈士遇难（1931-02-07）,SRC-1123;SRC-1124;SRC-1143;SRC-1144,公开权威史料（待核具体出处）,,support,B,rejected,2026-08-21 决策：无定位无摘录，由补证试点对应证据（含明确定位与短摘录）替代，本条废弃不合并。AI提议补充事件存在证据；来源已在 events.csv 登记，请人工确认 locator 后转正,

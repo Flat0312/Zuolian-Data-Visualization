@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-21T05:25:40.892096+00:00",
+  "generated_at": "2026-08-21T06:04:46.672858+00:00",
   "source_dir": "D:\\1大创\\左联知识库项目\\data\\processed",
   "publish_dir": "D:\\1大创\\左联知识库项目\\data\\publish",
   "rules": {
@@ -49,8 +49,8 @@
       "filtered": 143
     },
     "fact_evidences.csv": {
-      "input": 594,
-      "output": 451,
+      "input": 606,
+      "output": 463,
       "filtered": 143
     },
     "event_participants.csv": {
@@ -59,8 +59,8 @@
       "filtered": 0
     },
     "sources.csv": {
-      "input": 1153,
-      "output": 1153,
+      "input": 1163,
+      "output": 1163,
       "filtered": 0
     }
   },
