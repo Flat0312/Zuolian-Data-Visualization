@@ -1,0 +1,2 @@
+﻿severity,code,table,row_ref,message
+warning,organization_granularity,organizations.csv,,组织仅 3 条，但成员关系有 150 条，疑似组织粒度过粗。

@@ -1,0 +1,166 @@
+﻿priority,subject_type,subject_id,subject_name,confidence,date_precision,recommended_action
+高,event,EVT-00019,鲁迅拜访内山书店,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+高,event,EVT-00016,鲁迅与内山完造通信,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+高,event,EVT-00020,鲁迅拜访内山书店,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+高,event,EVT-00017,鲁迅与内山完造通信,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+高,event,EVT-00006,鲁迅与柔石会面,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+高,event,EVT-00007,鲁迅与柔石会面,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+高,event,EVT-00256,鲁迅五十寿辰集会,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位
+高,event,EVT-00126,郁达夫内山书店秘密会议,low,年,补充权威来源，提升 evidence_strength；人工复核后决定是否转正
+高,event,EVT-00257,东方旅社文学集会,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位
+高,event,EVT-00018,鲁迅与内山完造通信,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+高,event,EVT-00258,《北斗》创刊,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位
+高,event,EVT-00260,远东反战会议,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位
+高,event,EVT-00261,《太白》创刊,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位
+高,event,EVT-00262,《避暑录话》创刊,low,日,补充权威来源，提升 evidence_strength；核实日期精度（当前仅到「日」），补充日级定位
+中,event,EVT-00029,丁玲抵沪就读平民女校,medium,月,核实日期精度（当前仅到「月」），补充日级定位；人工复核后决定是否转正
+中,event,EVT-00028,瞿秋白到上海大学任教,medium,月,核实日期精度（当前仅到「月」），补充日级定位；人工复核后决定是否转正
+中,event,EVT-00150,丁玲进入上海大学中国文学系,medium,月,核实日期精度（当前仅到「月」），补充日级定位；人工复核后决定是否转正
+中,event,EVT-00120,上海文学论战,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00119,创造社文学论战,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00236,《生活》周刊创刊,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00002,鲁迅与柔石会面,medium,日,核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+中,event,EVT-00003,鲁迅与柔石会面,medium,日,核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+中,event,EVT-00023,鲁迅光华书局抗议,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00022,鲁迅商务印书馆抗议,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00004,鲁迅与柔石会面,medium,日,核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+中,event,EVT-00005,鲁迅与柔石会面,medium,日,核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+中,event,EVT-00212,上海文学座谈会,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00224,叶以群内山书店秘密会议,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00187,左联秘密会议,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00188,左联虹口秘密会议,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00065,虹口秘密会议,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00217,邹韬奋上海演讲,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00127,郁达夫虹口秘密会议,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00111,阳翰笙复旦大学演讲,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00145,李求实被捕事件,medium,日,核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+中,event,EVT-00008,左联五烈士遇难,high,日,核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+中,event,EVT-00148,龙华二十四烈士遇难,medium,日,核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+中,event,EVT-00024,《光华》创刊,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00038,《文学月报》文学讨论会,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00253,内山完造新年集会,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00196,周立波上海文学沙龙,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00184,穆木天上海会议,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00138,楼适夷因支持《文学》月刊被捕,high,日,核实日期精度（当前仅到「日」），补充日级定位；人工复核后决定是否转正
+中,event,EVT-00114,阳翰笙上海签名抗议,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00200,于黑丁上海文艺集会,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00199,王任叔上海文化交流,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00197,林淡秋商务印书馆文学讲座,low,年,补充权威来源，提升 evidence_strength
+中,event,EVT-00213,《文学月报》讨论会,low,年,补充权威来源，提升 evidence_strength
+中,place,PLC-00007,内山书店,low,street,补充权威来源，提升 evidence_strength
+中,place,PLC-00008,虹口区十字街头,low,district,补充权威来源，提升 evidence_strength
+中,place,PLC-00009,商务印书馆,low,district,补充权威来源，提升 evidence_strength
+中,place,PLC-00010,光华书局,low,district,补充权威来源，提升 evidence_strength
+中,place,PLC-00013,良友图书公司,low,district,补充权威来源，提升 evidence_strength
+中,place,PLC-00017,现代书局,low,district,补充权威来源，提升 evidence_strength
+中,place,PLC-00023,明星影片公司,low,district,补充权威来源，提升 evidence_strength
+中,place,PLC-00024,生活书店,low,street,补充权威来源，提升 evidence_strength
+中,place,PLC-00028,虹口,low,street,补充权威来源，提升 evidence_strength
+中,place,PLC-00034,复旦大学,low,street,补充权威来源，提升 evidence_strength
+中,place,PLC-00035,生活书店（福州路）,low,street,补充权威来源，提升 evidence_strength
+中,place,PLC-00036,复旦大学江湾校区,low,street,补充权威来源，提升 evidence_strength
+中,place,PLC-00042,创造社（闸北宝山路）,low,district,补充权威来源，提升 evidence_strength
+中,place,PLC-00065,北新书局,low,district,补充权威来源，提升 evidence_strength
+中,place,PLC-00068,虹口区密集活动地,low,district,补充权威来源，提升 evidence_strength
+中,place,PLC-00069,南京路,low,district,补充权威来源，提升 evidence_strength
+中,place,PLC-00071,荷兰西餐室,low,unknown,补充权威来源，提升 evidence_strength
+中,place,PLC-00072,东方旅社,low,district,补充权威来源，提升 evidence_strength
+中,place,PLC-00073,湖风书局,low,unknown,补充权威来源，提升 evidence_strength
+中,place,PLC-00075,远东反战大会旧址,low,unknown,补充权威来源，提升 evidence_strength
+中,place,PLC-00076,霞飞路桃源坊,low,unknown,补充权威来源，提升 evidence_strength
+中,place,PLC-00077,青岛民报社,low,unknown,补充权威来源，提升 evidence_strength
+低,event,EVT-00013,1927年创造社文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00061,冯雪峰1927年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00060,冯雪峰1927年参与创造社活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00049,夏衍1927年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00048,夏衍1927年参与创造社活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00092,郑伯奇1927年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00113,阳翰笙1927年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00014,鲁迅1927年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00183,1928年《萌芽月刊》文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00011,1928年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00009,1928年创造社文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00103,1928年太阳社文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00059,冯雪峰1928年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00058,冯雪峰1928年参与创造社活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00047,夏衍1928年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00046,夏衍1928年参与创造社活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00110,阳翰笙1928年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00010,鲁迅1928年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00101,1929年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00100,1929年太阳社文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00235,何家槐1929年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00132,柔石1929年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00179,穆木天1929年中华艺术大学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00122,郁达夫1929年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00040,1930年《萌芽月刊》文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00093,1930年内山书店文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00094,1930年创造社文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00131,柔石1930年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00185,楼适夷1930年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00181,穆木天1930年中华艺术大学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00209,高尔基1930年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00041,1931年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00225,1931年上海社会活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00201,1931年左联新年文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00116,丁玲1931年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00237,何家槐1931年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00064,内山书店秘密会议,medium,年,人工复核后决定是否转正
+低,event,EVT-00115,冯乃超1931年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00167,吴奚如1931年上海文艺活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00170,徐懋庸1931年上海文艺活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00154,沙汀1931年上海文学交流记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00147,沙汀1931年遭拘押相关记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00067,潘汉年1931年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00086,田汉1931年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00165,聂绀弩1931年上海文艺活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00146,艾芜1931年遭拘押相关记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00026,茅盾1931年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00245,萧伯纳1931年访华相关记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00238,邹韬奋1931年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00123,郁达夫1931年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00012,鲁迅1931年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00215,1932年上海文学交流会记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00071,1932年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00203,1932年左联新年文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00118,丁玲1932年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00121,冯乃超1932年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00079,周扬1932年遭拘押相关记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00051,夏衍1932年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00175,徐懋庸1932年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00186,楼适夷1932年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00156,沙汀1932年上海文学交流记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00066,潘汉年1932年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00036,瞿秋白1932年光华书局文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00025,茅盾1932年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00125,郁达夫1932年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00193,1933年上海抗日签名活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00078,周扬1933年遭拘押相关记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00144,胡风1933年在日本因反日活动被捕记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00223,高尔基1933年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00075,1934年良友图书文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00035,徐懋庸1934年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00030,瞿秋白1934年光华书局文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00015,鲁迅1934年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00239,何家槐1935年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00063,冯雪峰1935年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00168,吴奚如1935年上海文艺活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00044,夏衍1935年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00230,孙席珍1935年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00228,孙席珍1935年生活书店文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00171,徐懋庸1935年上海文艺活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00082,田汉1935年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00166,聂绀弩1935年上海文艺活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00240,邹韬奋1935年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00189,1936年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00191,1936年上海社会活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00095,1936年内山书店文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00076,1936年良友图书文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00054,夏衍1936年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00157,沙汀1936年上海文学交流记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00192,1937年上海抗日签名活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00233,孙席珍1937年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00232,孙席珍1937年生活书店文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00089,郑伯奇1937年上海文学活动记录,medium,年,人工复核后决定是否转正
+低,event,EVT-00214,1940年上海文学交流会记录,medium,年,人工复核后决定是否转正
+低,place,PLC-00074,宋庆龄莫利爱路寓所,high,unknown,维持待核标记，定期复核

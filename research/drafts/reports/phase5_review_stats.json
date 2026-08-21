@@ -1,0 +1,33 @@
+{
+  "total": 400,
+  "verdict_total": {
+    "needs_human": 252,
+    "plausible": 148
+  },
+  "method_total": {
+    "no_corroboration": 127,
+    "context_match": 81,
+    "context_match_partial": 22,
+    "type_flag": 103,
+    "org_corroborated": 67
+  },
+  "downgrade_recs": 17,
+  "verdict_by_risk": {
+    "high": {
+      "needs_human": 25,
+      "plausible": 21
+    },
+    "low": {
+      "plausible": 72,
+      "needs_human": 88
+    },
+    "critical": {
+      "needs_human": 133,
+      "plausible": 51
+    },
+    "medium": {
+      "needs_human": 6,
+      "plausible": 4
+    }
+  }
+}
