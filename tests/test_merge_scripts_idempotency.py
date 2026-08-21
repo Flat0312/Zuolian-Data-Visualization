@@ -259,7 +259,8 @@ def test_batch2_merge_from_old_baseline_schema_clean_and_src1165_referenced(tmp_
 
     evt148 = next(r for r in _read_rows(data_dir / "events.csv") if r["event_id"] == "EVT-00148")
     attached = set(evt148["source_ids"].split(";"))
-    assert "SRC-1165" in attached, evt148["source_ids"]
+    # 正式 ID 按沙盒内当时最大编号动态分配（第三批合并后不再必然是 SRC-1164/1165），
+    # 故按 URL 动态回推名录来源的正式 ID 并断言其已被事件挂接。
     roster_formal_id = next(
         r["source_id"]
         for r in _read_rows(data_dir / "sources.csv")

@@ -62,14 +62,14 @@
 | --- | ---: |
 | `persons.csv` | 162 |
 | `person_relations.csv` | 4238 |
-| `events.csv` | 150 |
+| `events.csv` | 148 |
 | `places.csv` | 41 |
 | `organizations.csv` | 36 |
 | `org_memberships.csv` | 150 |
 | `org_membership_evidences.csv` | 581 |
-| `fact_evidences.csv` | 608 |
-| `event_participants.csv` | 228 |
-| `sources.csv` | 1165 |
+| `fact_evidences.csv` | 628 |
+| `event_participants.csv` | 224 |
+| `sources.csv` | 1177 |
 
 ---
 
@@ -267,6 +267,7 @@ OPENAI_MODEL=gpt-4o
 - ✅ 已完成：证据驱动的组织身份重建、事实证据层、研究层与发布层分离。
 - ✅ 已完成：事件地点质量治理、人物关系分层抽样和基础网络分析。
 - ✅ 已完成：标准知识库、Streamlit 应用与 GitHub Pages 静态阅读版。
+- ✅ 已完成：第三批事件史料 20 条证据经人工签核合并转正，事件覆盖率升至 18.9%（28/148）。
 - 🔜 收尾重点：完成 400 条人物关系人工判定，并生成准确率与错误分析。
 - 🔜 收尾重点：形成至少 3 项可复核研究发现，完成答辩 PPT 与 5 分钟演示脚本。
 

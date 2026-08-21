@@ -1,4 +1,4 @@
-event_participant_id,event_id,person_id,participant_name,participant_role,source_ids,confidence,needs_manual_review
+﻿event_participant_id,event_id,person_id,participant_name,participant_role,source_ids,confidence,needs_manual_review
 EVP-00001,EVT-00001,ZLH-001,鲁迅,待核,SRC-1118;SRC-1119,high,no
 EVP-00084,EVT-00001,ZLH-006,潘汉年,待核,SRC-1118;SRC-1119,high,no
 EVP-00127,EVT-00001,ZLH-011,钱杏邨,待核,SRC-1118;SRC-1119,high,no
@@ -17,8 +17,6 @@ EVP-00009,EVT-00005,ZLH-001,鲁迅,直接参与者,SRC-1122,medium,yes
 EVP-00008,EVT-00005,ZLH-016,柔石,直接参与者,SRC-1122,medium,yes
 EVP-00010,EVT-00006,ZLH-001,鲁迅,直接参与者,SRC-1122,low,yes
 EVP-00011,EVT-00006,ZLH-016,柔石,直接参与者,SRC-1122,low,yes
-EVP-00013,EVT-00007,ZLH-001,鲁迅,直接参与者,SRC-1122,low,yes
-EVP-00012,EVT-00007,ZLH-016,柔石,直接参与者,SRC-1122,low,yes
 EVP-00014,EVT-00008,ZLH-001,鲁迅,关联人物,SRC-1123;SRC-1124,high,yes
 EVP-00037,EVT-00008,ZLH-002,茅盾,关联人物,SRC-1123;SRC-1124,high,yes
 EVP-00073,EVT-00008,ZLH-005,冯雪峰,关联人物,SRC-1123;SRC-1124,high,yes
@@ -114,8 +112,6 @@ EVP-00150,EVT-00114,ZLH-013,阳翰笙,直接参与者,SRC-0001,low,no
 EVP-00151,EVT-00115,ZLH-014,冯乃超,直接参与者,SRC-0001,medium,yes
 EVP-00152,EVT-00116,ZLH-021,丁玲,直接参与者,SRC-0001,medium,yes
 EVP-00154,EVT-00118,ZLH-021,丁玲,直接参与者,SRC-0001,medium,yes
-EVP-00155,EVT-00119,ZLH-014,冯乃超,unclear,SRC-0001,low,no
-EVP-00156,EVT-00119,ZLH-034,彭康,unclear,SRC-0001,low,no
 EVP-00157,EVT-00120,ZLH-014,冯乃超,unclear,SRC-0001,low,no
 EVP-00158,EVT-00120,ZLH-034,彭康,unclear,SRC-0001,low,no
 EVP-00159,EVT-00121,ZLH-014,冯乃超,直接参与者,SRC-0001,medium,yes

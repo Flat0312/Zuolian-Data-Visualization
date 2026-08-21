@@ -7,13 +7,13 @@
 | `persons.csv` | 162 | 162 | 0 |
 | `organizations.csv` | 36 | 36 | 0 |
 | `places.csv` | 41 | 41 | 0 |
-| `events.csv` | 150 | 150 | 0 |
+| `events.csv` | 148 | 148 | 0 |
 | `person_relations.csv` | 4238 | 4238 | 0 |
 | `org_memberships.csv` | 150 | 73 | 77 |
 | `org_membership_evidences.csv` | 581 | 438 | 143 |
-| `fact_evidences.csv` | 608 | 465 | 143 |
-| `event_participants.csv` | 228 | 228 | 0 |
-| `sources.csv` | 1165 | 1165 | 0 |
+| `fact_evidences.csv` | 628 | 485 | 143 |
+| `event_participants.csv` | 224 | 224 | 0 |
+| `sources.csv` | 1177 | 1177 | 0 |
 
 - Schema 严重错误：0
 - Schema 警告：37
