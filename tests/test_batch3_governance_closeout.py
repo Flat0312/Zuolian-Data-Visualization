@@ -94,7 +94,7 @@ def _baseline_reviewer_notes() -> dict[str, str]:
 
 
 def test_batch3_conflict_notes_are_byte_identical_to_pre_governance_baseline() -> None:
-    """9 条 conflict 注记必须与治理起点基线逐字节一致——文案治理只许动文档与结构化字段。
+    """仍保留为 conflict 的 8 条注记必须与治理起点基线逐字节一致。
 
     用户裁决（2026-08-27 验收）：对生产证据注记的历次“归一化”改写属越界，须回滚；
     evidence_support/conflict 等语义列本就不许动，reviewer_note 亦冻结在基线值。
@@ -104,7 +104,7 @@ def test_batch3_conflict_notes_are_byte_identical_to_pre_governance_baseline() -
     targets = [
         r for r in rows if r.get("origin_evidence_id", "").startswith("FE-EVP3-") and r["evidence_support"] == "conflict"
     ]
-    assert len(targets) == 9
+    assert len(targets) == 8
     for row in targets:
         original = baseline.get(row["evidence_id"])
         assert original is not None, f"{row['evidence_id']} 在基线中无对应候选证据"
@@ -134,7 +134,7 @@ def test_batch3_review_doc_has_no_unattributed_signoff_claim() -> None:
 
 
 def test_processed_fact_evidences_have_structured_adjudication_status() -> None:
-    """第三批 9 条 conflict 必须携带 resolved_by_event_correction，其余行为空。"""
+    """第三批仍保留为 conflict 的 8 条必须携带 resolved_by_event_correction，其余行为空。"""
     fields, rows = _read_facts(REPO_ROOT / "data" / "processed" / "fact_evidences.csv")
     assert "adjudication_status" in fields, "fact_evidences.csv 缺少 adjudication_status 列"
 
@@ -204,7 +204,11 @@ def _recompute_event_metrics(facts_path: Path, events_path: Path) -> dict[str, i
     direct: set[str] = set()
     confirmed: set[str] = set()
     for row in facts:
-        if row["predicate"] != "event_occurrence" or row["subject_id"] not in event_ids:
+        if (
+            row["predicate"] != "event_occurrence"
+            or row["subject_id"] not in event_ids
+            or row.get("review_status") == "rejected"
+        ):
             continue
         subject = row["subject_id"]
         attached.add(subject)
@@ -226,10 +230,8 @@ def _recompute_event_metrics(facts_path: Path, events_path: Path) -> dict[str, i
 def test_coverage_report_distinguishes_three_event_metrics(sandbox_tmp_path: Path) -> None:
     """三种口径名称互不冒充，数值由独立第二算法交叉复算一致。
 
-    裁决定值（BLOCKED.md B-2，2026-08-27 选项 b）：已挂接 28 / 直接支持 22 /
-    已确认 23。第三口径按字面公式（reviewed 且 support 或 resolved_by_event_
-    correction）实算即为 23/148；原任务书的 28 在该公式与现有数据下不可达
-    （EVT-00029 仅 lead、4 个事件仅 machine_extracted 支撑）。
+    第四批A执行后的生产定值为：已挂接 26 / 直接支持 21 / 已确认 26，
+    分母为 147；三种口径均排除 review_status=rejected。
     """
     from research.analysis.report_evidence_coverage import report_evidence_coverage
 
@@ -246,10 +248,10 @@ def test_coverage_report_distinguishes_three_event_metrics(sandbox_tmp_path: Pat
         REPO_ROOT / "data" / "processed" / "fact_evidences.csv",
         REPO_ROOT / "data" / "processed" / "events.csv",
     )
-    # 独立复算与报告一致，且等于裁决定值三牵手 28/22/23。
-    assert summary["event_attached_any"]["covered"] == recomputed["attached"] == 28
-    assert summary["event_direct_support"]["covered"] == recomputed["direct"] == 22
-    assert summary["event_confirmed"]["covered"] == recomputed["confirmed"] == 23
+    # 独立复算与报告一致，且等于第四批A执行后的定值 26/21/26。
+    assert summary["event_attached_any"]["covered"] == recomputed["attached"] == 26
+    assert summary["event_direct_support"]["covered"] == recomputed["direct"] == 21
+    assert summary["event_confirmed"]["covered"] == recomputed["confirmed"] == 26
 
     assert summary["event_attached_any"]["total"] == recomputed["total"]
     # 已挂接 ≥ 直接支持：支持族 ⊆ 全部挂接证据。
@@ -261,7 +263,7 @@ def test_coverage_report_distinguishes_three_event_metrics(sandbox_tmp_path: Pat
 
 def test_publish_layer_matches_processed_adjudication_semantics() -> None:
     """发布层是过滤后的公开子集：凡发布的行，裁决状态必须与生产层同值；
-    全部 9 条 resolved_by_event_correction 必须进入发布层（均为 reviewed）。"""
+    当前 8 条 resolved_by_event_correction 必须进入发布层（均为 reviewed）。"""
     _, processed = _read_facts(REPO_ROOT / "data" / "processed" / "fact_evidences.csv")
     _, published = _read_facts(REPO_ROOT / "data" / "publish" / "fact_evidences.csv")
 
@@ -281,6 +283,6 @@ def test_publish_layer_matches_processed_adjudication_semantics() -> None:
         for r in processed
         if r.get("adjudication_status") == "resolved_by_event_correction"
     }
-    assert len(resolved_ids) == 9
+    assert len(resolved_ids) == 8
     missing_in_publish = resolved_ids - set(published_by_id)
     assert not missing_in_publish, f"已裁决证据未进发布层：{sorted(missing_in_publish)}"

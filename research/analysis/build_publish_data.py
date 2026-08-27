@@ -60,7 +60,11 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
         lambda row: (str(row["subject_id"]).strip(), str(row["object_value"]).strip()) in public_membership_keys,
         axis=1,
     )
-    tables["fact_evidences.csv"] = facts[~membership_fact_mask | public_membership_fact_mask].copy()
+    # 第四批A裁决：rejected 状态的事实证据一律不进入发布层。
+    non_rejected_mask = facts["review_status"].astype(str).str.strip() != "rejected"
+    tables["fact_evidences.csv"] = facts[
+        non_rejected_mask & (~membership_fact_mask | public_membership_fact_mask)
+    ].copy()
 
     manifest_tables: dict[str, dict[str, int]] = {}
     for filename in REQUIRED_DATA_FILES:
@@ -82,6 +86,7 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
             "public_membership_types": sorted(PUBLIC_MEMBERSHIP_TYPES),
             "public_relation_statuses": sorted(PUBLIC_RELATION_STATUSES),
             "candidate_and_disputed_memberships": "excluded",
+            "rejected_fact_evidences": "excluded",
         },
         "tables": manifest_tables,
         "schema_errors": len(validation.errors),
@@ -109,6 +114,7 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
             f"- Schema 警告：{len(validation.warnings)}",
             "- 公开组织身份仅保留 `confirmed_member` 与 `related_person`。",
             "- `candidate` 与 `disputed` 仅保留在研究层。",
+            "- `fact_evidences.csv` 中 `review_status=rejected` 的事实证据不进入发布层。",
         ]
     )
     report_path.parent.mkdir(parents=True, exist_ok=True)

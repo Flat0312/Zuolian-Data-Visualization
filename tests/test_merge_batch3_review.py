@@ -111,6 +111,16 @@ def test_batch3_second_run_on_merged_copy_is_noop(tmp_path, monkeypatch, capsys)
     data_dir, drafts_dir = _stage(tmp_path)
     _configure(monkeypatch, module, data_dir, drafts_dir)
 
+    # 运行前事件基数来自当前生产副本（第四批A执行后为147，不再硬编码148）；
+    # 合并净删除量只计入运行前确实存在的待删重复事件（当前生产已无
+    # EVT-00007/EVT-00119，故期望增量为0）；第三批真实基线重放的 150→148
+    # 历史断言由 test_merge_batch3_real_baseline.py 单独锚定。
+    event_rows_before = _read_rows(data_dir / "events.csv")
+    events_before = _row_count(data_dir / "events.csv")
+    removable_before = sum(
+        1 for r in event_rows_before if r["event_id"] in ("EVT-00007", "EVT-00119")
+    )
+
     module.main()
     tracked = [
         data_dir / "sources.csv",
@@ -143,6 +153,16 @@ def test_batch3_fresh_add_counts_merge_and_remap(tmp_path, monkeypatch, capsys):
     src_base, ev_base = _strip_batch3_traces(data_dir, drafts_dir)
     _configure(monkeypatch, module, data_dir, drafts_dir)
 
+    # 运行前事件基数来自当前生产副本（第四批A执行后为147，不再硬编码148）；
+    # 合并净删除量只计入运行前确实存在的待删重复事件（当前生产已无
+    # EVT-00007/EVT-00119，故期望增量为0）；第三批真实基线重放的 150→148
+    # 历史断言由 test_merge_batch3_real_baseline.py 单独锚定。
+    event_rows_before = _read_rows(data_dir / "events.csv")
+    events_before = _row_count(data_dir / "events.csv")
+    removable_before = sum(
+        1 for r in event_rows_before if r["event_id"] in ("EVT-00007", "EVT-00119")
+    )
+
     module.main()
 
     assert _row_count(data_dir / "sources.csv") == src_base + 12
@@ -152,7 +172,9 @@ def test_batch3_fresh_add_counts_merge_and_remap(tmp_path, monkeypatch, capsys):
     events = _read_rows(data_dir / "events.csv")
     event_ids = {r["event_id"] for r in events}
     assert "EVT-00007" not in event_ids and "EVT-00119" not in event_ids
-    assert len(events) == 148
+    assert len(events) == events_before - removable_before, (
+        f"合并后事件数应等于基数减去实际删除数：{events_before}−{removable_before}→{len(events)}"
+    )
 
     parts = _read_rows(data_dir / "event_participants.csv")
     part_events = {r["event_id"] for r in parts}

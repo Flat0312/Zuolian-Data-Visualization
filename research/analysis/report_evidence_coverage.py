@@ -38,28 +38,43 @@ def report_evidence_coverage(data_dir: Path, report_path: Path, queue_path: Path
         (str(row["person_id"]).strip(), str(row["organization_id"]).strip()) in membership_keys
         for _, row in memberships.iterrows()
     )
-    event_ids = set(facts.loc[facts["predicate"] == "event_occurrence", "subject_id"].astype(str))
-    covered_events = sum(str(event_id) in event_ids for event_id in events["event_id"])
-
     # 三种事件口径，语义互不冒充：
     # 1) 已挂接：存在任一条 event_occurrence 事实证据；
     # 2) 直接支持：至少一条 evidence_support=support 的证据（不论复核/裁决状态）；
     # 3) 已确认：至少一条 reviewed 且（support 或 adjudication_status=resolved_by_event_correction）
     #    ——原始冲突不计入，仅“已由事件级裁决落地”的 conflict 计入。
-    event_facts = facts[facts["predicate"] == "event_occurrence"]
+    event_facts_raw = facts[facts["predicate"] == "event_occurrence"]
+    # 三口径均排除 rejected：被拒绝的证据不计入任何覆盖（第四批A裁决）。
+    event_facts = event_facts_raw[
+        event_facts_raw["review_status"].astype(str).str.strip() != "rejected"
+    ]
+    adjudication_status = (
+        event_facts["adjudication_status"].astype(str).str.strip()
+        if "adjudication_status" in event_facts.columns
+        else pd.Series("", index=event_facts.index)
+    )
+    confirmed_frame = event_facts[
+        (event_facts["review_status"] == "reviewed")
+        & (
+            (event_facts["evidence_support"] == "support")
+            | (adjudication_status == "resolved_by_event_correction")
+        )
+    ]
     direct_support_events = set(
-        event_facts.loc[event_facts["evidence_support"] == "support", "subject_id"].astype(str)
+        event_facts.loc[event_facts["evidence_support"] == "support", "subject_id"].astype(str).str.strip()
     )
-    confirmed_mask = (event_facts["review_status"] == "reviewed") & (
-        (event_facts["evidence_support"] == "support")
-        | (event_facts.get("adjudication_status", "") == "resolved_by_event_correction")
+    confirmed_events = set(confirmed_frame["subject_id"].astype(str).str.strip())
+    # 已挂接口径同样排除 rejected（第四批A裁决）：仅“非拒绝”的证据构成挂接事实。
+    qualifying_event_subjects = set(event_facts["subject_id"].astype(str).str.strip())
+    covered_events = sum(
+        str(event_id) in qualifying_event_subjects for event_id in events["event_id"]
     )
-    confirmed_events = set(event_facts.loc[confirmed_mask, "subject_id"].astype(str))
 
     total_events = len(events)
     metrics_events = {
         "event_attached_any": _coverage(
-            sum(str(event_id) in event_ids for event_id in events["event_id"]), total_events
+            sum(str(event_id) in qualifying_event_subjects for event_id in events["event_id"]),
+            total_events,
         ),
         "event_direct_support": _coverage(
             sum(str(event_id) in direct_support_events for event_id in events["event_id"]),
@@ -108,7 +123,7 @@ def report_evidence_coverage(data_dir: Path, report_path: Path, queue_path: Path
             )
     for _, row in events.iterrows():
         event_id = str(row["event_id"]).strip()
-        if event_id not in event_ids:
+        if event_id not in qualifying_event_subjects:
             queue.append(
                 {
                     "subject_type": "event",

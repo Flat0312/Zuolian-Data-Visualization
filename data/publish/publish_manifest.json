@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-27T07:14:11.044702+00:00",
+  "generated_at": "2026-08-27T09:22:56.868484+00:00",
   "source_dir": "D:\\1大创\\左联知识库项目\\data\\processed",
   "publish_dir": "D:\\1大创\\左联知识库项目\\data\\publish",
   "rules": {
@@ -10,7 +10,8 @@
     "public_relation_statuses": [
       "formal"
     ],
-    "candidate_and_disputed_memberships": "excluded"
+    "candidate_and_disputed_memberships": "excluded",
+    "rejected_fact_evidences": "excluded"
   },
   "tables": {
     "persons.csv": {
@@ -29,8 +30,8 @@
       "filtered": 0
     },
     "events.csv": {
-      "input": 148,
-      "output": 148,
+      "input": 147,
+      "output": 147,
       "filtered": 0
     },
     "person_relations.csv": {
@@ -49,13 +50,13 @@
       "filtered": 143
     },
     "fact_evidences.csv": {
-      "input": 628,
-      "output": 485,
-      "filtered": 143
+      "input": 626,
+      "output": 479,
+      "filtered": 147
     },
     "event_participants.csv": {
-      "input": 224,
-      "output": 224,
+      "input": 222,
+      "output": 222,
       "filtered": 0
     },
     "sources.csv": {

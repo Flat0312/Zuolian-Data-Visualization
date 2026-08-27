@@ -37,6 +37,9 @@ ALLOWED_CONFIDENCE = {"high", "medium", "low"}
 
 FORBIDDEN_CLAIMS = ["已合并", "已删除", "人工审核通过", "人工复核通过", "已转正", "已执行"]
 
+# 第四批A审计做出结论时的基线提交（审计对象在此提交的生产表中恰为 14 条）。
+AUDIT_BASELINE_COMMIT = "2a87781"
+
 
 def _read(path: Path) -> list[dict[str, str]]:
     with open(path, encoding="utf-8-sig", newline="") as fh:
@@ -44,14 +47,28 @@ def _read(path: Path) -> list[dict[str, str]]:
 
 
 def _production_target_evidence_ids() -> set[str]:
-    """从生产表实时推导 5 事件的现有证据 ID 集合（不硬编码清单）。"""
+    """从审计基线提交 2a87781 推导 5 事件当时的证据 ID 集合。
+
+    第四批A执行后，审计对象中两行证据已从生产表物理移除、其余状态已按人工
+    批准改变；本审计包的历史快照语义必须锚定到做出这些结论时的提交，
+    而非随后的实时生产表。
+    """
+    import subprocess
+    import io
+
     facts_path = REPO_ROOT / "data" / "processed" / "fact_evidences.csv"
-    with open(facts_path, encoding="utf-8-sig", newline="") as fh:
-        return {
-            row["evidence_id"]
-            for row in csv.DictReader(fh)
-            if row["subject_type"] == "event" and row["subject_id"] in TARGET_EVENT_IDS
-        }
+    _ = facts_path
+    blob = subprocess.run(
+        ["git", "show", f"{AUDIT_BASELINE_COMMIT}:data/processed/fact_evidences.csv"],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+    ).stdout.decode("utf-8-sig")
+    return {
+        row["evidence_id"]
+        for row in csv.DictReader(io.StringIO(blob))
+        if row["subject_type"] == "event" and row["subject_id"] in TARGET_EVENT_IDS
+    }
 
 
 def _load_audit() -> tuple[list[dict[str, str]], list[str]]:

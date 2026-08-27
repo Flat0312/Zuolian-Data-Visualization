@@ -1,5 +1,4 @@
 ﻿subject_type,subject_id,subject_name,review_reason,confidence,date_precision,needs_manual_review
-event,EVT-00029,丁玲抵沪就读平民女校,标记为需人工复核;,medium,月,yes
 event,EVT-00028,瞿秋白到上海大学任教,标记为需人工复核;,medium,月,yes
 event,EVT-00150,丁玲进入上海大学中国文学系,标记为需人工复核;,medium,月,yes
 event,EVT-00013,1927年创造社文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
@@ -43,8 +42,6 @@ event,EVT-00181,穆木天1930年中华艺术大学活动记录,标记为需人�
 event,EVT-00209,高尔基1930年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
 event,EVT-00023,鲁迅光华书局抗议,低置信度; 仅有年份精度;,low,年,no
 event,EVT-00022,鲁迅商务印书馆抗议,低置信度; 仅有年份精度;,low,年,no
-event,EVT-00004,鲁迅与柔石会面,标记为需人工复核;,medium,日,yes
-event,EVT-00005,鲁迅与柔石会面,标记为需人工复核;,medium,日,yes
 event,EVT-00006,鲁迅与柔石会面,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,日,no
 event,EVT-00256,鲁迅五十寿辰集会,第三批已裁决转正（2026-08-21，见 phase2_batch3_event_review_decisions.md）,medium,日,no
 event,EVT-00041,1931年上海文学活动记录,标记为需人工复核; 仅有年份精度;,medium,年,yes
