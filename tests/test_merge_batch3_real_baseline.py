@@ -95,6 +95,26 @@ def test_merge_on_pinned_premerge_commit(baseline_dir: Path, tmp_path: Path, mon
     assert len(result.errors) == 0, result.errors[:3]
     assert len(result.warnings) <= 13, [str(w) for w in result.warnings]
 
+    # —— 治理收口新增断言：合并输出必须携带结构化裁决语义（仅增加，不改既有断言）——
+    with open(data_dir / "fact_evidences.csv", encoding="utf-8-sig", newline="") as fh:
+        merged_facts = list(csv.DictReader(fh))
+    assert "adjudication_status" in merged_facts[0], "合并输出缺少 adjudication_status 列"
+    b3_conflicts = [
+        r
+        for r in merged_facts
+        if r["origin_evidence_id"].startswith("FE-EVP3-") and r["evidence_support"] == "conflict"
+    ]
+    assert len(b3_conflicts) == 9, f"第三批 conflict 应为 9 条，实际 {len(b3_conflicts)}"
+    assert all(r["adjudication_status"] == "resolved_by_event_correction" for r in b3_conflicts), (
+        "第三批 conflict 行必须全部标记 resolved_by_event_correction"
+    )
+    non_targets = [
+        r for r in merged_facts if not (
+            r["origin_evidence_id"].startswith("FE-EVP3-") and r["evidence_support"] == "conflict"
+        )
+    ]
+    assert all(r["adjudication_status"] == "" for r in non_targets), "非目标行不得写入裁决值"
+
     # 幂等：同一基线上二跑必须早退且零写入。
     snapshots = {
         name: (data_dir / name).read_bytes() for name in EXPECTED_COUNTS

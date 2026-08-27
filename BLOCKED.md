@@ -1,6 +1,30 @@
-# BLOCKED - 第三批事件史料候选包任务
+# BLOCKED
 
-无阻塞事项。观察记录（均已在交付物内标注）：
+## 2026-08-27 第三批治理收口：阻塞事项（置于首部，按任务书要求）
+
+### B-1 任务书指定的 pytest 临时目录已损坏（环境级阻塞）
+
+- **现象**：`C:\Users\33158\AppData\Local\Temp\codex-zuolian-accept-20260827` 在 2026-08-27 首次全量跑测后残留；该目录 DACL 异常，列出内容、读取 ACL（cacls/icacls）、takeown 接管、`rmdir /s /q` 全部返回 Access denied，沙箱内外一致复现；同盘普通临时目录增删正常。
+- **影响**：按任务书原文命令执行时，pytest 启动清理 basetemp 失败，10 个用例以 teardown ERROR 形式报错（表象"44 passed + 10 errors"，非真实回归）。
+- **处置**：改用同级全新目录复跑，实测 **54 passed、0 skipped、0 failed**，与任务书宣称的基线一致。后续验收命令中的 `--basetemp` 路径相应换成全新可写目录（本任务进度节记录实际路径），除路径参数外被测逻辑零变化。
+- **解除条件**：需具备管理员权限清理该残留目录后，方可恢复使用原指定路径。
+
+### B-2 覆盖率第三口径"已确认覆盖=28/148"与生产数据矛盾（规格冲突，按字面语义如实输出 23/148）
+
+- 任务书要求：`report_evidence_coverage.py` 输出"已确认覆盖：support 或 resolved_by_event_correction 且 reviewed"，并给出预期 28/148。
+- 生产数据实测（628 条证据逐行枚举）：28 个已挂接事件按最强证据分层为——
+  - A 组：存在 reviewed 支撑（evidence_support=support 且 reviewed）**18 个事件**；
+  - B 组：仅有 machine_extracted 支撑 **4 个**（EVT-00001、00004、00005、00017）；
+  - C 组：conflict 类证据挂接 **6 个**（EVT-00006、00020、00120、00187、00236、00258；其中 EVT-00006 同时落在 A 组）；
+  - D 组：仅一条 lead 类证据（EVT-00029，非 support 非 conflict）**1 个**。
+- 字面公式（reviewed ∧ (support ∨ resolved_by_event_correction)）的准确结果为 A∪C − 交集 = **23/148**，不是 28。
+- 即便放宽为"support 任意审核状态 ∪ conflict 全部"的无 review 过滤上限，也只得 **27/148**——EVT-00029 的唯一证据是 lead，任何 support∨resolved 公式都无法覆盖它。
+- **结论**：28 在给定公式下不可达；缺口来自 B（4 个未复核 machine_extracted）与 D（1 个 lead-only）共 5 个事件。
+- **处置（按优先级"史料语义正确 > 测试通过"）**：实现严格按字面语义计算并如实输出 23/148，三种口径名称互不冒充；不同步修改 review_status/evidence_support 以凑数（那属于伪造）。若未来确实需要 28，须人工把 EVT-00029 补立支持性证据并把 4 条 machine_extracted 支撑复核转正——超出本任务书授权范围，记录于此等待裁决。
+
+---
+
+## 2026-08-21 第三批事件史料候选包：历史观察记录（均已在交付物内标注或解决）
 
 1. 【来源暂时失效→已恢复】SRC-EVP3-010（gdxk.southcn.com，广东党史数据库）在 2026-08-21 晚间抽查时曾返回 502；**2026-08-21 二审复核（约 17 时许）页面恢复访问（HTTP 200），引文"1月17日晚上，柔石和冯铿到东方旅社，参加一个党内的秘密会议。"逐字命中**，失效状态解除。
 2. 【反爬壳页】chinawriter.com.cn 对无浏览器 UA 的程序化请求返回壳页，需 webfetch 渲染通道抓取；两条证据（FE-EVP3-0011/0012）已用该通道复开验证。

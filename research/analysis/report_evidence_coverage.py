@@ -41,6 +41,36 @@ def report_evidence_coverage(data_dir: Path, report_path: Path, queue_path: Path
     event_ids = set(facts.loc[facts["predicate"] == "event_occurrence", "subject_id"].astype(str))
     covered_events = sum(str(event_id) in event_ids for event_id in events["event_id"])
 
+    # 三种事件口径，语义互不冒充：
+    # 1) 已挂接：存在任一条 event_occurrence 事实证据；
+    # 2) 直接支持：至少一条 evidence_support=support 的证据（不论复核/裁决状态）；
+    # 3) 已确认：至少一条 reviewed 且（support 或 adjudication_status=resolved_by_event_correction）
+    #    ——原始冲突不计入，仅“已由事件级裁决落地”的 conflict 计入。
+    event_facts = facts[facts["predicate"] == "event_occurrence"]
+    direct_support_events = set(
+        event_facts.loc[event_facts["evidence_support"] == "support", "subject_id"].astype(str)
+    )
+    confirmed_mask = (event_facts["review_status"] == "reviewed") & (
+        (event_facts["evidence_support"] == "support")
+        | (event_facts.get("adjudication_status", "") == "resolved_by_event_correction")
+    )
+    confirmed_events = set(event_facts.loc[confirmed_mask, "subject_id"].astype(str))
+
+    total_events = len(events)
+    metrics_events = {
+        "event_attached_any": _coverage(
+            sum(str(event_id) in event_ids for event_id in events["event_id"]), total_events
+        ),
+        "event_direct_support": _coverage(
+            sum(str(event_id) in direct_support_events for event_id in events["event_id"]),
+            total_events,
+        ),
+        "event_confirmed": _coverage(
+            sum(str(event_id) in confirmed_events for event_id in events["event_id"]),
+            total_events,
+        ),
+    }
+
     person_fact_subjects = {
         predicate: set(facts.loc[facts["predicate"] == predicate, "subject_id"].astype(str))
         for predicate in ("birth_year", "death_year", "role")
@@ -48,6 +78,7 @@ def report_evidence_coverage(data_dir: Path, report_path: Path, queue_path: Path
     summary = {
         "memberships": _coverage(covered_memberships, len(memberships)),
         "events": _coverage(covered_events, len(events)),
+        **metrics_events,
         "person_birth_year": _coverage(
             sum(str(person_id) in person_fact_subjects["birth_year"] for person_id in persons["person_id"]),
             len(persons),
@@ -117,20 +148,59 @@ def report_evidence_coverage(data_dir: Path, report_path: Path, queue_path: Path
     ]
     labels = {
         "memberships": "组织身份",
-        "events": "事件存在",
+        "events": "事件存在（口径一：已挂接事实证据）",
+        "event_attached_any": "事件存在·已挂接事实证据覆盖（存在任一事实证据即计入）",
+        "event_direct_support": "事件存在·直接支持覆盖（evidence_support=support，不论裁决与复核状态）",
+        "event_confirmed": (
+            "事件存在·已确认覆盖（reviewed 且为 support 或已裁决 conflict"
+            "［adjudication_status=resolved_by_event_correction］）"
+        ),
         "person_birth_year": "人物出生年",
         "person_death_year": "人物逝世年",
         "person_role": "人物角色",
     }
-    for key, label in labels.items():
+    ordered_keys = [
+        "memberships",
+        "event_attached_any",
+        "event_direct_support",
+        "event_confirmed",
+        "person_birth_year",
+        "person_death_year",
+        "person_role",
+    ]
+    for key in ordered_keys:
         item = summary[key]
-        lines.append(f"| {label} | {item['covered']} | {item['total']} | {item['rate']:.1%} |")
+        lines.append(f"| {labels[key]} | {item['covered']} | {item['total']} | {item['rate']:.1%} |")
+    attached = metrics_events["event_attached_any"]
+    direct = metrics_events["event_direct_support"]
+    confirmed = metrics_events["event_confirmed"]
+    gap_note = ""
+    if confirmed["covered"] < direct["covered"]:
+        gap_note = (
+            f"已确认覆盖与直接支持覆盖的差额 {direct['covered'] - confirmed['covered']} 个事件，"
+            "由仅 machine_extracted 支撑或仅 lead 类证据挂接、尚未经复核/补证的记录构成；"
+            "详见 BLOCKED.md B-2。"
+        )
     lines.extend(
         [
+            "",
+            "三种事件覆盖口径含义互不替代：**已挂接≠直接支持≠已确认**——",
+            "- 口径一「已挂接」只说明该事件至少被一条事实证据提及，可能是线索（lead）、待裁冲突（conflict）或未复核抽取；",
+            "- 口径二「直接支持」要求 evidence_support=support 的支持性证据，但不要求人工复核完成；",
+            "- 口径三「已确认」要求复核完成且为支持性证据，或 conflict 已按事件级审核决策落地（结构化状态 resolved_by_event_correction）。",
             "",
             f"- 通用事实证据总数：{len(facts)}",
             f"- 待核核心事实数：{len(queue)}",
             f"- 待核队列：`{queue_path.name}`",
+            f"- 三口径速览：已挂接 {attached['covered']}/{attached['total']}；"
+            f"直接支持 {direct['covered']}/{direct['total']}；"
+            f"已确认 {confirmed['covered']}/{confirmed['total']}。",
+        ]
+    )
+    if gap_note:
+        lines.append(f"- {gap_note}")
+    lines.extend(
+        [
             "",
             "## 结论",
             "",

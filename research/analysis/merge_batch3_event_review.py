@@ -1,13 +1,17 @@
-"""把第三批事件史料候选包按人工签核的事件级裁决合并进生产数据。
+"""把第三批事件史料候选包按事件级审核决策合并进生产数据。
 
-依据：phase2_batch3_event_review_decisions.md（2026-08-21 签核：16 项全部通过；
+依据：phase2_batch3_event_review_decisions.md（16 项事件级决策全部落地；
 EVT-00006+EVT-00007、EVT-00120+EVT-00119 两组按物理删除合并）。
+授权状态：**授权待追认**（决策文档第 7 节）；授权补齐前禁止开展下一批物理合并。
 
 幂等保证：
 - 以 fact_evidences.origin_evidence_id（FE-EVP3-*）识别已转正证据；全部已转正时早退不写盘；
 - 来源复用映射=已转正证据回推+生产表 URL 查重兜底；SRC-EVP3-010 固定复用生产 SRC-1163；
 - 事件字段修正全部为终值赋值或带标记检查的追加，重复执行不产生重复文本或新 ID；
 - 物理删除与参与者重定向均带存在性守卫，事件已删时静默跳过。
+
+裁决语义：conflict 证据合并时写入 adjudication_status=resolved_by_event_correction，
+其余行为空值——机器因此可区分“原始冲突”“已裁决冲突”与“直接支持”。
 """
 
 from __future__ import annotations
@@ -24,9 +28,13 @@ BATCH3_SOURCES = DRAFTS / "phase2_batch3_event_sources.csv"
 BATCH3_EVIDENCES = DRAFTS / "phase2_batch3_event_evidences.csv"
 
 ORIGIN_PREFIX = "FE-EVP3-"
+ADJUDICATION_RESOLVED = "resolved_by_event_correction"
+ADJUDICATION_COLUMN = "adjudication_status"
 # SRC-EVP3-010 与生产 SRC-1163 为同一底层页面（纪录小康工程·广东数据库），合并时复用。
 REUSED_SOURCES = {"SRC-EVP3-010": "SRC-1163"}
-MERGE_NOTE = "2026-08-21 第三批人工审核签核后合并转正（见 phase2_batch3_event_review_decisions.md）"
+MERGE_NOTE = (
+    "2026-08-21 第三批审核决策合并转正（授权待追认，见 phase2_batch3_event_review_decisions.md 第7节）"
+)
 REMAP_NOTE = "主体原指被合并删除的重复事件，已改指保留条目。"
 
 # 物理合并：被删事件 → 保留事件。
@@ -236,6 +244,12 @@ def main() -> None:
         taken_ids.add(row["evidence_id"])
         row["origin_evidence_id"] = original_id
         row["review_status"] = "reviewed"
+        # 结构化裁决语义：conflict 合并即“已由事件级裁决落地”，其余行为空值。
+        # 只依据 evidence_support 结构判定，不解析 reviewer_note。
+        if ADJUDICATION_COLUMN not in row:
+            row[ADJUDICATION_COLUMN] = (
+                ADJUDICATION_RESOLVED if row["evidence_support"] == "conflict" else ""
+            )
         ev_rows.append(row)
         merged_count += 1
         event_source_updates.setdefault(row["subject_id"], set()).add(row["source_id"])
@@ -276,6 +290,9 @@ def main() -> None:
     evt_rows = [r for r in evt_rows if r["event_id"] not in EVENT_MERGES]
     removed_parts = sum(1 for r in part_rows if r["event_id"] in removed_events)
     part_rows = [r for r in part_rows if r["event_id"] not in removed_events]
+
+    if ADJUDICATION_COLUMN not in ev_fields:
+        ev_fields = list(ev_fields) + [ADJUDICATION_COLUMN]
 
     write_csv(DATA / "sources.csv", src_fields, src_rows)
     write_csv(DATA / "fact_evidences.csv", ev_fields, ev_rows)

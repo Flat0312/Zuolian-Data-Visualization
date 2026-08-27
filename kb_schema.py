@@ -491,6 +491,19 @@ def _check_fact_evidences(result: ValidationResult) -> None:
                 f"review_status 非法：{review_status}",
                 evidence_id,
             )
+        # 结构化裁决状态：空值＝原始语义；resolved_by_event_correction＝该 conflict
+        # 已由事件级裁决落地（如第三批）。列可选，出现后仅允许这两个取值。
+        allowed_adjudication = {"", "resolved_by_event_correction"}
+        adjudication = _clean_text(row.get("adjudication_status", ""))
+        if adjudication not in allowed_adjudication:
+            _add_issue(
+                result,
+                "error",
+                "invalid_fact_adjudication_status",
+                "fact_evidences.csv",
+                f"adjudication_status 非法：{adjudication}",
+                evidence_id,
+            )
 
 
 def _warn_on_duplicate_relations(result: ValidationResult) -> None:

@@ -1,5 +1,17 @@
 # Progress Log - 左联知识库
 
+## 2026-08-27 - 第三批治理收口：授权可追溯、adjudication_status 结构化裁决字段、覆盖率三口径
+
+**开工回执**：目标=机器可区分原始冲突/已裁决冲突/直接支持，清除无凭据的"人工已签核"表述，第四批扩充前只留一个可信口径；顺序=任务0基线复跑→BLOCKED.md 首部记录差异→任务1授权记录拆分（技术上已执行/人工授权凭据待补录）→任务2 adjudication_status 字段+覆盖率三口径（先红后绿）→任务3发布层与报告重建+旧基线断言补强→四连验收+白名单提交推送；最大风险=已确认覆盖的字面公式实测为 23/148 而非任务书宣称的 28/148（规格冲突 B-2），处置=严格按字面语义如实输出并在报告中注明成因，不虚增数字不改原始状态位。
+
+**任务1完成（授权记录拆分）**：`phase2_batch3_event_review_decisions.md` 重写为"技术上已执行；人工授权凭据待补录"——文首表把原批复引语标注为无法归属的历史转述，新增「授权待追认」状态、§5 勾选行改为 ⚠️ 待追认、新增 §7 授权追认说明（不伪造原则/既成数据以本节重释不回滚/**授权补齐前禁止开展第四批及后续物理合并**）。merge/annotate 脚本文档串与 MERGE_NOTE 同步去除签核主张；README/findings 两处"人工签核合并"措辞更正。红灯存证：stash md 后跑新测试得 2 failed（`%TEMP%\codex-zuolian-red-task1.log`），恢复后转绿。
+
+**任务2完成（结构化裁决语义+三口径）**：`fact_evidences.csv` 新增 `adjudication_status` 列——第三批 9 条 FE-EVP3-* conflict＝resolved_by_event_correction，其余 619 行空值，Schema 新增 `invalid_fact_adjudication_status` 拦截非法值（列可选，避免破坏既有 fixture）；由 `annotate_batch3_conflict_resolutions.py` 单次落地并归一化历史注记（修掉"冲突冲突""按签核决定消解"重复文案，冲突说明内容保留），二跑零写入。合并脚本在固定旧提交 0f7d445 重放时同样生成该列与 9 条裁决值，幂等性保持。覆盖率报告输出三种命名互斥口径：已挂接 **28/148**、直接支持 **22/148**、已确认（reviewed 且 support 或已裁决）**23/148**——28 在字面公式下不可达（EVT-00029 仅 lead、4 个事件仅 machine_extracted 支撑），差异与处置见 BLOCKED.md B-2。红灯存证：列/Schema/三口径/发布一致性 4 failed（`%TEMP%\codex-zuolian-red-task2.log`）→ 实现后全绿。
+
+**任务3完成（重建与一致性）**：`build_publish_data.py` 重建发布层（仅 fact_evidences.csv 与 publish_manifest.json 变化，门禁报告字节不变，485 行公开子集内 9 条已裁决证据同值在场）；四表行数 1177/628/148/224 不变；EVT-00007/EVT-00119 在活动队列零残留。`test_merge_batch3_real_baseline.py` 追加断言：重放含 adjudication_status 列、恰 9 条 resolved、非目标行为空。
+
+**最终验收（2026-08-27）**：①pytest `-p no:cacheprovider -q --basetemp C:\Users\33158\AppData\Local\Temp\codex-zuolian-accept3-20260827` = **60 passed, 0 skipped**（≥54 ✓；basetemp 因 B-1 环境损坏换用同级全新目录，任务书原路径不可用）；②schema = **0 errors / 13 warnings**（≤13 ✓）；③ruff 六个触及文件 **All checks passed**；④`git diff --check` 通过。变更共 15 个文件全部位于白名单内（含新建 tests/test_batch3_governance_closeout.py，6 项守门测试）。完成条件对照：三种覆盖率可机器复算为 28/22/23（第三口径 28 的规格冲突按优先级"史料语义正确>测试通过"记入 BLOCKED.md B-2 裁决待定）；9 条历史冲突全部具结构化已裁决状态；旧基线重放与二跑字节不变测试通过；授权文档不再声称未经证明的人工签核。
+
 ## 2026-08-21/22 - 第三批收口：签核补录、队列清理、冲突证据消解注记、真实旧提交基线测试
 
 **执行记录**：①审核表补齐签核记录节与逐项执行结果（签核意见「16项均通过，2.2/2.5物理删除即可」、执行提交0f7d445→1080ecf、§5清单勾销）。②旧队列清理重定向：phase4_review_queue.csv 删悬空行EVT-00007/EVT-00119并按当前生产状态刷新14个存留事件行（165→163）；phase4_priority_recs.csv 移除16条已完成建议含2条悬空（165→149）；暂缓组7事件行保留仍为待办；核心待核队列已由覆盖率脚本重新生成无悬空。③9条证据状态校正："9条"=晋升20条中evidence_support=conflict的9行（FE-EVP3-0005/0006/0008/0010/0013/0014/0015/0017/0020），新增幂等脚本 annotate_batch3_conflict_resolutions.py 追加"冲突已消解"注记，conflict标记保留作裁决依据存档（注记9/9，二跑零写入）。④真实旧提交基线测试：新增 test_merge_batch3_real_baseline.py，以 git archive 从固定提交 0f7d445 原样取出生产表+草稿执行合并，断言+12/+20/−2/−4、schema 0 err≤13 warn、二跑零写入；提交被历史重写时该测试失败（有意锚点）。⑤全部门禁重跑：pytest 54 passed、schema 0 err/13 warn、Ruff 全绿、发布层（148/485/1177）与静态站重建、覆盖率报告维持28/148=18.9%。
