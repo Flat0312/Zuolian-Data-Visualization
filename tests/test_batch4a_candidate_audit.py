@@ -187,3 +187,42 @@ def test_no_overreaching_claims_in_any_batch4a_artifact() -> None:
         text = path.read_text(encoding="utf-8-sig")
         for claim in FORBIDDEN_CLAIMS:
             assert claim not in text, f"{path.name} 出现越权结论表述：{claim}"
+
+
+def test_acceptance_guardrails_on_relink_and_support_semantics() -> None:
+    """验收整改守门：限定三条易夸大证据的建议语义与一条措辞（2026-08-27 验收）。
+
+    - AUD-B4A-010 为庭审材料、AUD-B4A-011 为资料目录：均不得建议改挂
+      EVT-00008“左联五烈士遇难”——只有 AUD-B4A-012 可指向该遇难事实；
+    - AUD-B4A-014 仅证明“就读”，不得以 supports_current_event 背书含
+      “抵沪”的完整事件名；
+    - AUD-B4A-007 来自后出工具书《左联词典》，不得宣称“最直接的同期文献”。
+    """
+    audit_rows, _ = _load_audit()
+    rows = {row["audit_id"]: row for row in audit_rows}
+
+    r10, r11 = rows["AUD-B4A-010"], rows["AUD-B4A-011"]
+    assert r10["relink_target"] != "EVT-00008", "庭审材料不得改挂到『左联五烈士遇难』"
+    assert r11["relink_target"] != "EVT-00008", "资料目录不得改挂到『左联五烈士遇难』"
+    if r10["recommended_action"] == "relink_candidate":
+        assert r10["relink_target"] == "" and "留空" in r10["review_note"], "010 改挂目标必须留空并说明"
+    assert r11["verdict"] == "irrelevant" and r11["recommended_action"] == "defer", (
+        "011 目录条目应判为无关并暂缓，不得建议改挂"
+    )
+
+    r12 = rows["AUD-B4A-012"]
+    assert r12["relink_target"] == "EVT-00008", "仅 012 直接支持遇难事实，应指向 EVT-00008"
+
+    r14 = rows["AUD-B4A-014"]
+    assert r14["verdict"] != "supports_current_event", "014 不得背书含‘抵沪’的完整事件"
+    assert r14["verdict"] == "insufficient_context", "014 应判上下文不足（仅证就读，未证抵沪）"
+    assert r14["recommended_action"] in {"correct_event_candidate", "defer"}, (
+        "014 应建议收窄事件名或暂缓"
+    )
+
+    r07 = rows["AUD-B4A-007"]
+    assert "最直接" not in r07["review_note"], "007 不得宣称来自后出词典的内容为最直接的同期文献"
+
+    # 报告正文同步不得残留同样夸大表述。
+    md = DECISIONS_MD.read_text(encoding="utf-8")
+    assert "成立大会最直接的同期文献" not in md
