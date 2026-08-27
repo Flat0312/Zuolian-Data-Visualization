@@ -151,7 +151,13 @@ def _recompute_event_metrics(facts_path: Path, events_path: Path) -> dict[str, i
 
 
 def test_coverage_report_distinguishes_three_event_metrics(sandbox_tmp_path: Path) -> None:
-    """三种口径名称互不冒充，数值由独立第二算法交叉复算一致。"""
+    """三种口径名称互不冒充，数值由独立第二算法交叉复算一致。
+
+    裁决定值（BLOCKED.md B-2，2026-08-27 选项 b）：已挂接 28 / 直接支持 22 /
+    已确认 23。第三口径按字面公式（reviewed 且 support 或 resolved_by_event_
+    correction）实算即为 23/148；原任务书的 28 在该公式与现有数据下不可达
+    （EVT-00029 仅 lead、4 个事件仅 machine_extracted 支撑）。
+    """
     from research.analysis.report_evidence_coverage import report_evidence_coverage
 
     summary = report_evidence_coverage(
@@ -167,9 +173,10 @@ def test_coverage_report_distinguishes_three_event_metrics(sandbox_tmp_path: Pat
         REPO_ROOT / "data" / "processed" / "fact_evidences.csv",
         REPO_ROOT / "data" / "processed" / "events.csv",
     )
-    assert summary["event_attached_any"]["covered"] == recomputed["attached"]
-    assert summary["event_direct_support"]["covered"] == recomputed["direct"]
-    assert summary["event_confirmed"]["covered"] == recomputed["confirmed"]
+    # 独立复算与报告一致，且等于裁决定值三牵手 28/22/23。
+    assert summary["event_attached_any"]["covered"] == recomputed["attached"] == 28
+    assert summary["event_direct_support"]["covered"] == recomputed["direct"] == 22
+    assert summary["event_confirmed"]["covered"] == recomputed["confirmed"] == 23
 
     assert summary["event_attached_any"]["total"] == recomputed["total"]
     # 已挂接 ≥ 直接支持：支持族 ⊆ 全部挂接证据。
