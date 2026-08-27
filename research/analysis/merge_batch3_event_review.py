@@ -2,7 +2,7 @@
 
 依据：phase2_batch3_event_review_decisions.md（16 项事件级决策全部落地；
 EVT-00006+EVT-00007、EVT-00120+EVT-00119 两组按物理删除合并）。
-授权状态：**授权待追认**（决策文档第 7 节）；授权补齐前禁止开展下一批物理合并。
+授权状态：**已追认**（2026-08-27 项目所有者确认，见决策文档第 7 节第 6 条）。
 
 幂等保证：
 - 以 fact_evidences.origin_evidence_id（FE-EVP3-*）识别已转正证据；全部已转正时早退不写盘；
@@ -33,7 +33,8 @@ ADJUDICATION_COLUMN = "adjudication_status"
 # SRC-EVP3-010 与生产 SRC-1163 为同一底层页面（纪录小康工程·广东数据库），合并时复用。
 REUSED_SOURCES = {"SRC-EVP3-010": "SRC-1163"}
 MERGE_NOTE = (
-    "2026-08-21 第三批审核决策合并转正（授权待追认，见 phase2_batch3_event_review_decisions.md 第7节）"
+    "2026-08-21 第三批审核决策合并转正（人工授权已于2026-08-27追认，"
+    "见 phase2_batch3_event_review_decisions.md 第7节）"
 )
 REMAP_NOTE = "主体原指被合并删除的重复事件，已改指保留条目。"
 

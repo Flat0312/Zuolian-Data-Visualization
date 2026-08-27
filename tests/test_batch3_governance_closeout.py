@@ -32,17 +32,21 @@ def _read_facts(path: Path) -> tuple[list[str], list[dict[str, str]]]:
 # ---------------------------------------------------------------------------
 
 
-def test_batch3_review_doc_marks_authorization_pending() -> None:
-    """审核表必须把技术执行与人工授权拆开，并给出「授权待追认」状态。"""
+def test_batch3_review_doc_marks_authorization_confirmed() -> None:
+    """2026-08-27 项目所有者确认授权后：审核表必须登记「已追认」状态与确认出处。"""
     text = DECISIONS_MD.read_text(encoding="utf-8")
-    assert "授权待追认" in text, "缺少授权待追认状态标记"
-    assert "技术上已执行" in text or "技术执行" in text, "缺少技术执行口径说明"
-    assert "人工授权凭据待补录" in text, "缺少人工授权凭据待补录说明"
-    assert "禁止依据本表开展第四批及后续任何批次的物理合并" in text, "缺少第四批物理合并禁令"
+    assert "已追认" in text, "缺少已追认状态标记"
+    assert "第三批人工授权我确认了" in text, "缺少用户确认引语的逐字登记"
+    assert "2026-08-27" in text, "缺少追认日期登记"
+    assert "## 7. 授权追认说明" in text, "缺少授权追认说明节"
+    # 追认解除的是禁令本身；历史禁令文本作为存档不得被无声删除。
+    assert "禁止依据本表开展第四批及后续任何批次的物理合并" in text or (
+        "该禁令自 2026-08-27 追认起不再适用" in text
+    ), "第四批禁令的解除记录缺失"
 
 
 def test_batch3_review_doc_has_no_unattributed_signoff_claim() -> None:
-    """禁止无归属的“人工已签核”结论（伪造签核人/时间/勾选）。"""
+    """禁止无归属的“人工已签核”结论（伪造签核人/时间/勾选）——永久性守门。"""
     text = DECISIONS_MD.read_text(encoding="utf-8")
     forbidden = [
         "# Phase 2 第三批事件级人工审核表（已签核并执行）",
