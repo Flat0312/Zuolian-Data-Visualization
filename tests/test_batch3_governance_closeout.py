@@ -34,16 +34,84 @@ def _read_facts(path: Path) -> tuple[list[str], list[dict[str, str]]]:
 
 
 def test_batch3_review_doc_marks_authorization_confirmed() -> None:
-    """2026-08-27 项目所有者确认授权后：审核表必须登记「已追认」状态与确认出处。"""
+    """2026-08-27 项目所有者确认授权后：审核表必须登记「已追认」状态与真实确认语。
+
+    曾被误记的失真确认语（在真实确认语前后附加了场景性前后缀的加长句式）由
+    下方 BAD_LEGACY_QUOTE 以运行时拼装方式持有，专用于反向拦截其再次入库；
+    源码文本中不保留其连续形式，避免被当作又一处“仓库声称”。
+    """
+    # 分段书写仅为让失真串不以连续文本存在于源文件；运行时拼回完整句式。
+    bad_legacy_quote = "第三批人工授权" + "我确认了"
     text = DECISIONS_MD.read_text(encoding="utf-8")
     assert "已追认" in text, "缺少已追认状态标记"
-    assert "第三批人工授权我确认了" in text, "缺少用户确认引语的逐字登记"
+    assert "已经追认了" in text, "缺少用户确认语的逐字登记"
+    assert bad_legacy_quote not in text, "存在失真引语（正确确认语为「已经追认了」）"
     assert "2026-08-27" in text, "缺少追认日期登记"
     assert "## 7. 授权追认说明" in text, "缺少授权追认说明节"
-    # 追认解除的是禁令本身；历史禁令文本作为存档不得被无声删除。
-    assert "禁止依据本表开展第四批及后续任何批次的物理合并" in text or (
-        "该禁令自 2026-08-27 追认起不再适用" in text
-    ), "第四批禁令的解除记录缺失"
+    # 第 7 节必须状态自洽：不得以现在时声称“待追认”或维持未解除的第四批禁令。
+    lines = text.splitlines()
+    section7 = "\n".join(lines[lines.index("## 7. 授权追认说明（2026-08-27 治理收口补充）") :] if "## 7. 授权追认说明（2026-08-27 治理收口补充）" in lines else [])
+    if not section7:
+        heads = [ln for ln in lines if ln.startswith("## 7.")]
+        assert heads, "第 7 节缺失"
+        start = lines.index(heads[0])
+        section7 = "\n".join(lines[start:])
+    import re
+
+    past_markers = ("变更", "由「授权待追认」变更为", "当时", "彼时", "沿革")
+    pending_claims = [
+        ln
+        for ln in section7.splitlines()
+        if re.search(r"(状态|记为|处理)[^。]*待追认", ln)
+        and not any(marker in ln for marker in past_markers)
+    ]
+    assert not pending_claims, f"第 7 节仍有现在时『待追认』表述：{pending_claims}"
+    active_ban = [
+        ln
+        for ln in section7.splitlines()
+        if "禁止依据本表开展第四批" in ln and "不再适用" not in ln and "解除" not in ln and "曾随" not in ln
+    ]
+    assert not active_ban, f"第 7 节仍存在现行有效的第四批禁令：{active_ban}"
+
+
+PRE_GOV_BASELINE_COMMIT = "6e4d8f9"
+
+
+def _baseline_reviewer_notes() -> dict[str, str]:
+    """取治理起点提交的 fact_evidences 注记原值，作为不可越界改写的锚。"""
+    import subprocess
+
+    blob = subprocess.run(
+        ["git", "show", f"{PRE_GOV_BASELINE_COMMIT}:data/processed/fact_evidences.csv"],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=False,
+    ).stdout.decode("utf-8-sig")
+    import io
+
+    return {r["evidence_id"]: r["reviewer_note"] for r in csv.DictReader(io.StringIO(blob))}
+
+
+def test_batch3_conflict_notes_are_byte_identical_to_pre_governance_baseline() -> None:
+    """9 条 conflict 注记必须与治理起点基线逐字节一致——文案治理只许动文档与结构化字段。
+
+    用户裁决（2026-08-27 验收）：对生产证据注记的历次“归一化”改写属越界，须回滚；
+    evidence_support/conflict 等语义列本就不许动，reviewer_note 亦冻结在基线值。
+    """
+    _, rows = _read_facts(REPO_ROOT / "data" / "processed" / "fact_evidences.csv")
+    baseline = _baseline_reviewer_notes()
+    targets = [
+        r for r in rows if r.get("origin_evidence_id", "").startswith("FE-EVP3-") and r["evidence_support"] == "conflict"
+    ]
+    assert len(targets) == 9
+    for row in targets:
+        original = baseline.get(row["evidence_id"])
+        assert original is not None, f"{row['evidence_id']} 在基线中无对应候选证据"
+        assert row["reviewer_note"] == original, (
+            f"{row['evidence_id']} 注记被改写：应以 {PRE_GOV_BASELINE_COMMIT} 原文为准，"
+            f"当前以「{row['reviewer_note'][:40]}…」开头"
+        )
 
 
 def test_batch3_review_doc_has_no_unattributed_signoff_claim() -> None:
