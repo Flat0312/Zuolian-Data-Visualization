@@ -14,11 +14,18 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from kb_schema import REQUIRED_DATA_FILES, validate_data_dir
 
+try:
+    from research.analysis.relation_publish_status import PUBLIC_RELATION_STATUSES as CREDIBLE_RELATION_STATUSES
+    from research.analysis.relation_publish_status import derive_relation_publish_status
+except ModuleNotFoundError:  # 直接脚本运行时
+    from relation_publish_status import PUBLIC_RELATION_STATUSES as CREDIBLE_RELATION_STATUSES
+    from relation_publish_status import derive_relation_publish_status
+
 DEFAULT_PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
 DEFAULT_PUBLISH_DIR = PROJECT_ROOT / "data" / "publish"
 DEFAULT_REPORT = PROJECT_ROOT / "research" / "drafts" / "reports" / "phase3_publish_gate_report.md"
 PUBLIC_MEMBERSHIP_TYPES = {"confirmed_member", "related_person"}
-PUBLIC_RELATION_STATUSES = {"formal"}
+PUBLIC_RELATION_STATUSES = set(CREDIBLE_RELATION_STATUSES)
 
 
 def _read(path: Path) -> pd.DataFrame:
@@ -52,7 +59,25 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
     ].copy()
 
     relations = tables["person_relations.csv"]
-    tables["person_relations.csv"] = relations[relations["display_status"].isin(PUBLIC_RELATION_STATUSES)].copy()
+    # 可信度门禁：仅 verified/supported 进入发布层。
+    # 兼容旧夹具（无 publish_status 列）：按现有风险/类型/置信派生，不把
+    # critical/high、待核验、low、needs_manual_review=yes 当作正式已证实关系展示。
+    if "publish_status" not in relations.columns:
+        relations = relations.copy()
+        relations["publish_status"] = relations.apply(
+            lambda row: derive_relation_publish_status(row.to_dict()), axis=1
+        )
+    else:
+        # 缺值回填派生，保证门禁可复现
+        mask_empty = relations["publish_status"].astype(str).str.strip() == ""
+        if bool(mask_empty.any()):
+            relations = relations.copy()
+            relations.loc[mask_empty, "publish_status"] = relations[mask_empty].apply(
+                lambda row: derive_relation_publish_status(row.to_dict()), axis=1
+            )
+    tables["person_relations.csv"] = relations[
+        relations["publish_status"].astype(str).str.strip().isin(PUBLIC_RELATION_STATUSES)
+    ].copy()
 
     facts = tables["fact_evidences.csv"]
     membership_fact_mask = facts["predicate"] == "organization_membership"
@@ -66,9 +91,25 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
         non_rejected_mask & (~membership_fact_mask | public_membership_fact_mask)
     ].copy()
 
+    # 关系证据：rejected 不进入发布层；且仅保留发布层关系的外键闭合子集
+    public_relation_ids = set(
+        tables["person_relations.csv"]["relation_id"].astype(str).str.strip().tolist()
+    ) if "relation_id" in tables["person_relations.csv"].columns else set()
+    if (processed_dir / "relation_evidences.csv").exists():
+        rel_evid = _read(processed_dir / "relation_evidences.csv")
+        rel_evid = rel_evid[rel_evid["review_status"].astype(str).str.strip() != "rejected"].copy()
+        if public_relation_ids and "relation_id" in rel_evid.columns:
+            rel_evid = rel_evid[rel_evid["relation_id"].astype(str).str.strip().isin(public_relation_ids)].copy()
+        tables["relation_evidences.csv"] = rel_evid
+    # 来源层级：作品/引文原样透传（不做内容过滤，保证映射完整）
+    for _optional in ("source_works.csv", "source_passages.csv"):
+        _p = processed_dir / _optional
+        if _p.exists():
+            tables[_optional] = _read(_p)
+
     manifest_tables: dict[str, dict[str, int]] = {}
-    for filename in REQUIRED_DATA_FILES:
-        source_count = len(_read(processed_dir / filename))
+    for filename in list(REQUIRED_DATA_FILES) + [f for f in tables if f not in REQUIRED_DATA_FILES]:
+        source_count = len(_read(processed_dir / filename)) if (processed_dir / filename).exists() else len(tables[filename])
         output_count = len(tables[filename])
         tables[filename].to_csv(publish_dir / filename, index=False, encoding="utf-8-sig")
         manifest_tables[filename] = {
@@ -76,6 +117,18 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
             "output": output_count,
             "filtered": source_count - output_count,
         }
+    # 来源报告同时输出作品数、引文数、独立来源族数（引用条数≠独立来源作品数）
+    _src_pub = tables.get("sources.csv", pd.DataFrame())
+    _works_pub = tables.get("source_works.csv", pd.DataFrame())
+    if not _src_pub.empty and "source_family" in _src_pub.columns:
+        _families = int(_src_pub["source_family"].astype(str).str.strip().replace("", pd.NA).dropna().nunique())
+    else:
+        _families = 0
+    source_summary = {
+        "citations": int(manifest_tables.get("sources.csv", {}).get("output", 0)),
+        "works": int(len(_works_pub)) if _works_pub is not None else 0,
+        "families": _families,
+    }
 
     validation = validate_data_dir(publish_dir)
     manifest: dict[str, object] = {
@@ -87,8 +140,11 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
             "public_relation_statuses": sorted(PUBLIC_RELATION_STATUSES),
             "candidate_and_disputed_memberships": "excluded",
             "rejected_fact_evidences": "excluded",
+            "rejected_relation_evidences": "excluded",
+            "non_public_relations": "excluded_inferred_pending_rejected",
         },
         "tables": manifest_tables,
+        "source_summary": source_summary,
         "schema_errors": len(validation.errors),
         "schema_warnings": len(validation.warnings),
     }
@@ -115,6 +171,11 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
             "- 公开组织身份仅保留 `confirmed_member` 与 `related_person`。",
             "- `candidate` 与 `disputed` 仅保留在研究层。",
             "- `fact_evidences.csv` 中 `review_status=rejected` 的事实证据不进入发布层。",
+            "- 人物关系仅保留 `publish_status` 为 `verified/supported` 的记录；"
+            "`pending_review/inferred/rejected`（含 critical/high、待核验、low、needs_manual_review=yes）仅保留在研究层。",
+            "- `relation_evidences.csv` 中 `review_status=rejected` 的关系证据不进入发布层。",
+            f"- 来源层级：引文 {source_summary['citations']} 条 / 作品 {source_summary['works']} 种 / "
+            f"独立来源族 {source_summary['families']} 个（引用条数≠独立来源作品数，同一来源族不重复计数）。",
         ]
     )
     report_path.parent.mkdir(parents=True, exist_ok=True)

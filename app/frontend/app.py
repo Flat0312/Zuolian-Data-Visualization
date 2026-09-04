@@ -49,6 +49,15 @@ def sync_page_from_widget() -> None:
 
 
 def visible_edges(data: LoadedData) -> pd.DataFrame:
+    frame = data.edges[data.edges["Display_Status"].astype(str) != "hidden"].copy()
+    # 可信度门禁：默认仅展示 verified/supported；pending/inferred/rejected 须经研究模式显式开关进入
+    if "Publish_Status" in frame.columns:
+        frame = frame[frame["Publish_Status"].astype(str).isin({"verified", "supported"})].copy()
+    return frame
+
+
+def explorable_edges(data: LoadedData) -> pd.DataFrame:
+    """研究探索用全量（含待审核/推断），仅用于明确标注的探索视图。"""
     return data.edges[data.edges["Display_Status"].astype(str) != "hidden"].copy()
 
 

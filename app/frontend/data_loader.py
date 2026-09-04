@@ -79,8 +79,34 @@ def load_standardized_views(data_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame,
             "context": "Context",
             "evidence_ref": "Evidence_Ref",
             "weight": "Weight",
+            "publish_status": "Publish_Status",
         }
     ).copy()
+    if "Publish_Status" not in edges.columns:
+        edges["Publish_Status"] = ""
+    # 兼容旧数据：缺 publish_status 时按现行派生规则回填（critical/high、待核验、low、需审核不进正式展示）
+    _empty_pub = edges["Publish_Status"].astype(str).str.strip() == ""
+    if bool(_empty_pub.any()):
+        try:
+            import sys as _sys
+            from pathlib import Path as _Path
+
+            _root = _Path(__file__).resolve().parents[2]
+            if str(_root) not in _sys.path:
+                _sys.path.insert(0, str(_root))
+            from research.analysis.relation_publish_status import derive_relation_publish_status as _derive
+        except Exception:
+            _derive = None  # type: ignore
+        if _derive is not None:
+            for _idx in edges[_empty_pub].index:
+                try:
+                    _row = relations.loc[_idx].to_dict() if _idx in relations.index else {}
+                except Exception:
+                    _row = {}
+                try:
+                    edges.at[_idx, "Publish_Status"] = _derive(_row)
+                except Exception:
+                    edges.at[_idx, "Publish_Status"] = "pending_review"
     if "Relation_Type" not in edges.columns and "original_relation_type" in edges.columns:
         edges["Relation_Type"] = edges["original_relation_type"]
     for column in ["Source", "Target", "Relation_Type", "Context", "Evidence_Ref", "Weight"]:
@@ -249,6 +275,10 @@ def load_data(base_dir: Path | None = None, data_mode: str = "research") -> Load
     )
     edges["LLM_Confidence"] = pd.to_numeric(edges["llm_confidence"], errors="coerce")
     edges["Display_Status"] = edges["display_status"].replace("", "formal")
+    if "Publish_Status" not in edges.columns:
+        edges["Publish_Status"] = ""
+    edges["Publish_Status"] = edges["Publish_Status"].astype(str).str.strip().replace("", "pending_review")
+    # 兼容：旧 display_status=formal 但 publish_status 缺失时，已在上游回填；此处不再把 formal 等同于可信
     edges["Relation_Family"] = edges["Relation_Type"].astype(str).str.replace(r"^(强关联-|弱关联-)", "", regex=True)
     edges["Context_Preview"] = edges["Context"].apply(clean_text)
     edges["Evidence_Preview"] = edges["Evidence_Ref"].apply(lambda value: clean_text(value, 70))

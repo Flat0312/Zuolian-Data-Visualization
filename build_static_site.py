@@ -115,8 +115,13 @@ def status_label(status_counts: Counter[str]) -> str:
         "formal": "正式证据",
         "review": "待复核",
         "hidden": "隐藏记录",
+        "verified": "人工已确认",
+        "supported": "材料支持（待人工确认）",
+        "inferred": "推断线索（未公开展示）",
+        "pending_review": "待人工审核（未公开展示）",
+        "rejected": "已驳回（未公开展示）",
     }
-    for key in ("formal", "review", "hidden"):
+    for key in ("verified", "supported", "formal", "review", "hidden", "inferred", "pending_review", "rejected"):
         count = int(status_counts.get(key, 0))
         if count:
             parts.append(f"{mapping[key]} {count}")
@@ -429,7 +434,10 @@ def build_relation_profiles(relations_df: pd.DataFrame, name_map: dict[str, str]
             profile["contexts"].append(context_text)
         profile["evidences"].extend(split_ids(row.get("evidence_ref")))
         profile["source_ids"].extend(split_ids(row.get("source_ids")))
-        profile["status_counts"][text(row.get("display_status"), "formal")] += 1
+        # 可信度优先：publish_status 存在时按五态计数，否则回退 display_status（兼容旧夹具）
+        _pub = text(row.get("publish_status"), "")
+        _disp = text(row.get("display_status"), "formal")
+        profile["status_counts"][_pub if _pub else _disp] += 1
 
     relation_profiles: list[dict[str, object]] = []
     for profile in profiles.values():
@@ -752,10 +760,12 @@ def render_relations_index(relations: list[dict[str, object]]) -> str:
       <p class="eyebrow">关系索引</p>
       <h1>把人物对关系压缩成可读卡片</h1>
       <p class="page-hero__lead">这里展示的是按人物对聚合后的关系摘要，适合快速定位谁和谁之间有何种关联、证据来自哪里。</p>
+      <p class="page-hero__lead">默认公开层仅展示 <strong>verified（人工已确认）/ supported（材料支持，待人工确认）</strong>；
+      inferred（推断线索）/ pending_review（待审核）/ rejected（已驳回）仅保留在研究层，需主动开启辅助信息并明确标注后方可查看。</p>
       <div class="filter-box">
         <label for="relations-filter">按人名、关系类型、证据关键词筛选</label>
         <input id="relations-filter" type="search" placeholder="例如：鲁迅 通信 上海" data-list-filter="relations-list">
-        <p class="filter-box__meta" data-count-for="relations-list">共 {len(relations)} 组人物关系</p>
+        <p class="filter-box__meta" data-count-for="relations-list">共 {len(relations)} 组人物关系（仅可信公开子集）</p>
       </div>
     </section>
     <section class="page-section">

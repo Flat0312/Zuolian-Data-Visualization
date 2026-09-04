@@ -16,6 +16,13 @@ try:
 except ModuleNotFoundError:
     from rebuild_org_memberships import rebuild_org_memberships
 
+try:
+    from research.analysis.relation_publish_status import derive_relation_publish_status
+    from research.analysis.source_layer import portable_source_path, source_family_for
+except ModuleNotFoundError:
+    from relation_publish_status import derive_relation_publish_status
+    from source_layer import portable_source_path, source_family_for
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 RESEARCH_DIR = PROJECT_ROOT / "research"
@@ -198,6 +205,8 @@ class SourceCatalog:
         evidence_layer: str,
         availability: str,
     ) -> str:
+        # 仓库内绝对路径一律存为相对路径，保证可移植；仓库外路径原样保留
+        source_path = portable_source_path(source_path) if source_path else ""
         key = (source_kind, title, citation, source_path, source_url)
         existing = self.lookup.get(key)
         if existing:
@@ -215,6 +224,7 @@ class SourceCatalog:
                 "source_url": source_url,
                 "evidence_layer": evidence_layer,
                 "availability": availability,
+                "source_family": source_family_for(title, source_path, source_url),
             }
         )
         return source_id
@@ -456,6 +466,19 @@ def build_standard_tables(
         standard_relation_type = text(row.get("corrected_relation_type")) or original_relation_type
         evidence_ref = text(row.get("Evidence_Ref"))
         source_url = text(row.get("source_url"))
+        _risk = text(row.get("relation_risk_level"))
+        _conf = text(row.get("confidence")) or "medium"
+        _needs = text(row.get("needs_manual_review")) or "no"
+        _publish_status = derive_relation_publish_status(
+            {
+                "final_relation_type": standard_relation_type,
+                "relation_risk_level": _risk,
+                "confidence": _conf,
+                "needs_manual_review": _needs,
+            }
+        )
+        # display_status 仅作兼容：可公开展示的 verified/supported 记 formal，其余记 review
+        _display = "formal" if _publish_status in ("verified", "supported") else "review"
         relation_rows.append(
             {
                 "relation_id": relation_id,
@@ -468,16 +491,17 @@ def build_standard_tables(
                 "final_relation_type": standard_relation_type,
                 "llm_reason": "",
                 "llm_confidence": "",
-                "display_status": "formal",
+                "display_status": _display,
+                "publish_status": _publish_status,
                 "relation_quality_score": text(row.get("relation_quality_score")),
-                "relation_risk_level": text(row.get("relation_risk_level")),
+                "relation_risk_level": _risk,
                 "context": text(row.get("Context")),
                 "evidence_ref": evidence_ref,
                 "weight": text(row.get("Weight")) or "0",
                 "source_ids": catalog.attach_sources(evidence_ref=evidence_ref, source_url=source_url, fallback_source_id=raw_workbook_source_id),
                 "correction_reason": text(row.get("correction_reason")),
-                "confidence": text(row.get("confidence")) or "medium",
-                "needs_manual_review": text(row.get("needs_manual_review")) or "no",
+                "confidence": _conf,
+                "needs_manual_review": _needs,
             }
         )
 

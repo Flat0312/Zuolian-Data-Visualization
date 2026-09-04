@@ -252,6 +252,11 @@ def _status_label(status: str) -> str:
         "formal": "正式证据",
         "review": "推断辅助",
         "hidden": "隐藏记录",
+        "verified": "人工已确认",
+        "supported": "材料支持（待人工确认）",
+        "inferred": "推断线索",
+        "pending_review": "待人工审核",
+        "rejected": "已驳回",
     }
     return mapping.get(str(status), str(status) or "未标注")
 
@@ -326,6 +331,13 @@ def load_relation_detail_bundle(
 
 
 def filter_edges_for_display(edges_df: pd.DataFrame, include_review: bool = False) -> pd.DataFrame:
+    # 可信度门禁：默认仅 verified/supported；inferred/pending_review 仅在用户主动开启辅助信息时展示
+    if "Publish_Status" in edges_df.columns:
+        public = {"verified", "supported"}
+        if include_review:
+            # 研究探索：显式纳入 inferred/pending，但 rejected 永不展示
+            public = {"verified", "supported", "inferred", "pending_review"}
+        return edges_df[edges_df["Publish_Status"].astype(str).isin(public)].copy()
     statuses = {"formal"}
     if include_review:
         statuses.add("review")
@@ -1038,7 +1050,7 @@ def render_people(
         memberships_df,
         membership_evidences_df,
     )
-    show_review = st.checkbox("显示推断辅助关系", value=False, key=f"people_show_review_{person['Id']}")
+    show_review = st.checkbox("显示待审核/推断关系（研究探索，明确标注）", value=False, key=f"people_show_review_{person['Id']}")
     direct = filter_edges_for_display(direct_all, include_review=show_review)
     direct_summary = build_person_relation_summary(str(person["Label"]), direct)
 
@@ -1207,7 +1219,7 @@ def render_relations(
         '<div class="page-note">关系总览页是本站主舞台。这里先回答“左联的核心网络结构是什么”，再沿着人物对进入原始关系、LLM 辅助判断、证据摘录与上下文。</div>',
         unsafe_allow_html=True,
     )
-    show_review = st.checkbox("显示推断辅助关系", value=False, key="relations_show_review")
+    show_review = st.checkbox("显示待审核/推断关系（研究探索，明确标注）", value=False, key="relations_show_review")
     filtered_edges = filter_edges_for_display(edges_df, include_review=show_review)
     filtered_pair_df = build_pair_summary(filtered_edges)
     if filtered_pair_df.empty:
