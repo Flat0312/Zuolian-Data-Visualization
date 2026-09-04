@@ -816,7 +816,7 @@ def _person_output(
                 "selection_score": row["selection_score"],
                 "themes": row["themes"],
                 "priority_reason": (
-                    f"可信关系度{row['trusted_degree']}；全量度{row['full_degree']}；事件参与{row['event_count']}；"
+                    f"较低风险启发式关系度{row['trusted_degree']}；全量度{row['full_degree']}；事件参与{row['event_count']}；"
                     f"左联身份={row['zuolian_membership'] or '无'}；命中主题{row['theme_count']}项"
                 ),
                 "existing_evidence_summary": "组织身份证据见 org_membership_evidences；生卒年/角色事实级证据 0 条",

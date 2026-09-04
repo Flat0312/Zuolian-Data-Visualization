@@ -301,3 +301,63 @@ def test_publish_double_run_byte_identical(sandbox_tmp_path: Path) -> None:
     assert report.read_bytes() == report_before, "report 双跑不一致"
     m1 = json.loads(manifest_before.decode("utf-8"))
     assert m1.get("generated_at") == "unstamped"
+
+
+def test_candidate_heuristic_label_not_credible(tmp_path: Path) -> None:
+    """小范围返修：候选 priority_reason 须用“较低风险启发式关系度”，不得写“可信关系度”。
+
+    数值沿用现有较低风险筛选算法（排序/名单/score 不变）；四口径 evidence_supported /
+    human_verified / trusted 仍为 0；启发式口径不得变成 evidence-supported 口径。
+    """
+    from conftest import PROJECT_ROOT
+
+    from research.analysis import build_core_upgrade_candidates as cand
+    from research.analysis import build_trustworthy_network_analysis as net
+
+    out = tmp_path / "cand"
+    out.mkdir()
+    cand.build(PROJECT_ROOT / "data" / "processed", out)
+    text = (out / "core_person_evidence_candidates.csv").read_text(encoding="utf-8-sig")
+    assert "可信关系度" not in text
+    assert "较低风险启发式关系度" in text
+    frame = pd.read_csv(out / "core_person_evidence_candidates.csv", encoding="utf-8-sig", dtype=str).fillna("")
+    assert len(frame) == 30
+    for value in frame["priority_reason"].tolist():
+        assert "可信度" not in value and "可信网络度" not in value and "证据支持度" not in value
+    # Top30 名单与 selection_score 不变（仅标签文字变化）
+    committed = pd.read_csv(
+        PROJECT_ROOT / "research" / "drafts" / "reports" / "core_person_evidence_candidates.csv",
+        encoding="utf-8-sig",
+        dtype=str,
+    ).fillna("")
+    assert frame["person_id"].tolist() == committed["person_id"].tolist()
+    assert frame["selection_score"].tolist() == committed["selection_score"].tolist()
+
+    nout = tmp_path / "net"
+    nout.mkdir()
+    summary = net.build(PROJECT_ROOT / "data" / "processed", nout)
+    assert summary["evidence_supported"] == 0
+    assert summary["human_verified"] == 0
+    assert summary["trusted"] == 0
+    assert summary["low_risk_heuristic"] == 1760
+    # 同一行：启发式为真、证据支持为假，证明两口径未混同
+    low_risk_row = {
+        "final_relation_type": "通信",
+        "needs_manual_review": "no",
+        "relation_risk_level": "low",
+        "confidence": "medium",
+    }
+    assert cand.is_trusted_relation(low_risk_row) is True
+    assert net.is_evidence_supported_relation(low_risk_row, []) is False
+
+
+def test_static_zero_relations_guidance() -> None:
+    """小范围返修：静态关系页 0 公开时不得承诺本页可开启候选，须指向交互应用研究模式。"""
+    from build_static_site import render_relations_index
+
+    html = render_relations_index([])
+    assert "可主动开启研究候选关系" not in html
+    assert "需主动开启辅助信息" not in html
+    assert "当前尚无满足公开条件的关系" in html
+    assert "研究模式" in html
+    assert "未经人工核验" in html

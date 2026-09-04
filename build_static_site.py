@@ -758,8 +758,8 @@ def render_relations_index(relations: list[dict[str, object]]) -> str:
     if not relations:
         empty_notice = (
             '<div class="empty-state" style="display:block">'
-            "当前尚无完成人工核验的关系；可主动开启研究候选关系。"
-            "（研究候选均为“未经人工核验”，不得作为正式证据或可信关系引用。）</div>"
+            "当前尚无满足公开条件的关系。研究候选关系请在交互应用中切换到“研究模式”查看；"
+            "候选关系未经人工核验，不得作为正式证据或可信关系引用。</div>"
         )
     else:
         empty_notice = ""
@@ -769,7 +769,7 @@ def render_relations_index(relations: list[dict[str, object]]) -> str:
       <h1>把人物对关系压缩成可读卡片</h1>
       <p class="page-hero__lead">这里展示的是按人物对聚合后的关系摘要，适合快速定位谁和谁之间有何种关联、证据来自哪里。</p>
       <p class="page-hero__lead">默认公开层仅展示 <strong>verified（人工已确认）/ supported（材料支持，待人工确认；须有 support 证据 + locator + 引文/语境）</strong>；
-      inferred（推断线索，未经人工核验）/ pending_review（待审核，未经人工核验）/ rejected（已驳回）仅保留在研究层，需主动开启辅助信息并明确标注后方可查看。</p>
+      inferred（推断线索，未经人工核验）/ pending_review（待审核，未经人工核验）/ rejected（已驳回）仅保留在研究层，静态站不提供候选开关。</p>
       {empty_notice}
       <div class="filter-box">
         <label for="relations-filter">按人名、关系类型、证据关键词筛选</label>

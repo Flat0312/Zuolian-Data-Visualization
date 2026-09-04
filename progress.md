@@ -172,3 +172,7 @@
 **返修**：publish_status_origin（derived/human）+每次重算不透传；supported须support+未rejected+locator+quote/context，associated/pending/无quote/low/推断类型/critical/high/待核验/needs_manual均不公开（公开归零，允许）；来源层Schema强制双表共存、1:1映射、有效引用、citation_count重算，增量脚本统一sync_source_layer（稳定ID）；候选百科/媒体一律web_lead/D级，四件套+ABCD统计，殷夫/周扬冲突保持conflict禁落库；网络四口径分离（全量/低风险启发式1760/证据支持0/人工确认0/可信0，样本不足不排Top10，事件切片明确共参与，中心性仅数据观察）；发布默认unstamped字节幂等，警告分类写入报告。
 
 **结果**：pytest 103 passed；研究层0/13；发布0/1080（过滤预期54孤立+1013孤儿，研究基线12+1为真孤立）；发布关系4238→0，证据10249→0；低风险1758边对照保留；红→绿4项见research/drafts/reports/remediation_red_green_verification.md；本地提交不推送。
+
+## 2026-09-04 - 小范围验收返修：候选标签与静态指引
+
+- 候选人物 priority_reason“可信关系度”改为“较低风险启发式关系度”（数值/排序/Top30/score 不变）；静态关系页 0 公开时改指交互应用“研究模式”，静态不新增候选开关，公开仍为 0。
