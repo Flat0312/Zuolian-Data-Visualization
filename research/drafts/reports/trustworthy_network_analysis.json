@@ -1,355 +1,62 @@
 {
   "data_state": {
     "low_grade_trusted_edges": 0,
-    "luxun_only_trusted_edges": 14,
+    "luxun_only_trusted_edges": 0,
     "publish_status_column": true,
     "relation_evidences_table": true,
+    "relations_evidence_supported": 0,
+    "relations_human_verified": 0,
+    "relations_low_risk_heuristic": 1760,
     "relations_total": 4238,
-    "relations_trusted": 1760,
+    "relations_trusted": 0,
     "source_family_column": true
   },
   "family_fallback_note": "",
   "formulas": {
+    "evidence_supported": "derived supported：待核验/需复核/critical-high/low/推断类型/证据冲突全过 + support 未 rejected 带 locator 且 quote/context 非空",
     "evidence_weight": "base × 等级因子(A1.0/B0.7/C0.4/D0.2) × min(1+0.25×(族数-1), 2.0)；无证据关系 ×0.3",
+    "full_exploratory": "全部关系（仅研究探索用，不作可信断言）",
+    "human_verified": "human_adjudication 的 verified（须带 reviewer/reviewed_at/review_note）；当前生产多为 0",
     "low_grade_downweight": "最强证据等级为 C/D 的边权重 ×0.5",
+    "low_risk_heuristic": "历史 1760 条启发式口径：仅类型/风险/置信/复核标记（不看证据、不看 publish_status）；不得称为可信关系，仅作对照",
     "luxun_diary_downweight": "证据全部属于 luxun_diary 族的边权重 ×0.5",
-    "time_slices": "按事件 event_date 年份把共参与参与者连边，边权=同事件共现次数；关系本身无日期，切片不代表该期完整关系网",
-    "trusted_rule": "排除 待核验类型 / needs_manual_review=yes / critical-high 风险 / confidence=low；若有 publish_status 列则仅 verified/supported"
+    "time_slices": "按事件 event_date 年份把共参与参与者连边（事件共参与网络），边权=同事件共现次数；关系本身无日期，切片不代表该期完整关系网、不得冒充关系历时网络",
+    "trusted_rule": "可信 = 人工确认（verified）∪ 证据支持（supported 真满足证据条件）；associated/pending、无 quote/locator、critical/high、待核验、low、needs_manual_review=yes、冲突、推断类型一律排除"
   },
   "networks": {
-    "evidence_weighted": {
-      "communities": [
-        {
-          "index": 1,
-          "members": [
-            "ZLH-002",
-            "ZLH-003",
-            "ZLH-007",
-            "ZLH-014",
-            "ZLH-015",
-            "ZLH-021",
-            "ZLH-022",
-            "ZLH-023",
-            "ZLH-024",
-            "ZLH-025",
-            "ZLH-026",
-            "ZLH-027",
-            "ZLH-030",
-            "ZLH-031",
-            "ZLH-032",
-            "ZLH-036",
-            "ZLH-039",
-            "ZLH-042",
-            "ZLH-045",
-            "ZLH-046",
-            "ZLH-047",
-            "ZLH-048",
-            "ZLH-053",
-            "ZLH-063",
-            "ZLH-067",
-            "ZLH-074",
-            "ZLH-077",
-            "ZLH-080",
-            "ZLH-084",
-            "ZLH-096",
-            "ZLH-098",
-            "ZLH-099",
-            "ZLH-116",
-            "ZLH-119",
-            "ZLH-120",
-            "ZLH-128",
-            "ZLH-132",
-            "ZLH-136",
-            "ZLH-139"
-          ],
-          "size": 39
-        },
-        {
-          "index": 2,
-          "members": [
-            "ZLH-001",
-            "ZLH-004",
-            "ZLH-006",
-            "ZLH-010",
-            "ZLH-011",
-            "ZLH-034",
-            "ZLH-043",
-            "ZLH-050",
-            "ZLH-054",
-            "ZLH-055",
-            "ZLH-057",
-            "ZLH-060",
-            "ZLH-065",
-            "ZLH-071",
-            "ZLH-081",
-            "ZLH-082",
-            "ZLH-086",
-            "ZLH-091",
-            "ZLH-093",
-            "ZLH-097",
-            "ZLH-104",
-            "ZLH-106",
-            "ZLH-107",
-            "ZLH-108",
-            "ZLH-112",
-            "ZLH-113",
-            "ZLH-114",
-            "ZLH-115",
-            "ZLH-117",
-            "ZLH-123",
-            "ZLH-124",
-            "ZLH-126",
-            "ZLH-134",
-            "ZLH-138",
-            "ZLH-141",
-            "ZLH-142",
-            "ZLH-148"
-          ],
-          "size": 37
-        },
-        {
-          "index": 3,
-          "members": [
-            "ZLH-008",
-            "ZLH-013",
-            "ZLH-016",
-            "ZLH-028",
-            "ZLH-029",
-            "ZLH-035",
-            "ZLH-038",
-            "ZLH-058",
-            "ZLH-059",
-            "ZLH-069",
-            "ZLH-070",
-            "ZLH-073",
-            "ZLH-083",
-            "ZLH-100",
-            "ZLH-121",
-            "ZLH-122",
-            "ZLH-127",
-            "ZLH-133",
-            "ZLH-135",
-            "ZLH-137",
-            "ZLH-144",
-            "ZLH-145",
-            "ZLH-150"
-          ],
-          "size": 23
-        },
-        {
-          "index": 4,
-          "members": [
-            "ZLH-005",
-            "ZLH-009",
-            "ZLH-012",
-            "ZLH-017",
-            "ZLH-018",
-            "ZLH-019",
-            "ZLH-020",
-            "ZLH-037",
-            "ZLH-061",
-            "ZLH-105",
-            "ZLH-129",
-            "ZLH-130",
-            "ZLH-131",
-            "ZLH-143",
-            "ZLH-147"
-          ],
-          "size": 15
-        },
-        {
-          "index": 5,
-          "members": [
-            "ZLH-033"
-          ],
-          "size": 1
-        },
-        {
-          "index": 6,
-          "members": [
-            "ZLH-040"
-          ],
-          "size": 1
-        },
-        {
-          "index": 7,
-          "members": [
-            "ZLH-041"
-          ],
-          "size": 1
-        },
-        {
-          "index": 8,
-          "members": [
-            "ZLH-044"
-          ],
-          "size": 1
-        }
-      ],
-      "community_count": 52,
-      "components": 49,
-      "edges": 1758,
-      "isolated_nodes": 48,
-      "largest_component": 114,
-      "mean_degree": 21.703704,
+    "evidence_supported": {
+      "communities": [],
+      "community_count": 0,
+      "components": 162,
+      "edges": 0,
+      "isolated_nodes": 162,
+      "largest_component": 1,
+      "mean_degree": 0.0,
       "nodes": 162,
-      "top_betweenness": [
-        [
-          "ZLH-128",
-          "林语堂",
-          0.069224
-        ],
-        [
-          "ZLH-137",
-          "蔡元培",
-          0.062772
-        ],
-        [
-          "ZLH-133",
-          "埃德加·斯诺",
-          0.049815
-        ],
-        [
-          "ZLH-131",
-          "艾格尼丝·史沫特莱",
-          0.048555
-        ],
-        [
-          "ZLH-141",
-          "高尔基",
-          0.042616
-        ],
-        [
-          "ZLH-136",
-          "宋庆龄",
-          0.041994
-        ],
-        [
-          "ZLH-123",
-          "邹韬奋",
-          0.030887
-        ],
-        [
-          "ZLH-098",
-          "沈从文",
-          0.019474
-        ],
-        [
-          "ZLH-115",
-          "穆时英",
-          0.016845
-        ],
-        [
-          "ZLH-139",
-          "陈望道",
-          0.012706
-        ]
-      ],
-      "top_degree": [
-        [
-          "ZLH-141",
-          "高尔基",
-          0.602484
-        ],
-        [
-          "ZLH-128",
-          "林语堂",
-          0.503106
-        ],
-        [
-          "ZLH-131",
-          "艾格尼丝·史沫特莱",
-          0.459627
-        ],
-        [
-          "ZLH-133",
-          "埃德加·斯诺",
-          0.459627
-        ],
-        [
-          "ZLH-001",
-          "鲁迅",
-          0.428571
-        ],
-        [
-          "ZLH-021",
-          "丁玲",
-          0.428571
-        ],
-        [
-          "ZLH-136",
-          "宋庆龄",
-          0.42236
-        ],
-        [
-          "ZLH-137",
-          "蔡元培",
-          0.42236
-        ],
-        [
-          "ZLH-144",
-          "巴比塞",
-          0.397516
-        ],
-        [
-          "ZLH-004",
-          "夏衍",
-          0.385093
-        ]
-      ],
-      "top_weighted_degree": [
-        [
-          "ZLH-141",
-          "高尔基",
-          240.8
-        ],
-        [
-          "ZLH-001",
-          "鲁迅",
-          209.8
-        ],
-        [
-          "ZLH-021",
-          "丁玲",
-          206.8
-        ],
-        [
-          "ZLH-004",
-          "夏衍",
-          168.0
-        ],
-        [
-          "ZLH-026",
-          "胡风",
-          156.8
-        ],
-        [
-          "ZLH-016",
-          "柔石",
-          154.0
-        ],
-        [
-          "ZLH-144",
-          "巴比塞",
-          153.3
-        ],
-        [
-          "ZLH-037",
-          "楼适夷",
-          151.2
-        ],
-        [
-          "ZLH-005",
-          "冯雪峰",
-          148.2
-        ],
-        [
-          "ZLH-015",
-          "郁达夫",
-          146.7
-        ]
-      ],
-      "total_weight": 7918.0
+      "nodes_with_edges": 0,
+      "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+      "sample_sufficient": false,
+      "top_betweenness": [],
+      "top_degree": [],
+      "top_weighted_degree": [],
+      "total_weight": 0.0
+    },
+    "evidence_weighted": {
+      "communities": [],
+      "community_count": 0,
+      "components": 162,
+      "edges": 0,
+      "isolated_nodes": 162,
+      "largest_component": 1,
+      "mean_degree": 0.0,
+      "nodes": 162,
+      "nodes_with_edges": 0,
+      "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+      "sample_sufficient": false,
+      "top_betweenness": [],
+      "top_degree": [],
+      "top_weighted_degree": [],
+      "total_weight": 0.0
     },
     "full_exploratory": {
       "communities": [
@@ -535,6 +242,9 @@
       "largest_component": 122,
       "mean_degree": 52.185185,
       "nodes": 162,
+      "nodes_with_edges": 122,
+      "sample_note": "样本充足",
+      "sample_sufficient": true,
       "top_betweenness": [
         [
           "ZLH-001",
@@ -693,674 +403,41 @@
       ],
       "total_weight": 22874.0
     },
+    "human_verified": {
+      "communities": [],
+      "community_count": 0,
+      "components": 162,
+      "edges": 0,
+      "isolated_nodes": 162,
+      "largest_component": 1,
+      "mean_degree": 0.0,
+      "nodes": 162,
+      "nodes_with_edges": 0,
+      "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+      "sample_sufficient": false,
+      "top_betweenness": [],
+      "top_degree": [],
+      "top_weighted_degree": [],
+      "total_weight": 0.0
+    },
     "low_grade_downweighted": {
-      "communities": [
-        {
-          "index": 1,
-          "members": [
-            "ZLH-002",
-            "ZLH-003",
-            "ZLH-007",
-            "ZLH-014",
-            "ZLH-015",
-            "ZLH-021",
-            "ZLH-022",
-            "ZLH-023",
-            "ZLH-024",
-            "ZLH-025",
-            "ZLH-026",
-            "ZLH-027",
-            "ZLH-030",
-            "ZLH-031",
-            "ZLH-032",
-            "ZLH-036",
-            "ZLH-039",
-            "ZLH-042",
-            "ZLH-045",
-            "ZLH-046",
-            "ZLH-047",
-            "ZLH-048",
-            "ZLH-053",
-            "ZLH-063",
-            "ZLH-067",
-            "ZLH-074",
-            "ZLH-077",
-            "ZLH-080",
-            "ZLH-084",
-            "ZLH-096",
-            "ZLH-098",
-            "ZLH-099",
-            "ZLH-116",
-            "ZLH-119",
-            "ZLH-120",
-            "ZLH-128",
-            "ZLH-132",
-            "ZLH-136",
-            "ZLH-139"
-          ],
-          "size": 39
-        },
-        {
-          "index": 2,
-          "members": [
-            "ZLH-001",
-            "ZLH-004",
-            "ZLH-006",
-            "ZLH-010",
-            "ZLH-011",
-            "ZLH-034",
-            "ZLH-043",
-            "ZLH-050",
-            "ZLH-054",
-            "ZLH-055",
-            "ZLH-057",
-            "ZLH-060",
-            "ZLH-065",
-            "ZLH-071",
-            "ZLH-081",
-            "ZLH-082",
-            "ZLH-086",
-            "ZLH-091",
-            "ZLH-093",
-            "ZLH-097",
-            "ZLH-104",
-            "ZLH-106",
-            "ZLH-107",
-            "ZLH-108",
-            "ZLH-112",
-            "ZLH-113",
-            "ZLH-114",
-            "ZLH-115",
-            "ZLH-117",
-            "ZLH-123",
-            "ZLH-124",
-            "ZLH-126",
-            "ZLH-134",
-            "ZLH-138",
-            "ZLH-141",
-            "ZLH-142",
-            "ZLH-148"
-          ],
-          "size": 37
-        },
-        {
-          "index": 3,
-          "members": [
-            "ZLH-008",
-            "ZLH-013",
-            "ZLH-016",
-            "ZLH-028",
-            "ZLH-029",
-            "ZLH-035",
-            "ZLH-038",
-            "ZLH-058",
-            "ZLH-059",
-            "ZLH-069",
-            "ZLH-070",
-            "ZLH-073",
-            "ZLH-083",
-            "ZLH-100",
-            "ZLH-121",
-            "ZLH-122",
-            "ZLH-127",
-            "ZLH-133",
-            "ZLH-135",
-            "ZLH-137",
-            "ZLH-144",
-            "ZLH-145",
-            "ZLH-150"
-          ],
-          "size": 23
-        },
-        {
-          "index": 4,
-          "members": [
-            "ZLH-005",
-            "ZLH-009",
-            "ZLH-012",
-            "ZLH-017",
-            "ZLH-018",
-            "ZLH-019",
-            "ZLH-020",
-            "ZLH-037",
-            "ZLH-061",
-            "ZLH-105",
-            "ZLH-129",
-            "ZLH-130",
-            "ZLH-131",
-            "ZLH-143",
-            "ZLH-147"
-          ],
-          "size": 15
-        },
-        {
-          "index": 5,
-          "members": [
-            "ZLH-033"
-          ],
-          "size": 1
-        },
-        {
-          "index": 6,
-          "members": [
-            "ZLH-040"
-          ],
-          "size": 1
-        },
-        {
-          "index": 7,
-          "members": [
-            "ZLH-041"
-          ],
-          "size": 1
-        },
-        {
-          "index": 8,
-          "members": [
-            "ZLH-044"
-          ],
-          "size": 1
-        }
-      ],
-      "community_count": 52,
-      "components": 49,
-      "edges": 1758,
-      "isolated_nodes": 48,
-      "largest_component": 114,
-      "mean_degree": 21.703704,
+      "communities": [],
+      "community_count": 0,
+      "components": 162,
+      "edges": 0,
+      "isolated_nodes": 162,
+      "largest_component": 1,
+      "mean_degree": 0.0,
       "nodes": 162,
-      "top_betweenness": [
-        [
-          "ZLH-128",
-          "林语堂",
-          0.069224
-        ],
-        [
-          "ZLH-137",
-          "蔡元培",
-          0.062772
-        ],
-        [
-          "ZLH-133",
-          "埃德加·斯诺",
-          0.049815
-        ],
-        [
-          "ZLH-131",
-          "艾格尼丝·史沫特莱",
-          0.048555
-        ],
-        [
-          "ZLH-141",
-          "高尔基",
-          0.042616
-        ],
-        [
-          "ZLH-136",
-          "宋庆龄",
-          0.041994
-        ],
-        [
-          "ZLH-123",
-          "邹韬奋",
-          0.030887
-        ],
-        [
-          "ZLH-098",
-          "沈从文",
-          0.019474
-        ],
-        [
-          "ZLH-115",
-          "穆时英",
-          0.016845
-        ],
-        [
-          "ZLH-139",
-          "陈望道",
-          0.012706
-        ]
-      ],
-      "top_degree": [
-        [
-          "ZLH-141",
-          "高尔基",
-          0.602484
-        ],
-        [
-          "ZLH-128",
-          "林语堂",
-          0.503106
-        ],
-        [
-          "ZLH-131",
-          "艾格尼丝·史沫特莱",
-          0.459627
-        ],
-        [
-          "ZLH-133",
-          "埃德加·斯诺",
-          0.459627
-        ],
-        [
-          "ZLH-001",
-          "鲁迅",
-          0.428571
-        ],
-        [
-          "ZLH-021",
-          "丁玲",
-          0.428571
-        ],
-        [
-          "ZLH-136",
-          "宋庆龄",
-          0.42236
-        ],
-        [
-          "ZLH-137",
-          "蔡元培",
-          0.42236
-        ],
-        [
-          "ZLH-144",
-          "巴比塞",
-          0.397516
-        ],
-        [
-          "ZLH-004",
-          "夏衍",
-          0.385093
-        ]
-      ],
-      "top_weighted_degree": [
-        [
-          "ZLH-141",
-          "高尔基",
-          240.8
-        ],
-        [
-          "ZLH-001",
-          "鲁迅",
-          209.8
-        ],
-        [
-          "ZLH-021",
-          "丁玲",
-          206.8
-        ],
-        [
-          "ZLH-004",
-          "夏衍",
-          168.0
-        ],
-        [
-          "ZLH-026",
-          "胡风",
-          156.8
-        ],
-        [
-          "ZLH-016",
-          "柔石",
-          154.0
-        ],
-        [
-          "ZLH-144",
-          "巴比塞",
-          153.3
-        ],
-        [
-          "ZLH-037",
-          "楼适夷",
-          151.2
-        ],
-        [
-          "ZLH-005",
-          "冯雪峰",
-          148.2
-        ],
-        [
-          "ZLH-015",
-          "郁达夫",
-          146.7
-        ]
-      ],
-      "total_weight": 7918.0
+      "nodes_with_edges": 0,
+      "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+      "sample_sufficient": false,
+      "top_betweenness": [],
+      "top_degree": [],
+      "top_weighted_degree": [],
+      "total_weight": 0.0
     },
-    "luxun_diary_downweighted": {
-      "communities": [
-        {
-          "index": 1,
-          "members": [
-            "ZLH-002",
-            "ZLH-003",
-            "ZLH-005",
-            "ZLH-008",
-            "ZLH-010",
-            "ZLH-012",
-            "ZLH-015",
-            "ZLH-022",
-            "ZLH-024",
-            "ZLH-025",
-            "ZLH-026",
-            "ZLH-027",
-            "ZLH-029",
-            "ZLH-031",
-            "ZLH-032",
-            "ZLH-037",
-            "ZLH-038",
-            "ZLH-042",
-            "ZLH-045",
-            "ZLH-046",
-            "ZLH-047",
-            "ZLH-048",
-            "ZLH-053",
-            "ZLH-059",
-            "ZLH-060",
-            "ZLH-063",
-            "ZLH-073",
-            "ZLH-091",
-            "ZLH-098",
-            "ZLH-099",
-            "ZLH-108",
-            "ZLH-115",
-            "ZLH-120",
-            "ZLH-122",
-            "ZLH-127",
-            "ZLH-128",
-            "ZLH-137",
-            "ZLH-139"
-          ],
-          "size": 38
-        },
-        {
-          "index": 2,
-          "members": [
-            "ZLH-001",
-            "ZLH-004",
-            "ZLH-009",
-            "ZLH-013",
-            "ZLH-016",
-            "ZLH-017",
-            "ZLH-018",
-            "ZLH-019",
-            "ZLH-020",
-            "ZLH-028",
-            "ZLH-058",
-            "ZLH-061",
-            "ZLH-065",
-            "ZLH-069",
-            "ZLH-071",
-            "ZLH-074",
-            "ZLH-081",
-            "ZLH-083",
-            "ZLH-100",
-            "ZLH-105",
-            "ZLH-113",
-            "ZLH-114",
-            "ZLH-121",
-            "ZLH-124",
-            "ZLH-126",
-            "ZLH-130",
-            "ZLH-131",
-            "ZLH-132",
-            "ZLH-133",
-            "ZLH-134",
-            "ZLH-135",
-            "ZLH-142"
-          ],
-          "size": 32
-        },
-        {
-          "index": 3,
-          "members": [
-            "ZLH-006",
-            "ZLH-007",
-            "ZLH-021",
-            "ZLH-023",
-            "ZLH-030",
-            "ZLH-036",
-            "ZLH-039",
-            "ZLH-043",
-            "ZLH-077",
-            "ZLH-080",
-            "ZLH-084",
-            "ZLH-086",
-            "ZLH-093",
-            "ZLH-096",
-            "ZLH-097",
-            "ZLH-104",
-            "ZLH-112",
-            "ZLH-116",
-            "ZLH-119",
-            "ZLH-141",
-            "ZLH-144",
-            "ZLH-145",
-            "ZLH-150"
-          ],
-          "size": 23
-        },
-        {
-          "index": 4,
-          "members": [
-            "ZLH-011",
-            "ZLH-014",
-            "ZLH-034",
-            "ZLH-054",
-            "ZLH-055",
-            "ZLH-057",
-            "ZLH-067",
-            "ZLH-106",
-            "ZLH-107",
-            "ZLH-117",
-            "ZLH-123",
-            "ZLH-129",
-            "ZLH-136",
-            "ZLH-138",
-            "ZLH-143",
-            "ZLH-147",
-            "ZLH-148"
-          ],
-          "size": 17
-        },
-        {
-          "index": 5,
-          "members": [
-            "ZLH-035",
-            "ZLH-050",
-            "ZLH-070",
-            "ZLH-082"
-          ],
-          "size": 4
-        },
-        {
-          "index": 6,
-          "members": [
-            "ZLH-033"
-          ],
-          "size": 1
-        },
-        {
-          "index": 7,
-          "members": [
-            "ZLH-040"
-          ],
-          "size": 1
-        },
-        {
-          "index": 8,
-          "members": [
-            "ZLH-041"
-          ],
-          "size": 1
-        }
-      ],
-      "community_count": 53,
-      "components": 49,
-      "edges": 1758,
-      "isolated_nodes": 48,
-      "largest_component": 114,
-      "mean_degree": 21.703704,
-      "nodes": 162,
-      "top_betweenness": [
-        [
-          "ZLH-128",
-          "林语堂",
-          0.064981
-        ],
-        [
-          "ZLH-137",
-          "蔡元培",
-          0.060152
-        ],
-        [
-          "ZLH-133",
-          "埃德加·斯诺",
-          0.049633
-        ],
-        [
-          "ZLH-131",
-          "艾格尼丝·史沫特莱",
-          0.046967
-        ],
-        [
-          "ZLH-136",
-          "宋庆龄",
-          0.042592
-        ],
-        [
-          "ZLH-141",
-          "高尔基",
-          0.04114
-        ],
-        [
-          "ZLH-123",
-          "邹韬奋",
-          0.029315
-        ],
-        [
-          "ZLH-001",
-          "鲁迅",
-          0.02503
-        ],
-        [
-          "ZLH-098",
-          "沈从文",
-          0.018599
-        ],
-        [
-          "ZLH-122",
-          "许广平",
-          0.018423
-        ]
-      ],
-      "top_degree": [
-        [
-          "ZLH-141",
-          "高尔基",
-          0.602484
-        ],
-        [
-          "ZLH-128",
-          "林语堂",
-          0.503106
-        ],
-        [
-          "ZLH-131",
-          "艾格尼丝·史沫特莱",
-          0.459627
-        ],
-        [
-          "ZLH-133",
-          "埃德加·斯诺",
-          0.459627
-        ],
-        [
-          "ZLH-001",
-          "鲁迅",
-          0.428571
-        ],
-        [
-          "ZLH-021",
-          "丁玲",
-          0.428571
-        ],
-        [
-          "ZLH-136",
-          "宋庆龄",
-          0.42236
-        ],
-        [
-          "ZLH-137",
-          "蔡元培",
-          0.42236
-        ],
-        [
-          "ZLH-144",
-          "巴比塞",
-          0.397516
-        ],
-        [
-          "ZLH-004",
-          "夏衍",
-          0.385093
-        ]
-      ],
-      "top_weighted_degree": [
-        [
-          "ZLH-141",
-          "高尔基",
-          240.8
-        ],
-        [
-          "ZLH-021",
-          "丁玲",
-          206.3
-        ],
-        [
-          "ZLH-001",
-          "鲁迅",
-          190.3
-        ],
-        [
-          "ZLH-004",
-          "夏衍",
-          168.0
-        ],
-        [
-          "ZLH-026",
-          "胡风",
-          156.8
-        ],
-        [
-          "ZLH-016",
-          "柔石",
-          154.0
-        ],
-        [
-          "ZLH-144",
-          "巴比塞",
-          153.3
-        ],
-        [
-          "ZLH-037",
-          "楼适夷",
-          151.2
-        ],
-        [
-          "ZLH-058",
-          "郭沫若",
-          146.3
-        ],
-        [
-          "ZLH-005",
-          "冯雪峰",
-          146.2
-        ]
-      ],
-      "total_weight": 7879.0
-    },
-    "trusted": {
+    "low_risk_heuristic": {
       "communities": [
         {
           "index": 1,
@@ -1535,6 +612,9 @@
       "largest_component": 114,
       "mean_degree": 21.703704,
       "nodes": 162,
+      "nodes_with_edges": 114,
+      "sample_note": "样本充足",
+      "sample_sufficient": true,
       "top_betweenness": [
         [
           "ZLH-128",
@@ -1692,1376 +772,69 @@
         ]
       ],
       "total_weight": 11278.0
+    },
+    "luxun_diary_downweighted": {
+      "communities": [],
+      "community_count": 0,
+      "components": 162,
+      "edges": 0,
+      "isolated_nodes": 162,
+      "largest_component": 1,
+      "mean_degree": 0.0,
+      "nodes": 162,
+      "nodes_with_edges": 0,
+      "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+      "sample_sufficient": false,
+      "top_betweenness": [],
+      "top_degree": [],
+      "top_weighted_degree": [],
+      "total_weight": 0.0
+    },
+    "trusted": {
+      "communities": [],
+      "community_count": 0,
+      "components": 162,
+      "edges": 0,
+      "isolated_nodes": 162,
+      "largest_component": 1,
+      "mean_degree": 0.0,
+      "nodes": 162,
+      "nodes_with_edges": 0,
+      "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+      "sample_sufficient": false,
+      "top_betweenness": [],
+      "top_degree": [],
+      "top_weighted_degree": [],
+      "total_weight": 0.0
     }
   },
+  "sample_note_trusted": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+  "sample_sufficient_trusted": false,
   "sensitivity": {
-    "low_grade_source_downweight": {
-      "after": {
-        "communities": [
-          {
-            "index": 1,
-            "members": [
-              "ZLH-002",
-              "ZLH-003",
-              "ZLH-007",
-              "ZLH-014",
-              "ZLH-015",
-              "ZLH-021",
-              "ZLH-022",
-              "ZLH-023",
-              "ZLH-024",
-              "ZLH-025",
-              "ZLH-026",
-              "ZLH-027",
-              "ZLH-030",
-              "ZLH-031",
-              "ZLH-032",
-              "ZLH-036",
-              "ZLH-039",
-              "ZLH-042",
-              "ZLH-045",
-              "ZLH-046",
-              "ZLH-047",
-              "ZLH-048",
-              "ZLH-053",
-              "ZLH-063",
-              "ZLH-067",
-              "ZLH-074",
-              "ZLH-077",
-              "ZLH-080",
-              "ZLH-084",
-              "ZLH-096",
-              "ZLH-098",
-              "ZLH-099",
-              "ZLH-116",
-              "ZLH-119",
-              "ZLH-120",
-              "ZLH-128",
-              "ZLH-132",
-              "ZLH-136",
-              "ZLH-139"
-            ],
-            "size": 39
-          },
-          {
-            "index": 2,
-            "members": [
-              "ZLH-001",
-              "ZLH-004",
-              "ZLH-006",
-              "ZLH-010",
-              "ZLH-011",
-              "ZLH-034",
-              "ZLH-043",
-              "ZLH-050",
-              "ZLH-054",
-              "ZLH-055",
-              "ZLH-057",
-              "ZLH-060",
-              "ZLH-065",
-              "ZLH-071",
-              "ZLH-081",
-              "ZLH-082",
-              "ZLH-086",
-              "ZLH-091",
-              "ZLH-093",
-              "ZLH-097",
-              "ZLH-104",
-              "ZLH-106",
-              "ZLH-107",
-              "ZLH-108",
-              "ZLH-112",
-              "ZLH-113",
-              "ZLH-114",
-              "ZLH-115",
-              "ZLH-117",
-              "ZLH-123",
-              "ZLH-124",
-              "ZLH-126",
-              "ZLH-134",
-              "ZLH-138",
-              "ZLH-141",
-              "ZLH-142",
-              "ZLH-148"
-            ],
-            "size": 37
-          },
-          {
-            "index": 3,
-            "members": [
-              "ZLH-008",
-              "ZLH-013",
-              "ZLH-016",
-              "ZLH-028",
-              "ZLH-029",
-              "ZLH-035",
-              "ZLH-038",
-              "ZLH-058",
-              "ZLH-059",
-              "ZLH-069",
-              "ZLH-070",
-              "ZLH-073",
-              "ZLH-083",
-              "ZLH-100",
-              "ZLH-121",
-              "ZLH-122",
-              "ZLH-127",
-              "ZLH-133",
-              "ZLH-135",
-              "ZLH-137",
-              "ZLH-144",
-              "ZLH-145",
-              "ZLH-150"
-            ],
-            "size": 23
-          },
-          {
-            "index": 4,
-            "members": [
-              "ZLH-005",
-              "ZLH-009",
-              "ZLH-012",
-              "ZLH-017",
-              "ZLH-018",
-              "ZLH-019",
-              "ZLH-020",
-              "ZLH-037",
-              "ZLH-061",
-              "ZLH-105",
-              "ZLH-129",
-              "ZLH-130",
-              "ZLH-131",
-              "ZLH-143",
-              "ZLH-147"
-            ],
-            "size": 15
-          },
-          {
-            "index": 5,
-            "members": [
-              "ZLH-033"
-            ],
-            "size": 1
-          },
-          {
-            "index": 6,
-            "members": [
-              "ZLH-040"
-            ],
-            "size": 1
-          },
-          {
-            "index": 7,
-            "members": [
-              "ZLH-041"
-            ],
-            "size": 1
-          },
-          {
-            "index": 8,
-            "members": [
-              "ZLH-044"
-            ],
-            "size": 1
-          }
-        ],
-        "community_count": 52,
-        "components": 49,
-        "edges": 1758,
-        "isolated_nodes": 48,
-        "largest_component": 114,
-        "mean_degree": 21.703704,
-        "nodes": 162,
-        "top_betweenness": [
-          [
-            "ZLH-128",
-            "林语堂",
-            0.069224
-          ],
-          [
-            "ZLH-137",
-            "蔡元培",
-            0.062772
-          ],
-          [
-            "ZLH-133",
-            "埃德加·斯诺",
-            0.049815
-          ],
-          [
-            "ZLH-131",
-            "艾格尼丝·史沫特莱",
-            0.048555
-          ],
-          [
-            "ZLH-141",
-            "高尔基",
-            0.042616
-          ],
-          [
-            "ZLH-136",
-            "宋庆龄",
-            0.041994
-          ],
-          [
-            "ZLH-123",
-            "邹韬奋",
-            0.030887
-          ],
-          [
-            "ZLH-098",
-            "沈从文",
-            0.019474
-          ],
-          [
-            "ZLH-115",
-            "穆时英",
-            0.016845
-          ],
-          [
-            "ZLH-139",
-            "陈望道",
-            0.012706
-          ]
-        ],
-        "top_degree": [
-          [
-            "ZLH-141",
-            "高尔基",
-            0.602484
-          ],
-          [
-            "ZLH-128",
-            "林语堂",
-            0.503106
-          ],
-          [
-            "ZLH-131",
-            "艾格尼丝·史沫特莱",
-            0.459627
-          ],
-          [
-            "ZLH-133",
-            "埃德加·斯诺",
-            0.459627
-          ],
-          [
-            "ZLH-001",
-            "鲁迅",
-            0.428571
-          ],
-          [
-            "ZLH-021",
-            "丁玲",
-            0.428571
-          ],
-          [
-            "ZLH-136",
-            "宋庆龄",
-            0.42236
-          ],
-          [
-            "ZLH-137",
-            "蔡元培",
-            0.42236
-          ],
-          [
-            "ZLH-144",
-            "巴比塞",
-            0.397516
-          ],
-          [
-            "ZLH-004",
-            "夏衍",
-            0.385093
-          ]
-        ],
-        "top_weighted_degree": [
-          [
-            "ZLH-141",
-            "高尔基",
-            240.8
-          ],
-          [
-            "ZLH-001",
-            "鲁迅",
-            209.8
-          ],
-          [
-            "ZLH-021",
-            "丁玲",
-            206.8
-          ],
-          [
-            "ZLH-004",
-            "夏衍",
-            168.0
-          ],
-          [
-            "ZLH-026",
-            "胡风",
-            156.8
-          ],
-          [
-            "ZLH-016",
-            "柔石",
-            154.0
-          ],
-          [
-            "ZLH-144",
-            "巴比塞",
-            153.3
-          ],
-          [
-            "ZLH-037",
-            "楼适夷",
-            151.2
-          ],
-          [
-            "ZLH-005",
-            "冯雪峰",
-            148.2
-          ],
-          [
-            "ZLH-015",
-            "郁达夫",
-            146.7
-          ]
-        ],
-        "total_weight": 7918.0
-      },
-      "before": {
-        "communities": [
-          {
-            "index": 1,
-            "members": [
-              "ZLH-002",
-              "ZLH-003",
-              "ZLH-007",
-              "ZLH-014",
-              "ZLH-015",
-              "ZLH-021",
-              "ZLH-022",
-              "ZLH-023",
-              "ZLH-024",
-              "ZLH-025",
-              "ZLH-026",
-              "ZLH-027",
-              "ZLH-030",
-              "ZLH-031",
-              "ZLH-032",
-              "ZLH-036",
-              "ZLH-039",
-              "ZLH-042",
-              "ZLH-045",
-              "ZLH-046",
-              "ZLH-047",
-              "ZLH-048",
-              "ZLH-053",
-              "ZLH-063",
-              "ZLH-067",
-              "ZLH-074",
-              "ZLH-077",
-              "ZLH-080",
-              "ZLH-084",
-              "ZLH-096",
-              "ZLH-098",
-              "ZLH-099",
-              "ZLH-116",
-              "ZLH-119",
-              "ZLH-120",
-              "ZLH-128",
-              "ZLH-132",
-              "ZLH-136",
-              "ZLH-139"
-            ],
-            "size": 39
-          },
-          {
-            "index": 2,
-            "members": [
-              "ZLH-001",
-              "ZLH-004",
-              "ZLH-006",
-              "ZLH-010",
-              "ZLH-011",
-              "ZLH-034",
-              "ZLH-043",
-              "ZLH-050",
-              "ZLH-054",
-              "ZLH-055",
-              "ZLH-057",
-              "ZLH-060",
-              "ZLH-065",
-              "ZLH-071",
-              "ZLH-081",
-              "ZLH-082",
-              "ZLH-086",
-              "ZLH-091",
-              "ZLH-093",
-              "ZLH-097",
-              "ZLH-104",
-              "ZLH-106",
-              "ZLH-107",
-              "ZLH-108",
-              "ZLH-112",
-              "ZLH-113",
-              "ZLH-114",
-              "ZLH-115",
-              "ZLH-117",
-              "ZLH-123",
-              "ZLH-124",
-              "ZLH-126",
-              "ZLH-134",
-              "ZLH-138",
-              "ZLH-141",
-              "ZLH-142",
-              "ZLH-148"
-            ],
-            "size": 37
-          },
-          {
-            "index": 3,
-            "members": [
-              "ZLH-008",
-              "ZLH-013",
-              "ZLH-016",
-              "ZLH-028",
-              "ZLH-029",
-              "ZLH-035",
-              "ZLH-038",
-              "ZLH-058",
-              "ZLH-059",
-              "ZLH-069",
-              "ZLH-070",
-              "ZLH-073",
-              "ZLH-083",
-              "ZLH-100",
-              "ZLH-121",
-              "ZLH-122",
-              "ZLH-127",
-              "ZLH-133",
-              "ZLH-135",
-              "ZLH-137",
-              "ZLH-144",
-              "ZLH-145",
-              "ZLH-150"
-            ],
-            "size": 23
-          },
-          {
-            "index": 4,
-            "members": [
-              "ZLH-005",
-              "ZLH-009",
-              "ZLH-012",
-              "ZLH-017",
-              "ZLH-018",
-              "ZLH-019",
-              "ZLH-020",
-              "ZLH-037",
-              "ZLH-061",
-              "ZLH-105",
-              "ZLH-129",
-              "ZLH-130",
-              "ZLH-131",
-              "ZLH-143",
-              "ZLH-147"
-            ],
-            "size": 15
-          },
-          {
-            "index": 5,
-            "members": [
-              "ZLH-033"
-            ],
-            "size": 1
-          },
-          {
-            "index": 6,
-            "members": [
-              "ZLH-040"
-            ],
-            "size": 1
-          },
-          {
-            "index": 7,
-            "members": [
-              "ZLH-041"
-            ],
-            "size": 1
-          },
-          {
-            "index": 8,
-            "members": [
-              "ZLH-044"
-            ],
-            "size": 1
-          }
-        ],
-        "community_count": 52,
-        "components": 49,
-        "edges": 1758,
-        "isolated_nodes": 48,
-        "largest_component": 114,
-        "mean_degree": 21.703704,
-        "nodes": 162,
-        "top_betweenness": [
-          [
-            "ZLH-128",
-            "林语堂",
-            0.069224
-          ],
-          [
-            "ZLH-137",
-            "蔡元培",
-            0.062772
-          ],
-          [
-            "ZLH-133",
-            "埃德加·斯诺",
-            0.049815
-          ],
-          [
-            "ZLH-131",
-            "艾格尼丝·史沫特莱",
-            0.048555
-          ],
-          [
-            "ZLH-141",
-            "高尔基",
-            0.042616
-          ],
-          [
-            "ZLH-136",
-            "宋庆龄",
-            0.041994
-          ],
-          [
-            "ZLH-123",
-            "邹韬奋",
-            0.030887
-          ],
-          [
-            "ZLH-098",
-            "沈从文",
-            0.019474
-          ],
-          [
-            "ZLH-115",
-            "穆时英",
-            0.016845
-          ],
-          [
-            "ZLH-139",
-            "陈望道",
-            0.012706
-          ]
-        ],
-        "top_degree": [
-          [
-            "ZLH-141",
-            "高尔基",
-            0.602484
-          ],
-          [
-            "ZLH-128",
-            "林语堂",
-            0.503106
-          ],
-          [
-            "ZLH-131",
-            "艾格尼丝·史沫特莱",
-            0.459627
-          ],
-          [
-            "ZLH-133",
-            "埃德加·斯诺",
-            0.459627
-          ],
-          [
-            "ZLH-001",
-            "鲁迅",
-            0.428571
-          ],
-          [
-            "ZLH-021",
-            "丁玲",
-            0.428571
-          ],
-          [
-            "ZLH-136",
-            "宋庆龄",
-            0.42236
-          ],
-          [
-            "ZLH-137",
-            "蔡元培",
-            0.42236
-          ],
-          [
-            "ZLH-144",
-            "巴比塞",
-            0.397516
-          ],
-          [
-            "ZLH-004",
-            "夏衍",
-            0.385093
-          ]
-        ],
-        "top_weighted_degree": [
-          [
-            "ZLH-141",
-            "高尔基",
-            240.8
-          ],
-          [
-            "ZLH-001",
-            "鲁迅",
-            209.8
-          ],
-          [
-            "ZLH-021",
-            "丁玲",
-            206.8
-          ],
-          [
-            "ZLH-004",
-            "夏衍",
-            168.0
-          ],
-          [
-            "ZLH-026",
-            "胡风",
-            156.8
-          ],
-          [
-            "ZLH-016",
-            "柔石",
-            154.0
-          ],
-          [
-            "ZLH-144",
-            "巴比塞",
-            153.3
-          ],
-          [
-            "ZLH-037",
-            "楼适夷",
-            151.2
-          ],
-          [
-            "ZLH-005",
-            "冯雪峰",
-            148.2
-          ],
-          [
-            "ZLH-015",
-            "郁达夫",
-            146.7
-          ]
-        ],
-        "total_weight": 7918.0
-      },
-      "weighted_degree_top10_overlap": {
-        "common_count": 10,
-        "jaccard_top10": 1.0,
+    "heuristic_vs_evidence": {
+      "degree_top10_overlap": {
+        "common_count": 0,
+        "jaccard_top10": 0.0,
         "rank_changes": []
-      }
-    },
-    "luxun_diary_single_source_downweight": {
-      "after": {
-        "communities": [
-          {
-            "index": 1,
-            "members": [
-              "ZLH-002",
-              "ZLH-003",
-              "ZLH-005",
-              "ZLH-008",
-              "ZLH-010",
-              "ZLH-012",
-              "ZLH-015",
-              "ZLH-022",
-              "ZLH-024",
-              "ZLH-025",
-              "ZLH-026",
-              "ZLH-027",
-              "ZLH-029",
-              "ZLH-031",
-              "ZLH-032",
-              "ZLH-037",
-              "ZLH-038",
-              "ZLH-042",
-              "ZLH-045",
-              "ZLH-046",
-              "ZLH-047",
-              "ZLH-048",
-              "ZLH-053",
-              "ZLH-059",
-              "ZLH-060",
-              "ZLH-063",
-              "ZLH-073",
-              "ZLH-091",
-              "ZLH-098",
-              "ZLH-099",
-              "ZLH-108",
-              "ZLH-115",
-              "ZLH-120",
-              "ZLH-122",
-              "ZLH-127",
-              "ZLH-128",
-              "ZLH-137",
-              "ZLH-139"
-            ],
-            "size": 38
-          },
-          {
-            "index": 2,
-            "members": [
-              "ZLH-001",
-              "ZLH-004",
-              "ZLH-009",
-              "ZLH-013",
-              "ZLH-016",
-              "ZLH-017",
-              "ZLH-018",
-              "ZLH-019",
-              "ZLH-020",
-              "ZLH-028",
-              "ZLH-058",
-              "ZLH-061",
-              "ZLH-065",
-              "ZLH-069",
-              "ZLH-071",
-              "ZLH-074",
-              "ZLH-081",
-              "ZLH-083",
-              "ZLH-100",
-              "ZLH-105",
-              "ZLH-113",
-              "ZLH-114",
-              "ZLH-121",
-              "ZLH-124",
-              "ZLH-126",
-              "ZLH-130",
-              "ZLH-131",
-              "ZLH-132",
-              "ZLH-133",
-              "ZLH-134",
-              "ZLH-135",
-              "ZLH-142"
-            ],
-            "size": 32
-          },
-          {
-            "index": 3,
-            "members": [
-              "ZLH-006",
-              "ZLH-007",
-              "ZLH-021",
-              "ZLH-023",
-              "ZLH-030",
-              "ZLH-036",
-              "ZLH-039",
-              "ZLH-043",
-              "ZLH-077",
-              "ZLH-080",
-              "ZLH-084",
-              "ZLH-086",
-              "ZLH-093",
-              "ZLH-096",
-              "ZLH-097",
-              "ZLH-104",
-              "ZLH-112",
-              "ZLH-116",
-              "ZLH-119",
-              "ZLH-141",
-              "ZLH-144",
-              "ZLH-145",
-              "ZLH-150"
-            ],
-            "size": 23
-          },
-          {
-            "index": 4,
-            "members": [
-              "ZLH-011",
-              "ZLH-014",
-              "ZLH-034",
-              "ZLH-054",
-              "ZLH-055",
-              "ZLH-057",
-              "ZLH-067",
-              "ZLH-106",
-              "ZLH-107",
-              "ZLH-117",
-              "ZLH-123",
-              "ZLH-129",
-              "ZLH-136",
-              "ZLH-138",
-              "ZLH-143",
-              "ZLH-147",
-              "ZLH-148"
-            ],
-            "size": 17
-          },
-          {
-            "index": 5,
-            "members": [
-              "ZLH-035",
-              "ZLH-050",
-              "ZLH-070",
-              "ZLH-082"
-            ],
-            "size": 4
-          },
-          {
-            "index": 6,
-            "members": [
-              "ZLH-033"
-            ],
-            "size": 1
-          },
-          {
-            "index": 7,
-            "members": [
-              "ZLH-040"
-            ],
-            "size": 1
-          },
-          {
-            "index": 8,
-            "members": [
-              "ZLH-041"
-            ],
-            "size": 1
-          }
-        ],
-        "community_count": 53,
-        "components": 49,
-        "edges": 1758,
-        "isolated_nodes": 48,
-        "largest_component": 114,
-        "mean_degree": 21.703704,
-        "nodes": 162,
-        "top_betweenness": [
-          [
-            "ZLH-128",
-            "林语堂",
-            0.064981
-          ],
-          [
-            "ZLH-137",
-            "蔡元培",
-            0.060152
-          ],
-          [
-            "ZLH-133",
-            "埃德加·斯诺",
-            0.049633
-          ],
-          [
-            "ZLH-131",
-            "艾格尼丝·史沫特莱",
-            0.046967
-          ],
-          [
-            "ZLH-136",
-            "宋庆龄",
-            0.042592
-          ],
-          [
-            "ZLH-141",
-            "高尔基",
-            0.04114
-          ],
-          [
-            "ZLH-123",
-            "邹韬奋",
-            0.029315
-          ],
-          [
-            "ZLH-001",
-            "鲁迅",
-            0.02503
-          ],
-          [
-            "ZLH-098",
-            "沈从文",
-            0.018599
-          ],
-          [
-            "ZLH-122",
-            "许广平",
-            0.018423
-          ]
-        ],
-        "top_degree": [
-          [
-            "ZLH-141",
-            "高尔基",
-            0.602484
-          ],
-          [
-            "ZLH-128",
-            "林语堂",
-            0.503106
-          ],
-          [
-            "ZLH-131",
-            "艾格尼丝·史沫特莱",
-            0.459627
-          ],
-          [
-            "ZLH-133",
-            "埃德加·斯诺",
-            0.459627
-          ],
-          [
-            "ZLH-001",
-            "鲁迅",
-            0.428571
-          ],
-          [
-            "ZLH-021",
-            "丁玲",
-            0.428571
-          ],
-          [
-            "ZLH-136",
-            "宋庆龄",
-            0.42236
-          ],
-          [
-            "ZLH-137",
-            "蔡元培",
-            0.42236
-          ],
-          [
-            "ZLH-144",
-            "巴比塞",
-            0.397516
-          ],
-          [
-            "ZLH-004",
-            "夏衍",
-            0.385093
-          ]
-        ],
-        "top_weighted_degree": [
-          [
-            "ZLH-141",
-            "高尔基",
-            240.8
-          ],
-          [
-            "ZLH-021",
-            "丁玲",
-            206.3
-          ],
-          [
-            "ZLH-001",
-            "鲁迅",
-            190.3
-          ],
-          [
-            "ZLH-004",
-            "夏衍",
-            168.0
-          ],
-          [
-            "ZLH-026",
-            "胡风",
-            156.8
-          ],
-          [
-            "ZLH-016",
-            "柔石",
-            154.0
-          ],
-          [
-            "ZLH-144",
-            "巴比塞",
-            153.3
-          ],
-          [
-            "ZLH-037",
-            "楼适夷",
-            151.2
-          ],
-          [
-            "ZLH-058",
-            "郭沫若",
-            146.3
-          ],
-          [
-            "ZLH-005",
-            "冯雪峰",
-            146.2
-          ]
-        ],
-        "total_weight": 7879.0
       },
-      "before": {
-        "communities": [
-          {
-            "index": 1,
-            "members": [
-              "ZLH-002",
-              "ZLH-003",
-              "ZLH-007",
-              "ZLH-014",
-              "ZLH-015",
-              "ZLH-021",
-              "ZLH-022",
-              "ZLH-023",
-              "ZLH-024",
-              "ZLH-025",
-              "ZLH-026",
-              "ZLH-027",
-              "ZLH-030",
-              "ZLH-031",
-              "ZLH-032",
-              "ZLH-036",
-              "ZLH-039",
-              "ZLH-042",
-              "ZLH-045",
-              "ZLH-046",
-              "ZLH-047",
-              "ZLH-048",
-              "ZLH-053",
-              "ZLH-063",
-              "ZLH-067",
-              "ZLH-074",
-              "ZLH-077",
-              "ZLH-080",
-              "ZLH-084",
-              "ZLH-096",
-              "ZLH-098",
-              "ZLH-099",
-              "ZLH-116",
-              "ZLH-119",
-              "ZLH-120",
-              "ZLH-128",
-              "ZLH-132",
-              "ZLH-136",
-              "ZLH-139"
-            ],
-            "size": 39
-          },
-          {
-            "index": 2,
-            "members": [
-              "ZLH-001",
-              "ZLH-004",
-              "ZLH-006",
-              "ZLH-010",
-              "ZLH-011",
-              "ZLH-034",
-              "ZLH-043",
-              "ZLH-050",
-              "ZLH-054",
-              "ZLH-055",
-              "ZLH-057",
-              "ZLH-060",
-              "ZLH-065",
-              "ZLH-071",
-              "ZLH-081",
-              "ZLH-082",
-              "ZLH-086",
-              "ZLH-091",
-              "ZLH-093",
-              "ZLH-097",
-              "ZLH-104",
-              "ZLH-106",
-              "ZLH-107",
-              "ZLH-108",
-              "ZLH-112",
-              "ZLH-113",
-              "ZLH-114",
-              "ZLH-115",
-              "ZLH-117",
-              "ZLH-123",
-              "ZLH-124",
-              "ZLH-126",
-              "ZLH-134",
-              "ZLH-138",
-              "ZLH-141",
-              "ZLH-142",
-              "ZLH-148"
-            ],
-            "size": 37
-          },
-          {
-            "index": 3,
-            "members": [
-              "ZLH-008",
-              "ZLH-013",
-              "ZLH-016",
-              "ZLH-028",
-              "ZLH-029",
-              "ZLH-035",
-              "ZLH-038",
-              "ZLH-058",
-              "ZLH-059",
-              "ZLH-069",
-              "ZLH-070",
-              "ZLH-073",
-              "ZLH-083",
-              "ZLH-100",
-              "ZLH-121",
-              "ZLH-122",
-              "ZLH-127",
-              "ZLH-133",
-              "ZLH-135",
-              "ZLH-137",
-              "ZLH-144",
-              "ZLH-145",
-              "ZLH-150"
-            ],
-            "size": 23
-          },
-          {
-            "index": 4,
-            "members": [
-              "ZLH-005",
-              "ZLH-009",
-              "ZLH-012",
-              "ZLH-017",
-              "ZLH-018",
-              "ZLH-019",
-              "ZLH-020",
-              "ZLH-037",
-              "ZLH-061",
-              "ZLH-105",
-              "ZLH-129",
-              "ZLH-130",
-              "ZLH-131",
-              "ZLH-143",
-              "ZLH-147"
-            ],
-            "size": 15
-          },
-          {
-            "index": 5,
-            "members": [
-              "ZLH-033"
-            ],
-            "size": 1
-          },
-          {
-            "index": 6,
-            "members": [
-              "ZLH-040"
-            ],
-            "size": 1
-          },
-          {
-            "index": 7,
-            "members": [
-              "ZLH-041"
-            ],
-            "size": 1
-          },
-          {
-            "index": 8,
-            "members": [
-              "ZLH-044"
-            ],
-            "size": 1
-          }
-        ],
-        "community_count": 52,
-        "components": 49,
-        "edges": 1758,
-        "isolated_nodes": 48,
-        "largest_component": 114,
-        "mean_degree": 21.703704,
+      "evidence_supported": {
+        "communities": [],
+        "community_count": 0,
+        "components": 162,
+        "edges": 0,
+        "isolated_nodes": 162,
+        "largest_component": 1,
+        "mean_degree": 0.0,
         "nodes": 162,
-        "top_betweenness": [
-          [
-            "ZLH-128",
-            "林语堂",
-            0.069224
-          ],
-          [
-            "ZLH-137",
-            "蔡元培",
-            0.062772
-          ],
-          [
-            "ZLH-133",
-            "埃德加·斯诺",
-            0.049815
-          ],
-          [
-            "ZLH-131",
-            "艾格尼丝·史沫特莱",
-            0.048555
-          ],
-          [
-            "ZLH-141",
-            "高尔基",
-            0.042616
-          ],
-          [
-            "ZLH-136",
-            "宋庆龄",
-            0.041994
-          ],
-          [
-            "ZLH-123",
-            "邹韬奋",
-            0.030887
-          ],
-          [
-            "ZLH-098",
-            "沈从文",
-            0.019474
-          ],
-          [
-            "ZLH-115",
-            "穆时英",
-            0.016845
-          ],
-          [
-            "ZLH-139",
-            "陈望道",
-            0.012706
-          ]
-        ],
-        "top_degree": [
-          [
-            "ZLH-141",
-            "高尔基",
-            0.602484
-          ],
-          [
-            "ZLH-128",
-            "林语堂",
-            0.503106
-          ],
-          [
-            "ZLH-131",
-            "艾格尼丝·史沫特莱",
-            0.459627
-          ],
-          [
-            "ZLH-133",
-            "埃德加·斯诺",
-            0.459627
-          ],
-          [
-            "ZLH-001",
-            "鲁迅",
-            0.428571
-          ],
-          [
-            "ZLH-021",
-            "丁玲",
-            0.428571
-          ],
-          [
-            "ZLH-136",
-            "宋庆龄",
-            0.42236
-          ],
-          [
-            "ZLH-137",
-            "蔡元培",
-            0.42236
-          ],
-          [
-            "ZLH-144",
-            "巴比塞",
-            0.397516
-          ],
-          [
-            "ZLH-004",
-            "夏衍",
-            0.385093
-          ]
-        ],
-        "top_weighted_degree": [
-          [
-            "ZLH-141",
-            "高尔基",
-            240.8
-          ],
-          [
-            "ZLH-001",
-            "鲁迅",
-            209.8
-          ],
-          [
-            "ZLH-021",
-            "丁玲",
-            206.8
-          ],
-          [
-            "ZLH-004",
-            "夏衍",
-            168.0
-          ],
-          [
-            "ZLH-026",
-            "胡风",
-            156.8
-          ],
-          [
-            "ZLH-016",
-            "柔石",
-            154.0
-          ],
-          [
-            "ZLH-144",
-            "巴比塞",
-            153.3
-          ],
-          [
-            "ZLH-037",
-            "楼适夷",
-            151.2
-          ],
-          [
-            "ZLH-005",
-            "冯雪峰",
-            148.2
-          ],
-          [
-            "ZLH-015",
-            "郁达夫",
-            146.7
-          ]
-        ],
-        "total_weight": 7918.0
+        "nodes_with_edges": 0,
+        "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+        "sample_sufficient": false,
+        "top_betweenness": [],
+        "top_degree": [],
+        "top_weighted_degree": [],
+        "total_weight": 0.0
       },
-      "weighted_degree_top10_overlap": {
-        "common_count": 9,
-        "jaccard_top10": 0.818182,
-        "rank_changes": [
-          [
-            "ZLH-001",
-            2,
-            3
-          ],
-          [
-            "ZLH-005",
-            9,
-            10
-          ],
-          [
-            "ZLH-021",
-            3,
-            2
-          ]
-        ]
-      }
-    },
-    "remove_pending_relations": {
-      "after": {
+      "heuristic": {
         "communities": [
           {
             "index": 1,
@@ -3236,6 +1009,9 @@
         "largest_component": 114,
         "mean_degree": 21.703704,
         "nodes": 162,
+        "nodes_with_edges": 114,
+        "sample_note": "样本充足",
+        "sample_sufficient": true,
         "top_betweenness": [
           [
             "ZLH-128",
@@ -3393,6 +1169,107 @@
           ]
         ],
         "total_weight": 11278.0
+      }
+    },
+    "low_grade_source_downweight": {
+      "after": {
+        "communities": [],
+        "community_count": 0,
+        "components": 162,
+        "edges": 0,
+        "isolated_nodes": 162,
+        "largest_component": 1,
+        "mean_degree": 0.0,
+        "nodes": 162,
+        "nodes_with_edges": 0,
+        "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+        "sample_sufficient": false,
+        "top_betweenness": [],
+        "top_degree": [],
+        "top_weighted_degree": [],
+        "total_weight": 0.0
+      },
+      "before": {
+        "communities": [],
+        "community_count": 0,
+        "components": 162,
+        "edges": 0,
+        "isolated_nodes": 162,
+        "largest_component": 1,
+        "mean_degree": 0.0,
+        "nodes": 162,
+        "nodes_with_edges": 0,
+        "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+        "sample_sufficient": false,
+        "top_betweenness": [],
+        "top_degree": [],
+        "top_weighted_degree": [],
+        "total_weight": 0.0
+      },
+      "weighted_degree_top10_overlap": {
+        "common_count": 0,
+        "jaccard_top10": 0.0,
+        "rank_changes": []
+      }
+    },
+    "luxun_diary_single_source_downweight": {
+      "after": {
+        "communities": [],
+        "community_count": 0,
+        "components": 162,
+        "edges": 0,
+        "isolated_nodes": 162,
+        "largest_component": 1,
+        "mean_degree": 0.0,
+        "nodes": 162,
+        "nodes_with_edges": 0,
+        "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+        "sample_sufficient": false,
+        "top_betweenness": [],
+        "top_degree": [],
+        "top_weighted_degree": [],
+        "total_weight": 0.0
+      },
+      "before": {
+        "communities": [],
+        "community_count": 0,
+        "components": 162,
+        "edges": 0,
+        "isolated_nodes": 162,
+        "largest_component": 1,
+        "mean_degree": 0.0,
+        "nodes": 162,
+        "nodes_with_edges": 0,
+        "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+        "sample_sufficient": false,
+        "top_betweenness": [],
+        "top_degree": [],
+        "top_weighted_degree": [],
+        "total_weight": 0.0
+      },
+      "weighted_degree_top10_overlap": {
+        "common_count": 0,
+        "jaccard_top10": 0.0,
+        "rank_changes": []
+      }
+    },
+    "remove_pending_relations": {
+      "after": {
+        "communities": [],
+        "community_count": 0,
+        "components": 162,
+        "edges": 0,
+        "isolated_nodes": 162,
+        "largest_component": 1,
+        "mean_degree": 0.0,
+        "nodes": 162,
+        "nodes_with_edges": 0,
+        "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
+        "sample_sufficient": false,
+        "top_betweenness": [],
+        "top_degree": [],
+        "top_weighted_degree": [],
+        "total_weight": 0.0
       },
       "before": {
         "communities": [
@@ -3578,6 +1455,9 @@
         "largest_component": 122,
         "mean_degree": 52.185185,
         "nodes": 162,
+        "nodes_with_edges": 122,
+        "sample_note": "样本充足",
+        "sample_sufficient": true,
         "top_betweenness": [
           [
             "ZLH-001",
@@ -3737,31 +1617,14 @@
         "total_weight": 22874.0
       },
       "betweenness_top10_overlap": {
-        "common_count": 1,
-        "jaccard_top10": 0.052632,
-        "rank_changes": [
-          [
-            "ZLH-001",
-            1,
-            10
-          ]
-        ]
+        "common_count": 0,
+        "jaccard_top10": 0.0,
+        "rank_changes": []
       },
       "degree_top10_overlap": {
-        "common_count": 2,
-        "jaccard_top10": 0.111111,
-        "rank_changes": [
-          [
-            "ZLH-001",
-            1,
-            5
-          ],
-          [
-            "ZLH-004",
-            3,
-            10
-          ]
-        ]
+        "common_count": 0,
+        "jaccard_top10": 0.0,
+        "rank_changes": []
       }
     }
   },
@@ -3846,6 +1709,9 @@
       "largest_component": 16,
       "mean_degree": 0.506173,
       "nodes": 162,
+      "nodes_with_edges": 16,
+      "sample_note": "样本充足",
+      "sample_sufficient": true,
       "top_betweenness": [
         [
           "ZLH-001",
@@ -4095,6 +1961,9 @@
       "largest_component": 25,
       "mean_degree": 0.987654,
       "nodes": 162,
+      "nodes_with_edges": 31,
+      "sample_note": "样本充足",
+      "sample_sufficient": true,
       "top_betweenness": [
         [
           "ZLH-037",
@@ -4329,6 +2198,9 @@
       "largest_component": 7,
       "mean_degree": 0.333333,
       "nodes": 162,
+      "nodes_with_edges": 11,
+      "sample_note": "样本充足",
+      "sample_sufficient": true,
       "top_betweenness": [
         [
           "ZLH-001",

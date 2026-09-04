@@ -221,8 +221,14 @@ def render_analysis(
     )
     show_review = st.checkbox("显示待审核关系", value=False, key="analysis_show_review")
     analysis_edges = filter_edges_for_display(edges_df, include_review=show_review)
-    research_bundle = load_analysis_bundle(nodes_df, analysis_edges, events_df)
     st.caption(f"分析样本：人物 {len(nodes_df)}｜关系 {len(analysis_edges)}｜事件 {len(events_df)}")
+    if not show_review and analysis_edges.empty:
+        st.info("当前尚无完成人工核验的关系；可主动开启研究候选关系。")
+        st.caption("研究候选关系均为“未经人工核验”，不得作为正式证据或可信关系引用；以下统计仅反映公开样本为空的状态。")
+        return
+    if show_review and not analysis_edges.empty:
+        st.warning("以下含研究候选关系（未经人工核验），不得作为正式证据或可信关系引用；中心性排名仅为数据观察。")
+    research_bundle = load_analysis_bundle(nodes_df, analysis_edges, events_df)
 
     finding_map = {finding.key: finding for finding in research_bundle.findings}
 

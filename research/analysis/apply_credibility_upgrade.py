@@ -1,9 +1,13 @@
-"""Agent A 数据治理迁移脚本（幂等，可重跑）。
+"""Agent A 数据治理迁移脚本（幂等，可重跑，返修版）。
 
-范围（Agent A）：关系发布状态 + 关系证据 + 来源两层模型。
-- person_relations.publish_status 由现有风险/类型/置信/人工标记派生
-- relation_evidences 逐条由 relation 的 source_ids/context/evidence_ref 拆分，全部 pending
-- sources.source_family + 相对路径化；source_works / source_passages 由现有 sources 分组生成
+范围（Agent A + 本次返修）：
+- relation_evidences 逐条由 relation 的 source_ids/context/evidence_ref 拆分，全部 pending/associated（仅首建；已存在则不覆盖）
+- person_relations.publish_status + publish_status_origin + reviewer/reviewed_at/review_note
+  每次按当前行（类型/风险/置信/复核标记）+ 当前 relation_evidences 全量重算，不透传旧值；
+  仅 human_adjudication 的 verified/rejected 予以保留（须带审计字段）
+- supported 仅当存在 support + 未 rejected + locator + (quote|context) 证据；associated/pending 候选不得冒充支持
+- low/同属组织/空间共现/时空共现不得进入公开层
+- sources.source_family + 相对路径化；source_works / source_passages 一律走 sync_source_layer 统一入口
 
 只迁移现有证据和状态，不新增史实判断；不改风险值（无反向降险）。
 时空（events/places/participants）归 Agent B，本脚本不触碰。
@@ -19,8 +23,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from research.analysis.relation_publish_status import derive_relation_publish_status
-from research.analysis.source_layer import file_sha256, portable_source_path, source_family_for
+from research.analysis.relation_publish_status import assign_relation_status_columns
+from research.analysis.source_layer import portable_source_path, source_family_for, sync_source_layer
 
 PROCESSED = PROJECT_ROOT / "data" / "processed"
 
@@ -37,23 +41,46 @@ def _write(df: pd.DataFrame, name: str) -> None:
 
 def migrate_relations() -> dict:
     rel = _read("person_relations.csv")
-    # 派生 publish_status：已人工标记 verified/rejected 的予以保留，其余重算
-    statuses = []
+    evid = _read("relation_evidences.csv") if (PROCESSED / "relation_evidences.csv").exists() else pd.DataFrame()
+    evid_by_rel: dict[str, list[dict[str, str]]] = {}
+    if not evid.empty:
+        for _, erow in evid.iterrows():
+            evid_by_rel.setdefault(str(erow.get("relation_id", "")), []).append(erow.to_dict())
+    statuses, origins, reviewers, reviewed_ats, review_notes = [], [], [], [], []
     for _, row in rel.iterrows():
         d = row.to_dict()
-        existing = str(d.get("publish_status", "")).strip()
-        if existing in ("verified", "rejected"):
-            statuses.append(existing)
-        else:
-            statuses.append(derive_relation_publish_status(d))
+        cols = assign_relation_status_columns(
+            d,
+            evid_by_rel.get(str(d.get("relation_id", "")), []),
+            existing={
+                "reviewer": str(d.get("reviewer", "") or ""),
+                "reviewed_at": str(d.get("reviewed_at", "") or ""),
+                "review_note": str(d.get("review_note", "") or ""),
+            },
+        )
+        statuses.append(cols["publish_status"])
+        origins.append(cols["publish_status_origin"])
+        reviewers.append(cols["reviewer"])
+        reviewed_ats.append(cols["reviewed_at"])
+        review_notes.append(cols["review_note"])
     rel["publish_status"] = statuses
+    rel["publish_status_origin"] = origins
+    rel["reviewer"] = reviewers
+    rel["reviewed_at"] = reviewed_ats
+    rel["review_note"] = review_notes
     # 不得反向降险：risk 列原样保留
     _write(rel, "person_relations.csv")
     counts = pd.Series(statuses).value_counts().to_dict()
-    return {"total": len(rel), "status_counts": counts}
+    origin_counts = pd.Series(origins).value_counts().to_dict()
+    return {"total": len(rel), "status_counts": counts, "origin_counts": origin_counts}
 
 
 def migrate_relation_evidences() -> dict:
+    # 幂等保护：证据表已存在则不重建——后续任何证据语义升级（support/reviewed/quote）
+    # 都不得被迁移脚本覆盖清除。
+    if (PROCESSED / "relation_evidences.csv").exists():
+        existing = _read("relation_evidences.csv")
+        return {"rows": len(existing), "skipped_existing": True}
     rel = _read("person_relations.csv")
     src = _read("sources.csv")
     level_map = {}
@@ -126,86 +153,20 @@ def migrate_sources() -> dict:
     ]
     _write(src, "sources.csv")
 
-    # works：按 (title, source_path, source_url) 去重
-    grouped = src.drop_duplicates(["title", "source_path", "source_url"]).sort_values(
-        ["title", "source_path", "source_url"]
-    ).reset_index(drop=True)
-    # 文件哈希（仅本地存在文件）
-    hash_cache: dict[str, str] = {}
-    for p in grouped["source_path"].unique().tolist():
-        if not p:
-            continue
-        cand = PROJECT_ROOT / p
-        if cand.is_file():
-            try:
-                hash_cache[p] = file_sha256(cand)
-            except Exception:
-                hash_cache[p] = ""
-    work_rows = []
-    work_key_to_id: dict[tuple, str] = {}
-    for i, (_, r) in enumerate(grouped.iterrows(), start=1):
-        wid = f"WORK-{i:04d}"
-        key = (str(r["title"]), str(r["source_path"]), str(r["source_url"]))
-        work_key_to_id[key] = wid
-        title = str(r["title"])
-        author = "鲁迅" if "鲁迅日记" in title else ""
-        work_rows.append(
-            {
-                "work_id": wid,
-                "title": title,
-                "author": author,
-                "version": "",
-                "publication_info": "待人工核录",
-                "source_category": str(r.get("evidence_type", "")),
-                "source_family": str(r.get("source_family", "")),
-                "citation_count": int((src["title"] == r["title"]).sum()),
-            }
-        )
-    works_df = pd.DataFrame(
-        work_rows,
-        columns=["work_id", "title", "author", "version", "publication_info", "source_category", "source_family", "citation_count"],
-    )
-    works_df.to_csv(PROCESSED / "source_works.csv", index=False, encoding="utf-8-sig")
-
-    # passages：每条 source 一条 passage
-    pass_rows = []
-    for i, (_, r) in enumerate(src.sort_values("source_id").iterrows(), start=1):
-        key = (str(r["title"]), str(r["source_path"]), str(r["source_url"]))
-        wid = work_key_to_id.get(key, "")
-        spath = str(r.get("source_path", ""))
-        fhash = hash_cache.get(spath, "")
-        # 仅当文件真实存在才有哈希；网页/空路径留空，不伪造
-        pass_rows.append(
-            {
-                "passage_id": f"PSGN-{i:05d}",
-                "work_id": wid,
-                "source_id": str(r.get("source_id", "")),
-                "locator": str(r.get("citation", ""))[:500],
-                "citation": str(r.get("citation", ""))[:800],
-                "file_hash": fhash,
-                "source_url": str(r.get("source_url", "")),
-            }
-        )
-    pass_df = pd.DataFrame(
-        pass_rows,
-        columns=["passage_id", "work_id", "source_id", "locator", "citation", "file_hash", "source_url"],
-    )
-    pass_df.to_csv(PROCESSED / "source_passages.csv", index=False, encoding="utf-8-sig")
-    return {
-        "sources": len(src),
-        "works": len(works_df),
-        "passages": len(pass_df),
-        "families": int(src["source_family"].nunique()),
-    }
+    # 层级表维护一律走统一注册/同步入口：稳定 ID、citation_count 按实际 passage 数重算
+    stats = sync_source_layer(PROCESSED)
+    stats["families"] = int(src["source_family"].nunique())
+    return stats
 
 
 def main() -> int:
-    r1 = migrate_relations()
-    print(f"relations: {r1}")
+    # 顺序：先证据/来源层（被依赖方），后关系状态（依赖证据重算）。幂等可重跑。
     r2 = migrate_relation_evidences()
     print(f"relation_evidences: {r2}")
     r3 = migrate_sources()
     print(f"sources: {r3}")
+    r1 = migrate_relations()
+    print(f"relations: {r1}")
     return 0
 
 

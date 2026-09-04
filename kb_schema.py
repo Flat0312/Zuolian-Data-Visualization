@@ -26,6 +26,9 @@ OPTIONAL_DATA_FILES = (
 )
 
 RELATION_PUBLISH_STATUSES = ("verified", "supported", "inferred", "pending_review", "rejected")
+RELATION_PUBLISH_STATUS_ORIGINS = ("derived", "human_adjudication")
+HUMAN_ONLY_RELATION_STATUSES = ("verified", "rejected")
+HUMAN_ADJUDICATION_AUDIT_FIELDS = ("reviewer", "reviewed_at", "review_note")
 
 OPTIONAL_REQUIRED_COLUMNS: dict[str, tuple[str, ...]] = {
     "relation_evidences.csv": (
@@ -672,14 +675,58 @@ def _check_relation_publish_status(result: ValidationResult) -> None:
     frame = result.tables.get("person_relations.csv")
     if frame is None or "publish_status" not in frame.columns:
         return
+    # publish_status 存在时，origin 与审计列必须同时存在（不得透传旧值、无来源状态）。
+    for required_col in ("publish_status_origin", *HUMAN_ADJUDICATION_AUDIT_FIELDS):
+        if required_col not in frame.columns:
+            _add_issue(
+                result, "error", "missing_columns",
+                "person_relations.csv", f"缺少必需列：{required_col}",
+            )
+            return
     for _, row in frame.iterrows():
+        rid = _clean_text(row.get("relation_id", ""))
         value = _clean_text(row.get("publish_status", ""))
         if value and value not in RELATION_PUBLISH_STATUSES:
             _add_issue(
                 result, "error", "invalid_relation_publish_status",
                 "person_relations.csv", f"publish_status 非法：{value}",
-                _clean_text(row.get("relation_id", "")),
+                rid,
             )
+            continue
+        origin = _clean_text(row.get("publish_status_origin", ""))
+        if value and origin not in RELATION_PUBLISH_STATUS_ORIGINS:
+            _add_issue(
+                result, "error", "invalid_relation_publish_origin",
+                "person_relations.csv", f"publish_status_origin 非法：{origin or '空值'}",
+                rid,
+            )
+            continue
+        if not value:
+            continue
+        # 只有 human_adjudication 的 verified/rejected 可以保留；derived 不得冒充人工。
+        if value in HUMAN_ONLY_RELATION_STATUSES and origin != "human_adjudication":
+            _add_issue(
+                result, "error", "invalid_relation_publish_origin",
+                "person_relations.csv",
+                f"{value} 必须由 human_adjudication 裁决，当前 origin={origin or '空值'}",
+                rid,
+            )
+        if origin == "human_adjudication":
+            if value not in HUMAN_ONLY_RELATION_STATUSES:
+                _add_issue(
+                    result, "error", "invalid_relation_publish_origin",
+                    "person_relations.csv",
+                    f"human_adjudication 仅允许 verified/rejected，当前 status={value}",
+                    rid,
+                )
+            for audit_field in HUMAN_ADJUDICATION_AUDIT_FIELDS:
+                if not _clean_text(row.get(audit_field, "")):
+                    _add_issue(
+                        result, "error", "missing_human_adjudication_audit",
+                        "person_relations.csv",
+                        f"human_adjudication 缺少审计字段：{audit_field}",
+                        rid,
+                    )
 
 
 def _check_relation_evidences(result: ValidationResult) -> None:
@@ -690,7 +737,7 @@ def _check_relation_evidences(result: ValidationResult) -> None:
         return
     relation_ids = _table_ids(result, "person_relations.csv", "relation_id")
     source_ids = _table_ids(result, "sources.csv", "source_id")
-    allowed_support = {"associated", "support", "unclear", "rejected"}
+    allowed_support = {"associated", "support", "conflict", "unclear", "rejected"}
     allowed_levels = {"A", "B", "C", "D"}
     allowed_review = {"pending", "reviewed", "rejected"}
     for _, row in frame.iterrows():
@@ -717,19 +764,71 @@ def _check_relation_evidences(result: ValidationResult) -> None:
 def _check_source_layer(result: ValidationResult) -> None:
     works = result.tables.get("source_works.csv")
     passages = result.tables.get("source_passages.csv")
+    sources = result.tables.get("sources.csv")
+    # 1. 两表必须同时存在：任一存在时另一缺失即报错（不得静默漂移）。
+    if (works is None) != (passages is None):
+        missing = "source_works.csv" if works is None else "source_passages.csv"
+        _add_issue(
+            result, "error", "missing_file", missing,
+            f"来源层级漂移：{missing} 缺失，source_works 与 source_passages 必须同时存在",
+        )
+        return
     if works is not None and "work_id" in works.columns and "source_family" in works.columns:
         for _, row in works.iterrows():
             if not _clean_text(row.get("work_id", "")) or not _clean_text(row.get("source_family", "")):
                 _add_issue(result, "error", "empty_required_value", "source_works.csv",
                             "列 work_id/source_family 不能为空", _clean_text(row.get("work_id", "")))
-    if passages is not None and set(("passage_id", "work_id", "source_id")).issubset(passages.columns):
-        # 增量合并脚本（如 merge_longhua_roster）只维护 sources/facts/events，
-        # 不同步 passages/works。为保持既有合并测试的 ≤13 warnings 不变，
-        # 此处不对 passages 的外键漂移做 schema 告警；映射完整性由新增治理测试覆盖。
-        pass
-    # 映射完整性（sources↔passages↔works 全覆盖）由新增治理测试断言，
-    # 不在此处做 schema 告警，避免增量合并中间态破坏既有 ≤13 warnings 断言。
-    pass
+    if works is None or passages is None or sources is None:
+        return
+    if not set(("passage_id", "work_id", "source_id")).issubset(passages.columns):
+        return
+    if "source_id" not in sources.columns or "work_id" not in works.columns:
+        return
+    work_ids = { _clean_text(v) for v in works["work_id"].tolist() if _clean_text(v) }
+    source_ids = { _clean_text(v) for v in sources["source_id"].tolist() if _clean_text(v) }
+    # 2. 每条 source 有且只有一条 passage 映射。
+    seen_source: set[str] = set()
+    for _, row in passages.iterrows():
+        pid = _clean_text(row.get("passage_id", ""))
+        sid = _clean_text(row.get("source_id", ""))
+        wid = _clean_text(row.get("work_id", ""))
+        # 3. passage 必须引用有效 work_id 和 source_id。
+        if sid and sid not in source_ids:
+            _add_issue(result, "error", "dangling_reference", "source_passages.csv",
+                        f"source_id 引用了 sources.csv 中不存在的 ID：{sid}", pid)
+        if wid and wid not in work_ids:
+            _add_issue(result, "error", "dangling_reference", "source_passages.csv",
+                        f"work_id 引用了 source_works.csv 中不存在的 ID：{wid}", pid)
+        if sid:
+            if sid in seen_source:
+                _add_issue(result, "error", "duplicate_source_passage", "source_passages.csv",
+                            f"source_id 存在多条 passage 映射：{sid}", pid)
+            else:
+                seen_source.add(sid)
+    for sid in sorted(source_ids):
+        if sid not in seen_source:
+            _add_issue(result, "error", "missing_source_passage", "source_passages.csv",
+                        f"sources.{sid} 缺少 passage 映射（须经 source_layer 统一注册入口同步）", sid)
+    # 4. citation_count 必须按该 work 实际 passage 数量计算。
+    count_by_work: dict[str, int] = {}
+    for _, row in passages.iterrows():
+        wid = _clean_text(row.get("work_id", ""))
+        if wid:
+            count_by_work[wid] = count_by_work.get(wid, 0) + 1
+    if "citation_count" in works.columns:
+        for _, row in works.iterrows():
+            wid = _clean_text(row.get("work_id", ""))
+            if not wid:
+                continue
+            raw = _clean_text(row.get("citation_count", ""))
+            try:
+                actual_declared = int(float(raw)) if raw != "" else -1
+            except ValueError:
+                actual_declared = -1
+            expected = count_by_work.get(wid, 0)
+            if actual_declared != expected:
+                _add_issue(result, "error", "invalid_citation_count", "source_works.csv",
+                            f"citation_count 应为实际 passage 数 {expected}，当前为 {raw or '空值'}", wid)
 
 
 def _check_event_time_and_roles(result: ValidationResult) -> None:

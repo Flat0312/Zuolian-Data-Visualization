@@ -248,15 +248,16 @@ def _safe_time_range_label(detail: RelationDetail | None) -> str:
 
 
 def _status_label(status: str) -> str:
+    # 返修：候选模式不得使用“正式证据”“可信关系”等措辞；一律明确未经人工核验。
     mapping = {
-        "formal": "正式证据",
-        "review": "推断辅助",
+        "formal": "研究记录（未经人工核验）",
+        "review": "推断线索（未经人工核验）",
         "hidden": "隐藏记录",
         "verified": "人工已确认",
         "supported": "材料支持（待人工确认）",
-        "inferred": "推断线索",
-        "pending_review": "待人工审核",
-        "rejected": "已驳回",
+        "inferred": "推断线索（未经人工核验）",
+        "pending_review": "待人工审核（未经人工核验）",
+        "rejected": "已驳回（未经人工核验）",
     }
     return mapping.get(str(status), str(status) or "未标注")
 
@@ -264,13 +265,19 @@ def _status_label(status: str) -> str:
 def _format_status_counts(profile: PairProfile) -> str:
     pieces: list[str] = []
     if profile.formal_count:
-        pieces.append(f"正式证据 {profile.formal_count}")
+        pieces.append(f"研究记录（未经人工核验） {profile.formal_count}")
     if profile.review_count:
-        pieces.append(f"推断辅助 {profile.review_count}")
+        pieces.append(f"推断线索（未经人工核验） {profile.review_count}")
     for key, value in profile.display_status_counts.items():
         if key not in {"formal", "review"} and value:
             pieces.append(f"{_status_label(key)} {value}")
     return "｜".join(pieces) if pieces else "状态待补"
+
+
+def render_empty_public_relations_notice() -> None:
+    """公开关系为 0 时的前台提示（任务三-5 必需文案）。"""
+    st.info("当前尚无完成人工核验的关系；可主动开启研究候选关系。")
+    st.caption("研究候选关系均为“未经人工核验”，不得作为正式证据或可信关系引用。")
 
 
 def _set_selected_pair(pair_key: str, state_key: str) -> None:
@@ -1221,9 +1228,16 @@ def render_relations(
     )
     show_review = st.checkbox("显示待审核/推断关系（研究探索，明确标注）", value=False, key="relations_show_review")
     filtered_edges = filter_edges_for_display(edges_df, include_review=show_review)
+    if not show_review and filtered_edges.empty:
+        render_empty_public_relations_notice()
+    if show_review and not filtered_edges.empty:
+        st.warning("以下为研究候选关系（未经人工核验），不得作为正式证据或可信关系引用。")
     filtered_pair_df = build_pair_summary(filtered_edges)
     if filtered_pair_df.empty:
-        st.info("当前条件下暂无可展示的关系人物对。")
+        if not show_review:
+            st.info("当前条件下暂无可展示的关系人物对（公开关系为 0）。可勾选上方“显示待审核/推断关系”查看研究候选。")
+        else:
+            st.info("当前条件下暂无可展示的关系人物对。")
         return
 
     max_weight_cap = max(1, int(filtered_pair_df["max_weight"].max()))

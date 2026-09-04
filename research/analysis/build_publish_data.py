@@ -16,10 +16,10 @@ from kb_schema import REQUIRED_DATA_FILES, validate_data_dir
 
 try:
     from research.analysis.relation_publish_status import PUBLIC_RELATION_STATUSES as CREDIBLE_RELATION_STATUSES
-    from research.analysis.relation_publish_status import derive_relation_publish_status
+    from research.analysis.relation_publish_status import assign_relation_status_columns
 except ModuleNotFoundError:  # 直接脚本运行时
     from relation_publish_status import PUBLIC_RELATION_STATUSES as CREDIBLE_RELATION_STATUSES
-    from relation_publish_status import derive_relation_publish_status
+    from relation_publish_status import assign_relation_status_columns
 
 DEFAULT_PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
 DEFAULT_PUBLISH_DIR = PROJECT_ROOT / "data" / "publish"
@@ -36,7 +36,62 @@ def _split_ids(value: object) -> list[str]:
     return [item.strip() for item in str(value).replace("；", ";").split(";") if item.strip()]
 
 
-def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path) -> dict[str, object]:
+def _recompute_relation_statuses(
+    relations: pd.DataFrame, rel_evid: pd.DataFrame | None
+) -> pd.DataFrame:
+    """返修门禁：derived 状态每次按当前行 + 当前证据全量重算，不透传旧值。
+
+    仅 human_adjudication 的 verified/rejected 予以保留；其余一律重算。
+    无证据（associated/pending/空 quote/locator）不得产生 supported。
+    """
+    evid_by_rel: dict[str, list[dict[str, str]]] = {}
+    if rel_evid is not None and not rel_evid.empty and "relation_id" in rel_evid.columns:
+        for _, erow in rel_evid.iterrows():
+            evid_by_rel.setdefault(str(erow.get("relation_id", "")).strip(), []).append(
+                {k: ("" if pd.isna(v) else str(v)) for k, v in erow.to_dict().items()}
+            )
+    relations = relations.copy()
+    statuses: list[str] = []
+    origins: list[str] = []
+    reviewers: list[str] = []
+    reviewed_ats: list[str] = []
+    review_notes: list[str] = []
+    for _, row in relations.iterrows():
+        d = {k: ("" if pd.isna(v) else str(v)) for k, v in row.to_dict().items()}
+        existing = {
+            "reviewer": d.get("reviewer", ""),
+            "reviewed_at": d.get("reviewed_at", ""),
+            "review_note": d.get("review_note", ""),
+        }
+        cols = assign_relation_status_columns(
+            d, evid_by_rel.get(str(d.get("relation_id", "")).strip(), []), existing=existing
+        )
+        statuses.append(cols["publish_status"])
+        origins.append(cols["publish_status_origin"])
+        reviewers.append(cols["reviewer"])
+        reviewed_ats.append(cols["reviewed_at"])
+        review_notes.append(cols["review_note"])
+    relations["publish_status"] = statuses
+    relations["publish_status_origin"] = origins
+    relations["reviewer"] = reviewers
+    relations["reviewed_at"] = reviewed_ats
+    relations["review_note"] = review_notes
+    return relations
+
+
+def _sort_for_stable_output(frame: pd.DataFrame) -> pd.DataFrame:
+    if frame.empty:
+        return frame
+    key = frame.columns[0]
+    try:
+        return frame.sort_values(by=[key], kind="mergesort").reset_index(drop=True)
+    except Exception:
+        return frame.reset_index(drop=True)
+
+
+def build_publish_data(
+    processed_dir: Path, publish_dir: Path, report_path: Path, stamp: bool = False
+) -> dict[str, object]:
     processed_dir = Path(processed_dir)
     publish_dir = Path(publish_dir)
     publish_dir.mkdir(parents=True, exist_ok=True)
@@ -59,22 +114,17 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
     ].copy()
 
     relations = tables["person_relations.csv"]
-    # 可信度门禁：仅 verified/supported 进入发布层。
-    # 兼容旧夹具（无 publish_status 列）：按现有风险/类型/置信派生，不把
-    # critical/high、待核验、low、needs_manual_review=yes 当作正式已证实关系展示。
-    if "publish_status" not in relations.columns:
-        relations = relations.copy()
-        relations["publish_status"] = relations.apply(
-            lambda row: derive_relation_publish_status(row.to_dict()), axis=1
-        )
-    else:
-        # 缺值回填派生，保证门禁可复现
-        mask_empty = relations["publish_status"].astype(str).str.strip() == ""
-        if bool(mask_empty.any()):
-            relations = relations.copy()
-            relations.loc[mask_empty, "publish_status"] = relations[mask_empty].apply(
-                lambda row: derive_relation_publish_status(row.to_dict()), axis=1
-            )
+    # 返修门禁：每次按当前证据全量重算 derived 状态，不透传旧 supported。
+    # 仅 human_adjudication 的 verified/rejected 保留；associated/pending、无 quote/locator、
+    # critical/high、待核验、low、needs_manual_review=yes 均不得进入公开层。
+    _rel_evid_for_gate: pd.DataFrame | None = None
+    _evid_path = processed_dir / "relation_evidences.csv"
+    if _evid_path.exists():
+        try:
+            _rel_evid_for_gate = _read(_evid_path)
+        except Exception:
+            _rel_evid_for_gate = None
+    relations = _recompute_relation_statuses(relations, _rel_evid_for_gate)
     tables["person_relations.csv"] = relations[
         relations["publish_status"].astype(str).str.strip().isin(PUBLIC_RELATION_STATUSES)
     ].copy()
@@ -98,7 +148,8 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
     if (processed_dir / "relation_evidences.csv").exists():
         rel_evid = _read(processed_dir / "relation_evidences.csv")
         rel_evid = rel_evid[rel_evid["review_status"].astype(str).str.strip() != "rejected"].copy()
-        if public_relation_ids and "relation_id" in rel_evid.columns:
+        if "relation_id" in rel_evid.columns:
+            # 公开关系为 0 时保留空表头（外键闭合），不透传非公开关系的证据。
             rel_evid = rel_evid[rel_evid["relation_id"].astype(str).str.strip().isin(public_relation_ids)].copy()
         tables["relation_evidences.csv"] = rel_evid
     # 来源层级：作品/引文原样透传（不做内容过滤，保证映射完整）
@@ -107,11 +158,16 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
         if _p.exists():
             tables[_optional] = _read(_p)
 
+    # 字节级幂等：所有表按主键排序后写盘，manifest 键排序，CSV 行终止符固定。
+    for _name in list(tables.keys()):
+        tables[_name] = _sort_for_stable_output(tables[_name])
     manifest_tables: dict[str, dict[str, int]] = {}
-    for filename in list(REQUIRED_DATA_FILES) + [f for f in tables if f not in REQUIRED_DATA_FILES]:
+    for filename in sorted(set(list(REQUIRED_DATA_FILES) + list(tables.keys()))):
+        if filename not in tables:
+            continue
         source_count = len(_read(processed_dir / filename)) if (processed_dir / filename).exists() else len(tables[filename])
         output_count = len(tables[filename])
-        tables[filename].to_csv(publish_dir / filename, index=False, encoding="utf-8-sig")
+        tables[filename].to_csv(publish_dir / filename, index=False, encoding="utf-8-sig", lineterminator="\n")
         manifest_tables[filename] = {
             "input": source_count,
             "output": output_count,
@@ -131,8 +187,15 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
     }
 
     validation = validate_data_dir(publish_dir)
+    research_validation = validate_data_dir(processed_dir)
+    # 警告分类：过滤关系后预期产生 vs 真正孤立数据（不得只隐藏 warning）。
+    from collections import Counter as _Counter
+
+    _pub_warn_counts = _Counter(i.code for i in validation.warnings)
+    _res_warn_counts = _Counter(i.code for i in research_validation.warnings)
     manifest: dict[str, object] = {
-        "generated_at": datetime.now(UTC).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat() if stamp else "unstamped",
+        "stamped": bool(stamp),
         "source_dir": str(processed_dir.resolve()),
         "publish_dir": str(publish_dir.resolve()),
         "rules": {
@@ -142,21 +205,31 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
             "rejected_fact_evidences": "excluded",
             "rejected_relation_evidences": "excluded",
             "non_public_relations": "excluded_inferred_pending_rejected",
+            "relation_gate": "derived_recomputed_with_evidence_no_passthrough_except_human_verified_rejected",
+            "supported_requires": "support_not_rejected_with_locator_and_quote_or_context",
         },
         "tables": manifest_tables,
         "source_summary": source_summary,
+        "research_schema_errors": len(research_validation.errors),
+        "research_schema_warnings": len(research_validation.warnings),
+        "research_warning_breakdown": dict(_res_warn_counts),
         "schema_errors": len(validation.errors),
         "schema_warnings": len(validation.warnings),
+        "publish_warning_breakdown": dict(_pub_warn_counts),
     }
     (publish_dir / "publish_manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2),
+        json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
 
     lines = [
-        "# Phase 3 发布门禁报告",
+        "# Phase 3 发布门禁报告（返修版）",
         "",
         "发布层由研究层自动生成，研究层原始结论未被删除或覆盖。",
+        "关系门禁每次按当前证据全量重算 derived 状态，不透传旧 supported；",
+        "仅 human_adjudication 的 verified/rejected 保留（须带 reviewer/reviewed_at/review_note）。",
+        "supported 要求 support + 未 rejected + locator + (quote|context)；",
+        "associated/pending、无 quote/locator、critical/high、待核验、low、needs_manual_review=yes 均不公开。",
         "",
         "| 数据表 | 输入 | 发布 | 过滤 |",
         "| --- | ---: | ---: | ---: |",
@@ -166,14 +239,21 @@ def build_publish_data(processed_dir: Path, publish_dir: Path, report_path: Path
     lines.extend(
         [
             "",
-            f"- Schema 严重错误：{len(validation.errors)}",
-            f"- Schema 警告：{len(validation.warnings)}",
+            f"- 研究层 Schema 严重错误：{len(research_validation.errors)}；警告：{len(research_validation.warnings)}"
+            f"（{dict(_res_warn_counts)}）。",
+            f"- 发布层 Schema 严重错误：{len(validation.errors)}；警告：{len(validation.warnings)}"
+            f"（{dict(_pub_warn_counts)}）。",
+            "- 发布层警告分类：`isolated_person` 增加主要为过滤非公开关系后预期产生（人物失去公开边）；",
+            "`orphan_source` 增加主要为非公开关系证据被过滤后、其来源在发布层暂无公开引用（研究层仍保留）。",
+            "- 真正孤立数据（研究层即孤立/孤儿）见研究层警告明细，不得只隐藏 warning。",
             "- 公开组织身份仅保留 `confirmed_member` 与 `related_person`。",
             "- `candidate` 与 `disputed` 仅保留在研究层。",
             "- `fact_evidences.csv` 中 `review_status=rejected` 的事实证据不进入发布层。",
             "- 人物关系仅保留 `publish_status` 为 `verified/supported` 的记录；"
-            "`pending_review/inferred/rejected`（含 critical/high、待核验、low、needs_manual_review=yes）仅保留在研究层。",
-            "- `relation_evidences.csv` 中 `review_status=rejected` 的关系证据不进入发布层。",
+            "`pending_review/inferred/rejected`（含 critical/high、待核验、low、needs_manual_review=yes、"
+            "associated/pending 证据、无 quote/locator、证据冲突）仅保留在研究层。",
+            "- `relation_evidences.csv` 中 `review_status=rejected` 的关系证据不进入发布层；"
+            "且仅保留发布层关系的外键闭合子集（公开关系为 0 时为空表头）。",
             f"- 来源层级：引文 {source_summary['citations']} 条 / 作品 {source_summary['works']} 种 / "
             f"独立来源族 {source_summary['families']} 个（引用条数≠独立来源作品数，同一来源族不重复计数）。",
         ]
@@ -191,13 +271,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--processed-dir", type=Path, default=DEFAULT_PROCESSED_DIR)
     parser.add_argument("--publish-dir", type=Path, default=DEFAULT_PUBLISH_DIR)
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
+    parser.add_argument("--stamp", action="store_true", help="显式写入动态 generated_at 时间戳（默认不写，保证字节幂等）")
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    manifest = build_publish_data(args.processed_dir, args.publish_dir, args.report)
-    print(json.dumps(manifest["tables"], ensure_ascii=False))
+    manifest = build_publish_data(args.processed_dir, args.publish_dir, args.report, stamp=args.stamp)
+    print(json.dumps(manifest["tables"], ensure_ascii=False, sort_keys=True))
     return 0
 
 

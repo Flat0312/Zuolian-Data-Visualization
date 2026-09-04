@@ -163,3 +163,12 @@
 **仓库状态提醒（交接风险）**：git 工作树严重超前——208 文件已修改、且 AGENTS.md/findings.md/progress.md/task_plan.md/kb_schema.py/tests/ 等大量核心文件处于未跟踪状态；另有 `pytest-cache-files-*` 散落缓存、`data/backup_*` 备份目录、`_fix_all.py` 一次性修复脚本与多分支（main / clean-version / codex/zuolian-kb-release-20260323）。提交基线混乱，需用户决策如何整理。
 
 **验收收口（2026-08-27 第二轮）**：按补充授权修复两个既有测试并重跑全量——candidate_audit 的期望集合改锚审计基线提交 `2a87781`（历史快照恰好14条语义不变）；batch3_fresh_add 移除硬编码148，改为运行前基数减实际可删重复事件数（当前生产无 EVT-00007/EVT-00119，期望增量0），其余断言保留、真实基线重放 150→148 未削弱。最终 **74 passed / 0 failed / 0 skipped**，Schema 0 错误 / ≤13 警告，四表 1177/626/147/222，三口径 26/147、21/147、26/147，apply 脚本末跑「无新增/已完成」且 git 状态零变化。
+
+
+## 2026-09-04 - 左联知识库返修整合（语义正确优先）
+
+**基线**：HEAD=012f10c 工作树干净；pytest 94 passed；研究层 0 errors/13 warnings；关系4238（pending2451/supported1760/inferred27）；发布关系1760/卡片1758；关系证据10249（associated+pending+quote空）；发布层0/202。
+
+**返修**：publish_status_origin（derived/human）+每次重算不透传；supported须support+未rejected+locator+quote/context，associated/pending/无quote/low/推断类型/critical/high/待核验/needs_manual均不公开（公开归零，允许）；来源层Schema强制双表共存、1:1映射、有效引用、citation_count重算，增量脚本统一sync_source_layer（稳定ID）；候选百科/媒体一律web_lead/D级，四件套+ABCD统计，殷夫/周扬冲突保持conflict禁落库；网络四口径分离（全量/低风险启发式1760/证据支持0/人工确认0/可信0，样本不足不排Top10，事件切片明确共参与，中心性仅数据观察）；发布默认unstamped字节幂等，警告分类写入报告。
+
+**结果**：pytest 103 passed；研究层0/13；发布0/1080（过滤预期54孤立+1013孤儿，研究基线12+1为真孤立）；发布关系4238→0，证据10249→0；低风险1758边对照保留；红→绿4项见research/drafts/reports/remediation_red_green_verification.md；本地提交不推送。

@@ -112,13 +112,13 @@ def pair_anchor(person_a_id: str, person_b_id: str) -> str:
 def status_label(status_counts: Counter[str]) -> str:
     parts: list[str] = []
     mapping = {
-        "formal": "正式证据",
-        "review": "待复核",
+        "formal": "研究记录（未经人工核验）",
+        "review": "推断线索（未经人工核验）",
         "hidden": "隐藏记录",
         "verified": "人工已确认",
         "supported": "材料支持（待人工确认）",
-        "inferred": "推断线索（未公开展示）",
-        "pending_review": "待人工审核（未公开展示）",
+        "inferred": "推断线索（未经人工核验，未公开展示）",
+        "pending_review": "待人工审核（未经人工核验，未公开展示）",
         "rejected": "已驳回（未公开展示）",
     }
     for key in ("verified", "supported", "formal", "review", "hidden", "inferred", "pending_review", "rejected"):
@@ -755,17 +755,26 @@ def render_events_index(events: list[dict[str, object]]) -> str:
 
 def render_relations_index(relations: list[dict[str, object]]) -> str:
     cards = "".join(relation_card(relation, "../people/") for relation in relations)
+    if not relations:
+        empty_notice = (
+            '<div class="empty-state" style="display:block">'
+            "当前尚无完成人工核验的关系；可主动开启研究候选关系。"
+            "（研究候选均为“未经人工核验”，不得作为正式证据或可信关系引用。）</div>"
+        )
+    else:
+        empty_notice = ""
     body = f"""
     <section class="page-hero">
       <p class="eyebrow">关系索引</p>
       <h1>把人物对关系压缩成可读卡片</h1>
       <p class="page-hero__lead">这里展示的是按人物对聚合后的关系摘要，适合快速定位谁和谁之间有何种关联、证据来自哪里。</p>
-      <p class="page-hero__lead">默认公开层仅展示 <strong>verified（人工已确认）/ supported（材料支持，待人工确认）</strong>；
-      inferred（推断线索）/ pending_review（待审核）/ rejected（已驳回）仅保留在研究层，需主动开启辅助信息并明确标注后方可查看。</p>
+      <p class="page-hero__lead">默认公开层仅展示 <strong>verified（人工已确认）/ supported（材料支持，待人工确认；须有 support 证据 + locator + 引文/语境）</strong>；
+      inferred（推断线索，未经人工核验）/ pending_review（待审核，未经人工核验）/ rejected（已驳回）仅保留在研究层，需主动开启辅助信息并明确标注后方可查看。</p>
+      {empty_notice}
       <div class="filter-box">
         <label for="relations-filter">按人名、关系类型、证据关键词筛选</label>
         <input id="relations-filter" type="search" placeholder="例如：鲁迅 通信 上海" data-list-filter="relations-list">
-        <p class="filter-box__meta" data-count-for="relations-list">共 {len(relations)} 组人物关系（仅可信公开子集）</p>
+        <p class="filter-box__meta" data-count-for="relations-list">共 {len(relations)} 组人物关系（仅公开子集；候选须标注“未经人工核验”）</p>
       </div>
     </section>
     <section class="page-section">
@@ -1302,14 +1311,14 @@ def main() -> None:
     write_text(DOCS_DIR / "events" / "index.html", render_events_index(event_records))
     write_text(DOCS_DIR / "relations" / "index.html", render_relations_index(relation_profiles))
     write_text(DOCS_DIR / "search" / "index.html", render_search_page(len(search_records)))
-    write_text(DOCS_DIR / "assets" / "search-index.json", json.dumps(search_records, ensure_ascii=False, indent=2))
+    write_text(DOCS_DIR / "assets" / "search-index.json", json.dumps(search_records, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
 
     graph_data = build_graph_data(people, relation_profiles)
-    write_text(DOCS_DIR / "assets" / "graph-data.json", json.dumps(graph_data, ensure_ascii=False))
+    write_text(DOCS_DIR / "assets" / "graph-data.json", json.dumps(graph_data, ensure_ascii=False, sort_keys=True) + "\n")
     write_text(DOCS_DIR / "graph" / "index.html", render_graph_page())
 
     timeline_data = build_timeline_data(event_records)
-    write_text(DOCS_DIR / "assets" / "timeline-data.json", json.dumps(timeline_data, ensure_ascii=False))
+    write_text(DOCS_DIR / "assets" / "timeline-data.json", json.dumps(timeline_data, ensure_ascii=False, sort_keys=True) + "\n")
     write_text(DOCS_DIR / "timeline" / "index.html", render_timeline_page())
 
     for person in people:

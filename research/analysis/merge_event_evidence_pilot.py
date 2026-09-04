@@ -199,6 +199,20 @@ def main() -> None:
     write_csv(DATA / "events.csv", evt_fields, evt_rows)
     write_csv(P1_SUPPLEMENT, p1_fields, p1_rows)
 
+    # 来源层统一注册：新增/修改 sources 后必须同步 works/passages。
+    try:
+        import sys as _sys
+
+        _ROOT = Path(__file__).resolve().parents[2]
+        if str(_ROOT) not in _sys.path:
+            _sys.path.insert(0, str(_ROOT))
+        from research.analysis.source_layer import sync_source_layer as _sync
+
+        _stats = _sync(DATA)
+        print(f"source_layer sync: {_stats}")
+    except Exception as exc:  # pragma: no cover
+        raise RuntimeError(f"source_layer 同步失败：{exc}") from exc
+
     print(f"sources: +{registered_sources} -> {len(src_rows)}")
     print(f"fact_evidences: +{merged_count} -> {len(ev_rows)}")
 

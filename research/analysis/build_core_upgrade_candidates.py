@@ -1,4 +1,4 @@
-"""核心内容补证候选包构建脚本（Agent B，只读生产数据，可重复运行）。
+"""核心内容补证候选包构建脚本（返修版，只读生产数据，可重复运行）。
 
 选择对象：30 名核心人物、20 个关键事件、10 个重要地点。
 优先主题：左联成立及组织演变、龙华烈士相关事件、鲁迅与青年作家网络、
@@ -7,8 +7,12 @@
 原则：
 - 选择完全由 data/processed 现有数据 + 脚本内显式登记的种子常量决定，可复现；
 - 只登记"现有证据"与"缺口"，不新增史实判断；
-- EVIDENCE_SEEDS 为只读检索权威公开来源所得的候选证据（含 URL、访问日期、
-  定位与逐字短引文），一律 pending_human_review，未检索到的字段记 missing；
+- EVIDENCE_SEEDS 为只读检索所得的候选线索（含 URL、访问日期、
+  定位与逐字短引文），其中维基百科/百度百科/普通媒体一律标为 web_lead/D 级线索，
+  不得称为权威证据；中国作家网/政府/纪念馆/档案馆/大学档案/学术论文/原始文献
+  按现有来源规则分级；一律 pending_human_review 或 conflict，未检索到的字段记 missing；
+- 与生产值冲突的候选（如殷夫/周扬生年、萌芽创刊/楼适夷被捕日期）保持 conflict 状态，
+  禁止自动落库；
 - 不修改任何生产数据。
 
 输出（默认 research/drafts/reports/）：
@@ -47,6 +51,53 @@ PUBLICATION_PAT = ("创刊", "月刊", "周刊", "书店", "书局", "出版", "
 
 PENDING = "pending_human_review"
 MISSING = "missing"
+CONFLICT = "conflict"
+
+# 与生产值冲突、禁止自动落库的候选（实体ID, 字段）集合：保持 conflict 状态。
+CONFLICT_SEEDS: set[tuple[str, str]] = {
+    ("ZLH-019", "birth_year"),  # 殷夫生年：维基 1909-06-11 vs 生产值 1910
+    ("ZLH-007", "birth_year"),  # 周扬生年：维基 1907-11-07 vs 生产值 1908
+    ("EVT-00183", "direct_support"),  # 萌芽创刊：维基 1930-01-01 vs 生产 1928
+    ("EVT-00138", "direct_support"),  # 楼适夷被捕：维基 1933 vs 生产 1934
+}
+
+
+def classify_candidate_source(url: str, title: str = "") -> tuple[str, str]:
+    """候选来源分级（返修版）：百科/普通媒体一律 D 级 web_lead，不得称为权威。
+
+    - 维基百科/百度百科 -> D / web_lead(encyclopedia)
+    - 普通媒体（界面新闻等） -> D / web_lead(news_media)
+    - 中国作家网 -> B / industry_official
+    - 政府网站（gov.cn） -> B / government
+    - 纪念馆/档案馆/大学档案/学术论文/原始文献 -> 按现有规则 A/B（此处保守记 B，待人工核定升 A）
+    - 未知 web -> D / web_lead
+    """
+    u = (url or "").strip().lower()
+    if not u:
+        return "", ""
+    if "wikipedia.org" in u or "baike.baidu.com" in u:
+        return "D", "web_lead"
+    if "chinawriter.com.cn" in u:
+        return "B", "industry_official"
+    if "gov.cn" in u:
+        return "B", "government"
+    if any(k in u for k in ("memorial", "museum", "archive", "edu.cn", "cnki", "wanfang", "cqvip")):
+        return "B", "archive_academic"
+    if "jiemian.com" in u or "thepaper.cn" in u:
+        return "D", "web_lead"
+    if u.startswith("http"):
+        return "D", "web_lead"
+    return "D", "web_lead"
+
+
+def content_hash_for(url: str, locator: str, quote: str) -> str:
+    """访问凭据等价物：URL + 定位 + 引文的 SHA256（空候选返回空）。"""
+    import hashlib
+
+    if not (url or "").strip():
+        return ""
+    basis = "|".join([(url or "").strip(), (locator or "").strip(), (quote or "").strip()])
+    return hashlib.sha256(basis.encode("utf-8")).hexdigest()
 
 # —— 只读检索所得候选证据种子（访问日期均为实际检索日 2026-09-04）——
 # 结构: 实体ID -> 字段 -> dict(title, url, access_date, locator, quote)
@@ -345,10 +396,12 @@ def _matches(text: str, patterns: tuple[str, ...]) -> bool:
 
 
 def is_trusted_relation(row: dict[str, str]) -> bool:
-    """可信关系判定（与 build_trustworthy_network_analysis.py 保持同一语义）。
+    """补证优先级用的启发式关系判定（较低风险规则筛选口径，非可信断言）。
 
     排除：待核验类型、needs_manual_review=yes、critical/high 风险、confidence=low；
-    若存在 Agent A 方案的 publish_status 列，则以 verified/supported 收窄。
+    不看 relation_evidences、不看 publish_status（保留历史 Top30 可比性）。
+    命名上不得称为“可信关系”，仅用于补证优先级排序；真正的可信判定见
+    build_trustworthy_network_analysis.is_trusted_relation（须满足 support 证据）。
     """
     if str(row.get("final_relation_type", "")).strip() == "待核验":
         return False
@@ -357,9 +410,6 @@ def is_trusted_relation(row: dict[str, str]) -> bool:
     if str(row.get("relation_risk_level", "")).strip().lower() in ("critical", "high"):
         return False
     if str(row.get("confidence", "")).strip().lower() == "low":
-        return False
-    status = str(row.get("publish_status", "")).strip()
-    if status and status not in ("verified", "supported"):
         return False
     return True
 
@@ -379,11 +429,63 @@ def _birth_after(year_text: str) -> bool:
         return False
 
 
-def _seed_status(seeds: dict[str, dict[str, str]], field: str) -> str:
+def _seed_status(entity_id: str, seeds: dict[str, dict[str, str]], field: str) -> str:
     entry = seeds.get(field)
     if entry and entry.get("url"):
+        if (entity_id, field) in CONFLICT_SEEDS:
+            return CONFLICT
         return PENDING
     return MISSING
+
+
+def _seed_retrieval_status(status: str) -> str:
+    if status == PENDING:
+        return "retrieved"
+    if status == CONFLICT:
+        return "conflict"
+    return "missing"
+
+
+def _seed_enrichment(entity_id: str, field: str, seeds: dict[str, dict[str, str]]) -> dict[str, str]:
+    """返回 source_level / source_type / retrieval_status / content_hash 四件套。"""
+    entry = seeds.get(field, {})
+    url = (entry.get("url", "") or "").strip()
+    title = (entry.get("title", "") or "").strip()
+    locator = (entry.get("locator", "") or "").strip()
+    quote = (entry.get("quote", "") or "").strip()
+    status = _seed_status(entity_id, seeds, field)
+    if status == MISSING or not url:
+        return {
+            "source_level": "",
+            "source_type": "",
+            "retrieval_status": "missing",
+            "content_hash": "",
+        }
+    level, stype = classify_candidate_source(url, title)
+    return {
+        "source_level": level,
+        "source_type": stype,
+        "retrieval_status": _seed_retrieval_status(status),
+        "content_hash": content_hash_for(url, locator, quote),
+    }
+
+
+def _level_counts(frames: list[pd.DataFrame], status_prefixes: tuple[str, ...]) -> dict[str, int]:
+    counts = {"A": 0, "B": 0, "C": 0, "D": 0}
+    for frame in frames:
+        for col in frame.columns:
+            if not col.endswith("_source_level"):
+                continue
+            prefix = col[: -len("_source_level")]
+            # 仅统计有候选（非 missing）的来源等级
+            status_col = f"{prefix}_status" if f"{prefix}_status" in frame.columns else ""
+            for _, row in frame.iterrows():
+                if status_col and row.get(status_col, "") == MISSING:
+                    continue
+                lv = str(row.get(col, "")).strip()
+                if lv in counts:
+                    counts[lv] += 1
+    return counts
 
 
 def build(data_dir: Path, out_dir: Path) -> dict[str, object]:
@@ -694,6 +796,12 @@ def _person_output(
     for i, row in enumerate(top_persons.to_dict("records"), start=1):
         pid = row["person_id"]
         seeds = EVIDENCE_SEEDS.get(pid, {})
+        birth_status = _seed_status(pid, seeds, "birth_year")
+        death_status = _seed_status(pid, seeds, "death_year")
+        role_status = _seed_status(pid, seeds, "role")
+        birth_en = _seed_enrichment(pid, "birth_year", seeds)
+        death_en = _seed_enrichment(pid, "death_year", seeds)
+        role_en = _seed_enrichment(pid, "role", seeds)
         rows.append(
             {
                 "candidate_id": f"CPC-P{i:02d}",
@@ -714,24 +822,36 @@ def _person_output(
                 "existing_evidence_summary": "组织身份证据见 org_membership_evidences；生卒年/角色事实级证据 0 条",
                 "evidence_gap": "birth_year/death_year/role 事实级证据全部缺失（现值为传承导入，未逐条立证）",
                 "suggested_action": "补权威辞典/纪念馆页面来源，locator 定位到页码或条目，人工复核后立证",
-                "birth_status": _seed_status(seeds, "birth_year"),
+                "birth_status": birth_status,
                 "birth_candidate_title": seeds.get("birth_year", {}).get("title", ""),
                 "birth_candidate_url": seeds.get("birth_year", {}).get("url", ""),
                 "birth_candidate_access_date": seeds.get("birth_year", {}).get("access_date", ""),
                 "birth_candidate_locator": seeds.get("birth_year", {}).get("locator", ""),
                 "birth_candidate_quote": seeds.get("birth_year", {}).get("quote", ""),
-                "death_status": _seed_status(seeds, "death_year"),
+                "birth_source_level": birth_en["source_level"],
+                "birth_source_type": birth_en["source_type"],
+                "birth_retrieval_status": birth_en["retrieval_status"],
+                "birth_content_hash": birth_en["content_hash"],
+                "death_status": death_status,
                 "death_candidate_title": seeds.get("death_year", {}).get("title", ""),
                 "death_candidate_url": seeds.get("death_year", {}).get("url", ""),
                 "death_candidate_access_date": seeds.get("death_year", {}).get("access_date", ""),
                 "death_candidate_locator": seeds.get("death_year", {}).get("locator", ""),
                 "death_candidate_quote": seeds.get("death_year", {}).get("quote", ""),
-                "role_status": _seed_status(seeds, "role"),
+                "death_source_level": death_en["source_level"],
+                "death_source_type": death_en["source_type"],
+                "death_retrieval_status": death_en["retrieval_status"],
+                "death_content_hash": death_en["content_hash"],
+                "role_status": role_status,
                 "role_candidate_title": seeds.get("role", {}).get("title", ""),
                 "role_candidate_url": seeds.get("role", {}).get("url", ""),
                 "role_candidate_access_date": seeds.get("role", {}).get("access_date", ""),
                 "role_candidate_locator": seeds.get("role", {}).get("locator", ""),
                 "role_candidate_quote": seeds.get("role", {}).get("quote", ""),
+                "role_source_level": role_en["source_level"],
+                "role_source_type": role_en["source_type"],
+                "role_retrieval_status": role_en["retrieval_status"],
+                "role_content_hash": role_en["content_hash"],
             }
         )
     return pd.DataFrame(rows)
@@ -742,6 +862,10 @@ def _event_output(top_events: pd.DataFrame) -> pd.DataFrame:
     for i, row in enumerate(top_events.to_dict("records"), start=1):
         eid = row["event_id"]
         seeds = EVIDENCE_SEEDS.get(eid, {})
+        ds_status = _seed_status(eid, seeds, "direct_support")
+        is_status = _seed_status(eid, seeds, "independent_source")
+        ds_en = _seed_enrichment(eid, "direct_support", seeds)
+        is_en = _seed_enrichment(eid, "independent_source", seeds)
         rows.append(
             {
                 "candidate_id": f"CPC-E{i:02d}",
@@ -767,18 +891,26 @@ def _event_output(top_events: pd.DataFrame) -> pd.DataFrame:
                     if row["direct_support_evidences"] == 0
                     else "补第二独立来源族并交叉核对"
                 ),
-                "direct_support_status": _seed_status(seeds, "direct_support"),
+                "direct_support_status": ds_status,
                 "direct_support_candidate_title": seeds.get("direct_support", {}).get("title", ""),
                 "direct_support_candidate_url": seeds.get("direct_support", {}).get("url", ""),
                 "direct_support_candidate_access_date": seeds.get("direct_support", {}).get("access_date", ""),
                 "direct_support_candidate_locator": seeds.get("direct_support", {}).get("locator", ""),
                 "direct_support_candidate_quote": seeds.get("direct_support", {}).get("quote", ""),
-                "independent_source_status": _seed_status(seeds, "independent_source"),
+                "direct_support_source_level": ds_en["source_level"],
+                "direct_support_source_type": ds_en["source_type"],
+                "direct_support_retrieval_status": ds_en["retrieval_status"],
+                "direct_support_content_hash": ds_en["content_hash"],
+                "independent_source_status": is_status,
                 "independent_source_candidate_title": seeds.get("independent_source", {}).get("title", ""),
                 "independent_source_candidate_url": seeds.get("independent_source", {}).get("url", ""),
                 "independent_source_candidate_access_date": seeds.get("independent_source", {}).get("access_date", ""),
                 "independent_source_candidate_locator": seeds.get("independent_source", {}).get("locator", ""),
                 "independent_source_candidate_quote": seeds.get("independent_source", {}).get("quote", ""),
+                "independent_source_source_level": is_en["source_level"],
+                "independent_source_source_type": is_en["source_type"],
+                "independent_source_retrieval_status": is_en["retrieval_status"],
+                "independent_source_content_hash": is_en["content_hash"],
             }
         )
     return pd.DataFrame(rows)
@@ -789,6 +921,10 @@ def _place_output(top_places: pd.DataFrame) -> pd.DataFrame:
     for i, row in enumerate(top_places.to_dict("records"), start=1):
         plid = row["place_id"]
         seeds = EVIDENCE_SEEDS.get(plid, {})
+        ad_status = _seed_status(plid, seeds, "address")
+        co_status = _seed_status(plid, seeds, "coord")
+        ad_en = _seed_enrichment(plid, "address", seeds)
+        co_en = _seed_enrichment(plid, "coord", seeds)
         rows.append(
             {
                 "candidate_id": f"CPC-L{i:02d}",
@@ -811,18 +947,26 @@ def _place_output(top_places: pd.DataFrame) -> pd.DataFrame:
                     f"坐标精度{'未知' if row['coord_precision_unknown'] else row['coord_precision']}"
                 ),
                 "suggested_action": "补历史沿革/旧址保护单位页面，登记现代地址与坐标来源，人工确认坐标精度",
-                "address_status": _seed_status(seeds, "address"),
+                "address_status": ad_status,
                 "address_candidate_title": seeds.get("address", {}).get("title", ""),
                 "address_candidate_url": seeds.get("address", {}).get("url", ""),
                 "address_candidate_access_date": seeds.get("address", {}).get("access_date", ""),
                 "address_candidate_locator": seeds.get("address", {}).get("locator", ""),
                 "address_candidate_quote": seeds.get("address", {}).get("quote", ""),
-                "coord_status": _seed_status(seeds, "coord"),
+                "address_source_level": ad_en["source_level"],
+                "address_source_type": ad_en["source_type"],
+                "address_retrieval_status": ad_en["retrieval_status"],
+                "address_content_hash": ad_en["content_hash"],
+                "coord_status": co_status,
                 "coord_candidate_title": seeds.get("coord", {}).get("title", ""),
                 "coord_candidate_url": seeds.get("coord", {}).get("url", ""),
                 "coord_candidate_access_date": seeds.get("coord", {}).get("access_date", ""),
                 "coord_candidate_locator": seeds.get("coord", {}).get("locator", ""),
                 "coord_candidate_quote": seeds.get("coord", {}).get("quote", ""),
+                "coord_source_level": co_en["source_level"],
+                "coord_source_type": co_en["source_type"],
+                "coord_retrieval_status": co_en["retrieval_status"],
+                "coord_content_hash": co_en["content_hash"],
             }
         )
     return pd.DataFrame(rows)
@@ -838,26 +982,33 @@ def _write_report(
 ) -> None:
     fields = ("birth", "death", "role")
     seed_found_person = sum((person_df[f"{f}_status"] == PENDING).sum() for f in fields)
+    seed_conflict_person = sum((person_df[f"{f}_status"] == CONFLICT).sum() for f in fields)
     total_missing_person = sum((person_df[f"{f}_status"] == MISSING).sum() for f in fields)
+    level_counts = _level_counts([person_df, event_df, place_df], ("birth", "death", "role"))
     family_note = (
         "以 sources.source_family 计独立来源族"
         if src_family
         else "sources.source_family 列缺失，退化为按 source_id 计数（上界口径）"
     )
     lines = [
-        "# 核心补证候选包选择报告（Agent B）",
+        "# 核心补证候选包选择报告（返修版）",
         "",
         f"- 数据快照：`{data_dir}`（读取日期 {SNAPSHOT_DATE}，只读）",
         f"- 候选数量：人物 {len(person_df)} / 事件 {len(event_df)} / 地点 {len(place_df)}",
         "- 人物生卒年/角色事实级证据：全库 0 条（fact_evidences 无 person birth/death/role 谓词），",
         "  现有 birth_year/death_year/role 值均为传承导入，**不得作为已证实史实展示**。",
         f"- 独立来源族口径：{family_note}。",
+        "- 候选来源分级：维基百科/百度百科/普通媒体一律为 web_lead/D 级线索，",
+        "  不得称为权威证据；中国作家网/政府/纪念馆/档案馆/大学档案/学术论文/原始文献按现有来源规则分级。",
+        f"- 候选来源等级分布（A/B/C/D）：{level_counts['A']}/{level_counts['B']}/"
+        f"{level_counts['C']}/{level_counts['D']}（仅统计非 missing 候选；missing 不计入）。",
         "",
         "## 选择规则（可复现）",
         "",
-        "1. 人物分 = 2.0×可信关系度(归一) + 0.8×全量关系度(归一) + 1.2×事件参与数(归一) + 左联身份(正式1.0/相关0.5/候选0.25) + 1.0×主题命中数(归一)。",
-        "   可信关系 = 排除 待核验类型 / needs_manual_review=yes / critical-high 风险 / confidence=low；",
-        "   若存在 publish_status 列（Agent A 方案），仅保留 verified/supported。",
+        "1. 人物分 = 2.0×较低风险关系度(归一，启发式，非可信断言) + 0.8×全量关系度(归一) + 1.2×事件参与数(归一) + 左联身份(正式1.0/相关0.5/候选0.25) + 1.0×主题命中数(归一)。",
+        "   较低风险关系 = 排除 待核验类型 / needs_manual_review=yes / critical-high 风险 / confidence=low；",
+        "   不看 relation_evidences、不看 publish_status；不得称为可信关系，仅用于补证优先级排序。",
+        "   真正的可信判定（须 support 证据）见可信网络分析；当前证据支持为 0，补证优先级暂用启发式口径。",
         "2. 事件分 = 1.2×主题命中(归一) + 0.8×核心参与者占比 + 1.5×(无直接支持证据) + 0.5×(独立来源族≤1) + 0.3×(需人工复核)。",
         "3. 地点分 = 1.0×挂接事件数(归一) + 0.6×主题命中(归一) + 0.4×历史地址缺 + 0.4×现代地址缺 + 0.4×坐标精度未知 + 0.3×坐标来源缺。",
         "   泛化城市级地点（如『上海』，83 个事件挂接）不进核心补证 Top10，其治理见时空审计报告。",
@@ -866,13 +1017,16 @@ def _write_report(
         "",
         "## 候选证据种子状态",
         "",
-        f"- 人物三字段（生/卒/角色）共 {3 * len(person_df)} 个待补事实：检索到候选证据 {seed_found_person} 个（全部 {PENDING}），",
+        f"- 人物三字段（生/卒/角色）共 {3 * len(person_df)} 个待补事实：检索到候选线索 {seed_found_person} 个（{PENDING}），"
+        f"冲突 {seed_conflict_person} 个（{CONFLICT}，与生产值冲突、禁止自动落库），",
         f"其余 {total_missing_person} 个记 {MISSING}。",
-        f"- 事件两字段（直接支持/独立来源）共 {2 * len(event_df)} 个待补：候选 "
-        f"{int((event_df['direct_support_status'] == PENDING).sum() + (event_df['independent_source_status'] == PENDING).sum())} 个。",
-        f"- 地点两字段（地址/坐标）共 {2 * len(place_df)} 个待补：候选 "
+        f"- 事件两字段（直接支持/独立来源）共 {2 * len(event_df)} 个待补：{PENDING} "
+        f"{int((event_df['direct_support_status'] == PENDING).sum() + (event_df['independent_source_status'] == PENDING).sum())} 个；"
+        f"{CONFLICT} {int((event_df['direct_support_status'] == CONFLICT).sum() + (event_df['independent_source_status'] == CONFLICT).sum())} 个。",
+        f"- 地点两字段（地址/坐标）共 {2 * len(place_df)} 个待补：{PENDING} "
         f"{int((place_df['address_status'] == PENDING).sum() + (place_df['coord_status'] == PENDING).sum())} 个。",
-        "- 所有候选证据仅登记 URL/访问日期/定位/短引文，不修改生产数据，不转正。",
+        "- 所有候选线索仅登记 URL/访问日期/定位/短引文 + source_level/source_type/retrieval_status/content_hash，",
+        "  不修改生产数据，不转正；conflict 候选禁止自动落库，须人工裁决。",
         "",
         "## 检索中发现的口径差异与否定性结果（全部待人工裁决，本 Agent 不改生产数据）",
         "",
@@ -916,7 +1070,8 @@ def _write_report(
         "",
         "- 选择分数反映**当前数据集内的结构位置与补证紧迫度**，不是历史重要性排名。",
         "- 关键词与种子名单仅用于研究优先级，不构成对新史实的断言。",
-        "- missing 表示本轮未检索到可用权威来源，不代表证据不存在。",
+        "- missing 表示本轮未检索到可用线索或仅有低级线索，不代表证据不存在；找不到权威替代时保留 missing，不得凑数。",
+        "- D 级 web_lead 线索（百科/普通媒体）不得称为权威证据，转正须人工复核并补更权威来源。",
         "",
     ]
     (out_dir / "core_upgrade_selection_report.md").write_text("\n".join(lines), encoding="utf-8")

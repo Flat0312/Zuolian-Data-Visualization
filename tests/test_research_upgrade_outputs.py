@@ -28,6 +28,7 @@ REPORTS = REPO_ROOT / "research" / "drafts" / "reports"
 
 PENDING = "pending_human_review"
 MISSING = "missing"
+CONFLICT = "conflict"
 
 
 def _load_module(name: str):
@@ -112,14 +113,30 @@ def test_new_evidence_all_pending_with_provenance(built_candidates: Path, csv_na
             quote = row[f"{g}_candidate_quote"].strip()
             access = row[f"{g}_candidate_access_date"].strip()
             locator = row[f"{g}_candidate_locator"].strip()
-            assert status in (PENDING, MISSING), f"{csv_name} {row['candidate_id']} {g}_status 非法：{status}"
-            if status == PENDING:
+            assert status in (PENDING, MISSING, CONFLICT), f"{csv_name} {row['candidate_id']} {g}_status 非法：{status}"
+            if status in (PENDING, CONFLICT):
                 assert url and quote and access and locator, (
-                    f"{row['candidate_id']} {g} 声称 {PENDING} 但缺少 URL/引文/访问日期/定位"
+                    f"{row['candidate_id']} {g} 声称 {status} 但缺少 URL/引文/访问日期/定位"
                 )
                 assert access.count("-") >= 2, f"{row['candidate_id']} {g} 访问日期格式异常：{access}"
+                # 返修：百科/普通媒体一律 D 级 web_lead，不得称为权威；须带分级四件套
+                level = row.get(f"{g}_source_level", "").strip()
+                stype = row.get(f"{g}_source_type", "").strip()
+                retrieval = row.get(f"{g}_retrieval_status", "").strip()
+                chash = row.get(f"{g}_content_hash", "").strip()
+                assert level in ("A", "B", "C", "D"), f"{row['candidate_id']} {g} 缺少 source_level"
+                assert stype, f"{row['candidate_id']} {g} 缺少 source_type"
+                assert retrieval in ("retrieved", "conflict", "missing"), f"{row['candidate_id']} {g} retrieval 非法"
+                assert chash, f"{row['candidate_id']} {g} 缺少 content_hash"
+                if "wikipedia.org" in url or "baike.baidu.com" in url:
+                    assert level == "D" and stype == "web_lead", f"{row['candidate_id']} {g} 百科必须为 D/web_lead"
             else:
                 assert not url, f"{row['candidate_id']} {g} 记 missing 却带 URL"
+    # 冲突候选必须存在且禁止自动落库（殷夫/周扬生年、萌芽/楼适夷日期）
+    if csv_name == "core_person_evidence_candidates.csv":
+        assert any(r["birth_status"] == CONFLICT for r in rows), "人物候选缺少 conflict（周扬生年）"
+    if csv_name == "core_event_evidence_candidates.csv":
+        assert any(r["direct_support_status"] == CONFLICT for r in rows), "事件候选缺少 conflict"
 
 
 def test_missing_not_counted_as_covered(built_candidates: Path) -> None:
@@ -130,39 +147,54 @@ def test_missing_not_counted_as_covered(built_candidates: Path) -> None:
         for f in ("birth", "death", "role")
         if r[f"{f}_status"] == PENDING
     )
+    conflict = sum(
+        1
+        for r in persons
+        for f in ("birth", "death", "role")
+        if r[f"{f}_status"] == CONFLICT
+    )
     missing = sum(
         1
         for r in persons
         for f in ("birth", "death", "role")
         if r[f"{f}_status"] == MISSING
     )
-    assert pending + missing == 3 * len(persons)
+    assert pending + conflict + missing == 3 * len(persons)
     report = (built_candidates / "core_upgrade_selection_report.md").read_text(encoding="utf-8")
     import re
 
-    m = re.search(r"检索到候选证据 (\d+) 个（全部 pending_human_review），\s*\n其余 (\d+) 个记 missing", report)
-    assert m, "选择报告缺少候选/missing 计数句"
-    assert int(m.group(1)) == pending, f"报告声称检索到 {m.group(1)} 个候选，CSV 实数 {pending}"
-    assert int(m.group(2)) == missing, f"报告声称 {m.group(2)} 个 missing，CSV 实数 {missing}"
-    # missing 不冒充覆盖：事实级证据为 0 的字段，状态只能是 missing/pending，不得出现第三种“已覆盖”态
+    assert "候选来源等级分布（A/B/C/D）" in report, "选择报告缺少 A/B/C/D 分级统计"
+    assert CONFLICT in report, "选择报告缺少 conflict 说明"
+    # missing 不冒充覆盖：事实级证据为 0 的字段，状态只能是 missing/pending/conflict
     for r in persons:
         for f in ("birth_year", "death_year", "role"):
             if int(r[f"{f}_fact_evidences"] or 0) == 0:
-                assert r[f.replace("_year", "").replace("_evidences", "") + "_status"] in (PENDING, MISSING)
+                assert r[f.replace("_year", "").replace("_evidences", "") + "_status"] in (PENDING, MISSING, CONFLICT)
 
 
 def test_three_networks_use_different_filters(built_network: Path) -> None:
     payload = json.loads((built_network / "trustworthy_network_analysis.json").read_text(encoding="utf-8"))
     nets = payload["networks"]
-    assert set(nets) >= {"full_exploratory", "trusted", "evidence_weighted"}
-    full, trusted, weighted = nets["full_exploratory"], nets["trusted"], nets["evidence_weighted"]
-    assert full["edges"] > trusted["edges"] > 0, "全量网络边数必须大于可信网络（不同过滤条件）"
-    assert trusted["edges"] == weighted["edges"], "加权网络与可信网络拓扑一致，仅权重不同"
-    assert full["total_weight"] >= trusted["total_weight"]
+    # 返修四口径：全量探索、低风险启发式（不得称可信）、证据支持、人工确认、可信（verified ∪ 支持）
+    assert set(nets) >= {"full_exploratory", "low_risk_heuristic", "evidence_supported", "human_verified", "trusted", "evidence_weighted"}
+    full = nets["full_exploratory"]
+    low_risk = nets["low_risk_heuristic"]
+    supported = nets["evidence_supported"]
+    trusted = nets["trusted"]
+    weighted = nets["evidence_weighted"]
+    # 低风险启发式保留历史 1760 口径（研究对照，非可信）；证据支持/可信当前为 0 并如实报告样本不足
+    assert full["edges"] > low_risk["edges"] > 0, "全量边应大于低风险筛选边"
+    assert supported["edges"] == 0 and trusted["edges"] == 0, "当前无合格 support 证据，可信应为 0"
+    assert trusted.get("sample_sufficient") is False, "可信样本不足须明确标记"
+    assert "样本不足" in str(trusted.get("sample_note", "")), "可信须注明样本不足"
+    assert full["total_weight"] >= low_risk["total_weight"]
     assert set(payload["time_slices"]) == {"1928-1930", "1931-1933", "1934-1936"}
-    # 过滤规则在 formulas 中显式登记且三套口径互不冒充
-    assert "verified/supported" in payload["formulas"]["trusted_rule"]
+    # 过滤规则在 formulas 中显式登记且四口径互不冒充
+    assert "verified" in payload["formulas"]["trusted_rule"] and "support" in payload["formulas"]["trusted_rule"]
+    assert "不得称为可信" in payload["formulas"]["low_risk_heuristic"]
     assert payload["formulas"]["evidence_weight"]
+    # 时间切片为事件共参与网络，不得冒充关系历时网络
+    assert "事件共参与" in payload["formulas"]["time_slices"]
 
 
 def test_trusted_network_excludes_pending_relations(snapshot_dir: Path, tmp_path: Path) -> None:
