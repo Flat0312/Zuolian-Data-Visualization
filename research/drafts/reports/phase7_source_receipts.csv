@@ -1,0 +1,3 @@
+﻿receipt_id,candidate_source_id,source_title,source_path_or_url,retrieval_status,access_date,content_hash,note
+P7-RCP-001,CAND-SRC-P7-001,鲁迅日记·日记十七（1928年）,https://zh.wikisource.org/zh-hans/鲁迅日记/日记十七,verified_http_200; local_text_checked,2026-09-04,c9d41730702add6034416c22ad363b3b256e1aaffec6ddab02583c94903a34c3,公开页响应字节 SHA-256；引文另在本地《鲁迅日记》全文逐字核对。
+P7-RCP-002,CAND-SRC-P7-002,鲁迅日记·日记二十四（1935年）,https://zh.wikisource.org/zh-hans/鲁迅日记/日记二十四,local_text_checked; public_locator_recorded,2026-09-04,22819f64addecb1529bc4c92e655f0589c26dd44203cc9dcba155123ab6be000,本地《鲁迅日记》全文 SHA-256；公开页链接已记录供人工复开。
