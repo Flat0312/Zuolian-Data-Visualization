@@ -1,0 +1,105 @@
+﻿candidate_id,type,event_id,detail,suggestion,decision
+ENC-T0001,missing_time_columns,,events.csv 缺少 start_date/end_date/date_certainty 列（或部分缺失）,按 event_date/date_precision 派生：start=end=event_date；日→exact、月→approximate_month、年→approximate_year、空→uncertain,pending_human_review
+ENC-K0001,duplicate_canonical_event_key,EVT-00016,canonical_event_key='鲁迅与内山完造通信|ZLH-001' 被 3 个事件共用（本事件日期 '1929-06-19'）,同名不同日期事件应在 key 末尾追加 |日期 消歧；同日同名事件需人工判断是否为重复条目,pending_human_review
+ENC-K0002,duplicate_canonical_event_key,EVT-00017,canonical_event_key='鲁迅与内山完造通信|ZLH-001' 被 3 个事件共用（本事件日期 '1929-09-23'）,同名不同日期事件应在 key 末尾追加 |日期 消歧；同日同名事件需人工判断是否为重复条目,pending_human_review
+ENC-K0003,duplicate_canonical_event_key,EVT-00018,canonical_event_key='鲁迅与内山完造通信|ZLH-001' 被 3 个事件共用（本事件日期 '1931-08-21'）,同名不同日期事件应在 key 末尾追加 |日期 消歧；同日同名事件需人工判断是否为重复条目,pending_human_review
+ENC-K0004,duplicate_canonical_event_key,EVT-00019,canonical_event_key='鲁迅拜访内山书店|ZLH-001' 被 2 个事件共用（本事件日期 '1929-02-16'）,同名不同日期事件应在 key 末尾追加 |日期 消歧；同日同名事件需人工判断是否为重复条目,pending_human_review
+ENC-K0005,duplicate_canonical_event_key,EVT-00020,canonical_event_key='鲁迅拜访内山书店|ZLH-001' 被 2 个事件共用（本事件日期 '1929-07-06'）,同名不同日期事件应在 key 末尾追加 |日期 消歧；同日同名事件需人工判断是否为重复条目,pending_human_review
+ENC-K0006,duplicate_canonical_event_key,EVT-00002,canonical_event_key='鲁迅与柔石会面|ZLH-001' 被 2 个事件共用（本事件日期 '1929-08-29'）,同名不同日期事件应在 key 末尾追加 |日期 消歧；同日同名事件需人工判断是否为重复条目,pending_human_review
+ENC-K0007,duplicate_canonical_event_key,EVT-00006,canonical_event_key='鲁迅与柔石会面|ZLH-001' 被 2 个事件共用（本事件日期 '1930-03-30'）,同名不同日期事件应在 key 末尾追加 |日期 消歧；同日同名事件需人工判断是否为重复条目,pending_human_review
+ENC-N0001,same_name_different_date,EVT-00016,事件名 '鲁迅与内山完造通信' 存在 3 个不同日期（1929-06-19…），本条日期 '1929-06-19',确认 key 已含日期段；若为不同史实建议事件名具体化，若为重复建议走人工合并流程,pending_human_review
+ENC-N0002,same_name_different_date,EVT-00017,事件名 '鲁迅与内山完造通信' 存在 3 个不同日期（1929-06-19…），本条日期 '1929-09-23',确认 key 已含日期段；若为不同史实建议事件名具体化，若为重复建议走人工合并流程,pending_human_review
+ENC-N0003,same_name_different_date,EVT-00018,事件名 '鲁迅与内山完造通信' 存在 3 个不同日期（1929-06-19…），本条日期 '1931-08-21',确认 key 已含日期段；若为不同史实建议事件名具体化，若为重复建议走人工合并流程,pending_human_review
+ENC-N0004,same_name_different_date,EVT-00002,事件名 '鲁迅与柔石会面' 存在 2 个不同日期（1929-08-29…），本条日期 '1929-08-29',确认 key 已含日期段；若为不同史实建议事件名具体化，若为重复建议走人工合并流程,pending_human_review
+ENC-N0005,same_name_different_date,EVT-00003,事件名 '鲁迅与柔石会面' 存在 2 个不同日期（1929-08-29…），本条日期 '1929-08-29',确认 key 已含日期段；若为不同史实建议事件名具体化，若为重复建议走人工合并流程,pending_human_review
+ENC-N0006,same_name_different_date,EVT-00006,事件名 '鲁迅与柔石会面' 存在 2 个不同日期（1929-08-29…），本条日期 '1930-03-30',确认 key 已含日期段；若为不同史实建议事件名具体化，若为重复建议走人工合并流程,pending_human_review
+ENC-N0007,same_name_different_date,EVT-00019,事件名 '鲁迅拜访内山书店' 存在 2 个不同日期（1929-02-16…），本条日期 '1929-02-16',确认 key 已含日期段；若为不同史实建议事件名具体化，若为重复建议走人工合并流程,pending_human_review
+ENC-N0008,same_name_different_date,EVT-00020,事件名 '鲁迅拜访内山书店' 存在 2 个不同日期（1929-02-16…），本条日期 '1929-07-06',确认 key 已含日期段；若为不同史实建议事件名具体化，若为重复建议走人工合并流程,pending_human_review
+ENC-G0001,generic_city_attachment,EVT-00120,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0002,generic_city_attachment,EVT-00061,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0003,generic_city_attachment,EVT-00049,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0004,generic_city_attachment,EVT-00092,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0005,generic_city_attachment,EVT-00113,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0006,generic_city_attachment,EVT-00014,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0007,generic_city_attachment,EVT-00011,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0008,generic_city_attachment,EVT-00059,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0009,generic_city_attachment,EVT-00047,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0010,generic_city_attachment,EVT-00110,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0011,generic_city_attachment,EVT-00010,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0012,generic_city_attachment,EVT-00101,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0013,generic_city_attachment,EVT-00236,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0014,generic_city_attachment,EVT-00235,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0015,generic_city_attachment,EVT-00132,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0016,generic_city_attachment,EVT-00122,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0017,generic_city_attachment,EVT-00136,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0018,generic_city_attachment,EVT-00131,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0019,generic_city_attachment,EVT-00185,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0020,generic_city_attachment,EVT-00209,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0021,generic_city_attachment,EVT-00041,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0022,generic_city_attachment,EVT-00225,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0023,generic_city_attachment,EVT-00201,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0024,generic_city_attachment,EVT-00116,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0025,generic_city_attachment,EVT-00212,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0026,generic_city_attachment,EVT-00237,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0027,generic_city_attachment,EVT-00115,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0028,generic_city_attachment,EVT-00167,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0029,generic_city_attachment,EVT-00170,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0030,generic_city_attachment,EVT-00154,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0031,generic_city_attachment,EVT-00147,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0032,generic_city_attachment,EVT-00067,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0033,generic_city_attachment,EVT-00086,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0034,generic_city_attachment,EVT-00165,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0035,generic_city_attachment,EVT-00146,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0036,generic_city_attachment,EVT-00026,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0037,generic_city_attachment,EVT-00245,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0038,generic_city_attachment,EVT-00238,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0039,generic_city_attachment,EVT-00217,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0040,generic_city_attachment,EVT-00123,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0041,generic_city_attachment,EVT-00012,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0042,generic_city_attachment,EVT-00215,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0043,generic_city_attachment,EVT-00071,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0044,generic_city_attachment,EVT-00203,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0045,generic_city_attachment,EVT-00118,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0046,generic_city_attachment,EVT-00121,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0047,generic_city_attachment,EVT-00079,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0048,generic_city_attachment,EVT-00196,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0049,generic_city_attachment,EVT-00051,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0050,generic_city_attachment,EVT-00175,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0051,generic_city_attachment,EVT-00186,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0052,generic_city_attachment,EVT-00156,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0053,generic_city_attachment,EVT-00066,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0054,generic_city_attachment,EVT-00184,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0055,generic_city_attachment,EVT-00025,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0056,generic_city_attachment,EVT-00125,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0057,generic_city_attachment,EVT-00193,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0058,generic_city_attachment,EVT-00078,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0059,generic_city_attachment,EVT-00144,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0060,generic_city_attachment,EVT-00223,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0061,generic_city_attachment,EVT-00138,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0062,generic_city_attachment,EVT-00035,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0063,generic_city_attachment,EVT-00114,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0064,generic_city_attachment,EVT-00015,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0065,generic_city_attachment,EVT-00239,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0066,generic_city_attachment,EVT-00063,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0067,generic_city_attachment,EVT-00168,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0068,generic_city_attachment,EVT-00044,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0069,generic_city_attachment,EVT-00230,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0070,generic_city_attachment,EVT-00171,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0071,generic_city_attachment,EVT-00082,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0072,generic_city_attachment,EVT-00166,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0073,generic_city_attachment,EVT-00240,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0074,generic_city_attachment,EVT-00189,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0075,generic_city_attachment,EVT-00191,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0076,generic_city_attachment,EVT-00200,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0077,generic_city_attachment,EVT-00054,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0078,generic_city_attachment,EVT-00157,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0079,generic_city_attachment,EVT-00192,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0080,generic_city_attachment,EVT-00233,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0081,generic_city_attachment,EVT-00199,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0082,generic_city_attachment,EVT-00089,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-G0083,generic_city_attachment,EVT-00214,事件挂接到城市级地点 PLC-00006（上海），historical_location='上海',依据证据将地点细化到街区/建筑级；无法细化者保留并在展示层标注城市级精度,pending_human_review
+ENC-P0001,missing_place_id,EVT-00183,无 place_id 但有 historical_location='萌芽月刊',人工为该地点建档或挂接到现存地点,pending_human_review
+ENC-P0002,missing_place_id,EVT-00040,无 place_id 但有 historical_location='萌芽月刊',人工为该地点建档或挂接到现存地点,pending_human_review
+ENC-P0003,missing_place_id,EVT-00187,无 place_id 但有 historical_location='静安寺路洛阳书店（今南京西路）',人工为该地点建档或挂接到现存地点,pending_human_review
+ENC-P0004,missing_place_id,EVT-00038,无 place_id 但有 historical_location='文学月报',人工为该地点建档或挂接到现存地点,pending_human_review
+ENC-P0005,missing_place_id,EVT-00213,无 place_id 但有 historical_location='文学月报',人工为该地点建档或挂接到现存地点,pending_human_review

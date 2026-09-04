@@ -1,0 +1,5 @@
+﻿candidate_id,observed_value,row_count,in_canonical_enum,mapping_recommendation,decision
+PRM-001,直接参与者,111,True,保留（枚举内）,no_change_needed
+PRM-002,unclear,90,False,建议映射为 不明,pending_human_review
+PRM-003,待核,17,True,保留（枚举内）,no_change_needed
+PRM-004,关联人物,4,True,保留（枚举内）,no_change_needed
