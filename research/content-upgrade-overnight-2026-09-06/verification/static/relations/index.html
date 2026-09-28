@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>关系索引 - 左联知识库静态阅读版</title>
+  <meta name="description" content="浏览左联知识库中的人物关系索引。">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script defer src="../assets/site.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="../index.html">
+        <span class="brand__eyebrow">STATIC READER</span>
+        <span class="brand__title">左联知识库</span>
+      </a>
+      <nav class="site-nav" aria-label="主导航"><a class="site-nav__link" href="../index.html">首页</a><a class="site-nav__link" href="../people/index.html">人物档案</a><a class="site-nav__link" href="../events/index.html">事件索引</a><a class="site-nav__link is-active" href="../relations/index.html">关系索引</a><a class="site-nav__link" href="../search/index.html">全文搜索</a><a class="site-nav__link" href="../graph/index.html">关系图谱</a><a class="site-nav__link" href="../timeline/index.html">事件时间轴</a></nav>
+      <button class="site-nav-toggle" aria-label="展开导航" onclick="this.closest('.site-header__inner').querySelector('.site-nav').classList.toggle('is-open')">☰</button>
+    </div>
+  </header>
+  <main id="main" class="page-main">
+    <div class="page-shell">
+    <section class="page-hero">
+      <p class="eyebrow">关系索引</p>
+      <h1>把人物对关系压缩成可读卡片</h1>
+      <p class="page-hero__lead">这里展示的是按人物对聚合后的关系摘要，适合快速定位谁和谁之间有何种关联、证据来自哪里。</p>
+      <p class="page-hero__lead">默认公开层仅展示 <strong>verified（人工已确认）/ supported（材料支持，待人工确认；须有 support 证据 + locator + 引文/语境）</strong>；
+      inferred（推断线索，未经人工核验）/ pending_review（待审核，未经人工核验）/ rejected（已驳回）仅保留在研究层，静态站不提供候选开关。</p>
+      <div class="empty-state" style="display:block">当前尚无满足公开条件的关系。研究候选关系请在交互应用中切换到“研究模式”查看；候选关系未经人工核验，不得作为正式证据或可信关系引用。</div>
+      <div class="filter-box">
+        <label for="relations-filter">按人名、关系类型、证据关键词筛选</label>
+        <input id="relations-filter" type="search" placeholder="例如：鲁迅 通信 上海" data-list-filter="relations-list">
+        <p class="filter-box__meta" data-count-for="relations-list">共 0 组人物关系（仅公开子集；候选须标注“未经人工核验”）</p>
+      </div>
+    </section>
+    <section class="page-section">
+      <div id="relations-list" class="relation-grid"></div>
+      <p class="empty-state" data-empty-for="relations-list" hidden>没有匹配到关系卡片，请换一个关键词。</p>
+    </section>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>静态阅读版基于仓库内标准知识库数据自动生成，适合 GitHub Pages 发布。</p>
+      <p>复杂分析与交互地图已内置于本站，支持关系图谱与事件时间轴在线浏览。</p>
+    </div>
+  </footer>
+</body>
+</html>

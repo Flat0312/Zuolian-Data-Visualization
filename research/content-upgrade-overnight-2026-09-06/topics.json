@@ -1,0 +1,115 @@
+[
+  {
+    "topic_id": "TOPIC-01",
+    "title": "书信、书刊与出版往来",
+    "research_question": "鲁迅日记1928年的书信—书刊—书店记录如何串联左联成立前的出版交往",
+    "document_path": "topics/T1_1928书信书刊出版往来_修订版.md",
+    "claim_ids": [
+      "CLAIM-T1",
+      "FACT-ORG-001"
+    ],
+    "entity_ids": [
+      "ZLH-001",
+      "ZLH-124",
+      "ZLH-003"
+    ],
+    "content_status": "review_ready_draft",
+    "limits": "9月26日寄陈望道稿件篇名未解决；书店沿革缺",
+    "execution_status": "checked"
+  },
+  {
+    "topic_id": "TOPIC-02",
+    "title": "左联成立及组织演变",
+    "research_question": "筹备会—成立大会—党团常委会—解散的记载链是否可逐环定位",
+    "document_path": "topics/T2_左联成立及组织演变.md",
+    "claim_ids": [
+      "CLAIM-ORG-001",
+      "CLAIM-ORG-002",
+      "CLAIM-ORG-003",
+      "CLAIM-ORG-004",
+      "CLAIM-ORG-005"
+    ],
+    "entity_ids": [
+      "ZLH-001",
+      "ZLH-014",
+      "ZLH-007"
+    ],
+    "content_status": "review_ready_draft",
+    "limits": "成立日期与名单均为词典/史著二手转录，未取到原刊页面；OCR错字保留原样；【返工降级2026-09-06】独立\"非重复灌水\"审核未完成，按独立验收要求暂降limited_report，待独立审核后可回升",
+    "execution_status": "checked",
+    "status_history": [
+      "2026-09-20: limited_report→review_ready_draft（独立审核通过+引文整改完成+用户授权「我都没问题，你自己看着办吧」；依据 verification/independent_topic_review_2026-09-20.md）"
+    ]
+  },
+  {
+    "topic_id": "TOPIC-03",
+    "title": "龙华事件相关人物与记载",
+    "research_question": "龙华殉难记载在不同年代文本中的印证与分歧",
+    "document_path": "topics/T3_龙华事件相关人物与记载.md",
+    "claim_ids": [
+      "CLAIM-LH-001",
+      "CLAIM-LH-002",
+      "CLAIM-LH-003",
+      "CLAIM-LH-004"
+    ],
+    "entity_ids": [
+      "ZLH-016",
+      "ZLH-017",
+      "ZLH-018",
+      "ZLH-021"
+    ],
+    "content_status": "review_ready_draft",
+    "limits": "殉难日期精度存疑（2月?日）；五烈士/廿三烈士人数口径分歧；单来源族（词典OCR为主）；【返工降级2026-09-06】独立\"非重复灌水\"审核未完成，按独立验收要求暂降limited_report，待独立审核后可回升",
+    "execution_status": "checked",
+    "status_history": [
+      "2026-09-20: limited_report→review_ready_draft（独立审核通过+引文整改完成+用户授权「我都没问题，你自己看着办吧」；依据 verification/independent_topic_review_2026-09-20.md）"
+    ]
+  },
+  {
+    "topic_id": "TOPIC-04",
+    "title": "女性作家的活动与交往",
+    "research_question": "四位女性左翼作家的活动与交往记载及其证据强度",
+    "document_path": "topics/T4_女性作家的活动与交往.md",
+    "claim_ids": [
+      "CLAIM-FW-001",
+      "CLAIM-FW-002",
+      "CLAIM-FW-003",
+      "CLAIM-FW-004",
+      "CLAIM-FW-005"
+    ],
+    "entity_ids": [
+      "ZLH-021",
+      "ZLH-018"
+    ],
+    "content_status": "review_ready_draft",
+    "limits": "证据集中于《左联词典》单一来源族；无日记级一手文献；【返工降级2026-09-06】独立\"非重复灌水\"审核未完成，按独立验收要求暂降limited_report，待独立审核后可回升",
+    "execution_status": "checked",
+    "status_history": [
+      "2026-09-20: limited_report→review_ready_draft（独立审核通过+引文整改完成+用户授权「我都没问题，你自己看着办吧」；依据 verification/independent_topic_review_2026-09-20.md）"
+    ]
+  },
+  {
+    "topic_id": "TOPIC-05",
+    "title": "上海文化空间与机构迁移",
+    "research_question": "左翼文化活动的上海空间记载及其年代定位",
+    "document_path": "topics/T5_上海文化空间与机构迁移.md",
+    "claim_ids": [
+      "CLAIM-SP-001",
+      "CLAIM-SP-002",
+      "CLAIM-SP-003",
+      "CLAIM-SP-004",
+      "CLAIM-SP-005",
+      "CLAIM-SP-006"
+    ],
+    "entity_ids": [
+      "ZLH-001",
+      "PLC-00002"
+    ],
+    "content_status": "review_ready_draft",
+    "limits": "门牌/沿革/现代对应全缺，未采用推定坐标；以鲁迅活动半径为主；【返工降级2026-09-06】独立\"非重复灌水\"审核未完成，按独立验收要求暂降limited_report，待独立审核后可回升",
+    "execution_status": "checked",
+    "status_history": [
+      "2026-09-20: limited_report→review_ready_draft（独立审核通过+引文整改完成+用户授权「我都没问题，你自己看着办吧」；依据 verification/independent_topic_review_2026-09-20.md）"
+    ]
+  }
+]

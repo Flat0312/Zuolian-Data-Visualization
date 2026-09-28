@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>左联知识库静态阅读版</title>
+  <meta name="description" content="适合 GitHub Pages 发布的左联知识库静态阅读站。">
+  <link rel="stylesheet" href="assets/site.css">
+  <script defer src="assets/site.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="index.html">
+        <span class="brand__eyebrow">STATIC READER</span>
+        <span class="brand__title">左联知识库</span>
+      </a>
+      <nav class="site-nav" aria-label="主导航"><a class="site-nav__link is-active" href="index.html">首页</a><a class="site-nav__link" href="people/index.html">人物档案</a><a class="site-nav__link" href="events/index.html">事件索引</a><a class="site-nav__link" href="relations/index.html">关系索引</a><a class="site-nav__link" href="search/index.html">全文搜索</a><a class="site-nav__link" href="graph/index.html">关系图谱</a><a class="site-nav__link" href="timeline/index.html">事件时间轴</a></nav>
+      <button class="site-nav-toggle" aria-label="展开导航" onclick="this.closest('.site-header__inner').querySelector('.site-nav').classList.toggle('is-open')">☰</button>
+    </div>
+  </header>
+  <main id="main" class="page-main">
+    <div class="page-shell">
+    <section class="hero hero--home">
+      <div class="hero__content">
+        <p class="eyebrow">GITHUB PAGES 静态阅读版</p>
+        <h1>把左联人物、关系与事件整理成可浏览的档案站</h1>
+        <p class="hero__lead">这一版不依赖 Python 运行环境，直接把标准化 CSV 生成静态页面，适合在线阅读、引用、搜索与 GitHub Pages 发布。</p>
+        <div class="hero__actions">
+          <a class="button button--primary" href="people/index.html">进入人物档案</a>
+          <a class="button" href="graph/index.html">关系图谱</a>
+          <a class="button" href="timeline/index.html">事件时间轴</a>
+          <a class="button" href="search/index.html">全文搜索</a>
+        </div>
+      </div>
+      <div class="hero__media">
+        <img src="assets/banner.png" alt="左联知识库静态阅读版横幅">
+      </div>
+    </section>
+
+    <section class="metric-grid">
+      <article class="metric-card"><div class="metric-card__label">人物档案</div><div class="metric-card__value">162</div><p class="metric-card__note">可直接进入单人页面阅读</p></article>
+      <article class="metric-card"><div class="metric-card__label">关系对</div><div class="metric-card__value">0</div><p class="metric-card__note">聚合为人物对关系卡片</p></article>
+      <article class="metric-card"><div class="metric-card__label">历史事件</div><div class="metric-card__value">147</div><p class="metric-card__note">保留时间、地点与参与者</p></article>
+      <article class="metric-card"><div class="metric-card__label">证据来源</div><div class="metric-card__value">1,177</div><p class="metric-card__note">仅展示可公开说明的来源信息</p></article>
+    </section>
+
+    <section class="section-grid section-grid--two">
+      <article class="section-panel">
+        <div class="section-panel__eyebrow">概览</div>
+        <h2>知识库的静态阅读入口</h2>
+        <p>这一版支持人物档案、关系图谱、事件时间轴与全文搜索，直接在浏览器中运行，无需 Python 环境。</p>
+        <ul class="rank-list"><li><span>普通成员</span><strong>58</strong></li><li><span>骨干成员</span><strong>48</strong></li><li><span>相关人士</span><strong>23</strong></li><li><span>外围联络人</span><strong>18</strong></li><li><span>核心领导</span><strong>15</strong></li></ul>
+      </article>
+      <article class="section-panel">
+        <div class="section-panel__eyebrow">关系类型</div>
+        <h2>目前最常见的关系标签</h2>
+        <p>静态站会优先把高频关系、人际共现与史料证据组织成阅读友好的关系卡片。</p>
+        <ul class="rank-list"></ul>
+      </article>
+    </section>
+
+    <section class="page-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">人物入口</p>
+          <h2>先看连接最密集的人物</h2>
+        </div>
+        <a class="section-link" href="people/index.html">查看全部人物</a>
+      </div>
+      <div class="card-grid"><article class="index-card" data-search="丁玲 蒋冰之、彬芷 1904-1986 骨干成员 "><a class="index-card__link" href="people/ZLH-021.html"><div class="index-card__header"><h3>丁玲</h3><span>骨干成员</span></div><p class="index-card__summary">蒋冰之、彬芷</p><div class="index-card__badges"><span class="badge">骨干成员</span><span class="badge">1904-1986</span><span class="badge">可靠度 5</span></div><div class="index-card__meta">0 位关联人物 · 8 条关联事件</div></a></article><article class="index-card" data-search="丛深 别名待补 1920-1980 普通成员 "><a class="index-card__link" href="people/ZLH-072.html"><div class="index-card__header"><h3>丛深</h3><span>普通成员</span></div><p class="index-card__summary">别名待补</p><div class="index-card__badges"><span class="badge">普通成员</span><span class="badge">1920-1980</span><span class="badge">可靠度 3</span></div><div class="index-card__meta">0 位关联人物 · 0 条关联事件</div></a></article><article class="index-card" data-search="严文井 严文锦 1915-2005 普通成员 "><a class="index-card__link" href="people/ZLH-074.html"><div class="index-card__header"><h3>严文井</h3><span>普通成员</span></div><p class="index-card__summary">严文锦</p><div class="index-card__badges"><span class="badge">普通成员</span><span class="badge">1915-2005</span><span class="badge">可靠度 3</span></div><div class="index-card__meta">0 位关联人物 · 0 条关联事件</div></a></article><article class="index-card" data-search="于伶 任郁伶 1907-1997 普通成员 "><a class="index-card__link" href="people/ZLH-087.html"><div class="index-card__header"><h3>于伶</h3><span>普通成员</span></div><p class="index-card__summary">任郁伶</p><div class="index-card__badges"><span class="badge">普通成员</span><span class="badge">1907-1997</span><span class="badge">可靠度 3</span></div><div class="index-card__meta">0 位关联人物 · 0 条关联事件</div></a></article><article class="index-card" data-search="于黑丁 于黑庭、黑庭 1907-1988 骨干成员 "><a class="index-card__link" href="people/ZLH-050.html"><div class="index-card__header"><h3>于黑丁</h3><span>骨干成员</span></div><p class="index-card__summary">于黑庭、黑庭</p><div class="index-card__badges"><span class="badge">骨干成员</span><span class="badge">1907-1988</span><span class="badge">可靠度 4</span></div><div class="index-card__meta">0 位关联人物 · 1 条关联事件</div></a></article><article class="index-card" data-search="任白戈 任全、任以鲁 1906-1986 普通成员 "><a class="index-card__link" href="people/ZLH-063.html"><div class="index-card__header"><h3>任白戈</h3><span>普通成员</span></div><p class="index-card__summary">任全、任以鲁</p><div class="index-card__badges"><span class="badge">普通成员</span><span class="badge">1906-1986</span><span class="badge">可靠度 3</span></div><div class="index-card__meta">0 位关联人物 · 1 条关联事件</div></a></article></div>
+    </section>
+
+    <section class="page-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">关系索引</p>
+          <h2>最值得先读的一组关系卡片</h2>
+        </div>
+        <a class="section-link" href="relations/index.html">查看全部关系</a>
+      </div>
+      <div class="relation-grid"></div>
+    </section>
+
+    <section class="page-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">事件时间线</p>
+          <h2>按时间进入左联活动现场</h2>
+        </div>
+        <a class="section-link" href="events/index.html">查看全部事件</a>
+      </div>
+      <div class="card-grid"><article class="index-card" data-search="瞿秋白到上海大学任教 1923-07 上海大学 上海（具体校址待核） 瞿秋白 1923年7月，瞿秋白到上海大学任教并主持社会学系工作，当前条目按这一可公开核实的在沪活动节点展示。"><a class="index-card__link" href="events/EVT-00028.html"><div class="index-card__header"><h3>瞿秋白到上海大学任教</h3><span>1923-07</span></div><p class="index-card__summary">上海大学 · 瞿秋白</p><div class="index-card__badges"><span class="badge">1923-07</span><span class="badge">月</span><span class="badge">1 位相关人物</span></div><div class="index-card__meta">1923年7月，瞿秋白到上海大学任教并主持社会学系工作，当前条目按这一可公开核实的在沪活动节点展示。</div></a></article><article class="index-card" data-search="丁玲进入上海大学中国文学系 1923-08 上海大学中国文学系 上海（具体校址待核） 丁玲 1923年8月，丁玲进入上海大学中国文学系旁听和学习，当前条目按这一较为明确的文学活动节点展示。"><a class="index-card__link" href="events/EVT-00150.html"><div class="index-card__header"><h3>丁玲进入上海大学中国文学系</h3><span>1923-08</span></div><p class="index-card__summary">上海大学中国文学系 · 丁玲</p><div class="index-card__badges"><span class="badge">1923-08</span><span class="badge">月</span><span class="badge">1 位相关人物</span></div><div class="index-card__meta">1923年8月，丁玲进入上海大学中国文学系旁听和学习，当前条目按这一较为明确的文学活动节点展示。</div></a></article><article class="index-card" data-search="《生活》周刊创刊 1925-10-11 上海 上海 邹韬奋 《生活》周刊创刊于1929在上海有相关记录。"><a class="index-card__link" href="events/EVT-00236.html"><div class="index-card__header"><h3>《生活》周刊创刊</h3><span>1925-10-11</span></div><p class="index-card__summary">上海 · 邹韬奋</p><div class="index-card__badges"><span class="badge">1925-10-11</span><span class="badge">日</span><span class="badge">1 位相关人物</span></div><div class="index-card__meta">《生活》周刊创刊于1929在上海有相关记录。</div></a></article><article class="index-card" data-search="鲁迅拜访内山书店 1929-02-16 内山书店 四川北路2050号 鲁迅 当前条目按已核实的日期 1929-02-16 展示；原始同名记录在时间或地点上仍存在版本冲突。"><a class="index-card__link" href="events/EVT-00019.html"><div class="index-card__header"><h3>鲁迅拜访内山书店</h3><span>1929-02-16</span></div><p class="index-card__summary">内山书店 · 鲁迅</p><div class="index-card__badges"><span class="badge">1929-02-16</span><span class="badge">日</span><span class="badge">1 位相关人物</span></div><div class="index-card__meta">当前条目按已核实的日期 1929-02-16 展示；原始同名记录在时间或地点上仍存在版本冲突。</div></a></article><article class="index-card" data-search="冯铿元宵抵沪 1929-02-24 上海 上海 冯铿 1929年2月24日，冯铿抵达上海，当前条目按这一明确可核的来沪时间展示。"><a class="index-card__link" href="events/EVT-00136.html"><div class="index-card__header"><h3>冯铿元宵抵沪</h3><span>1929-02-24</span></div><p class="index-card__summary">上海 · 冯铿</p><div class="index-card__badges"><span class="badge">1929-02-24</span><span class="badge">日</span><span class="badge">1 位相关人物</span></div><div class="index-card__meta">1929年2月24日，冯铿抵达上海，当前条目按这一明确可核的来沪时间展示。</div></a></article><article class="index-card" data-search="鲁迅与内山完造通信 1929-06-19 内山书店 四川北路2050号 鲁迅 当前条目按已核实的日期 1929-06-19 展示；原始同名记录在时间或地点上仍存在版本冲突。证据方向为收信并转寄，地点系通信媒介而非见面地。"><a class="index-card__link" href="events/EVT-00016.html"><div class="index-card__header"><h3>鲁迅与内山完造通信</h3><span>1929-06-19</span></div><p class="index-card__summary">内山书店 · 鲁迅</p><div class="index-card__badges"><span class="badge">1929-06-19</span><span class="badge">日</span><span class="badge">1 位相关人物</span></div><div class="index-card__meta">当前条目按已核实的日期 1929-06-19 展示；原始同名记录在时间或地点上仍存在版本冲突。证据方向为收信并转寄，地点系通信媒介而非见面地。</div></a></article></div>
+    </section>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>静态阅读版基于仓库内标准知识库数据自动生成，适合 GitHub Pages 发布。</p>
+      <p>复杂分析与交互地图已内置于本站，支持关系图谱与事件时间轴在线浏览。</p>
+    </div>
+  </footer>
+</body>
+</html>

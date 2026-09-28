@@ -1,0 +1,28 @@
+{
+ "rel": {
+  "support": 56,
+  "associated": 115,
+  "insufficient": 240
+ },
+ "logs": {
+  "local_checked": 401,
+  "not_found": 369,
+  "not_attempted": 0
+ },
+ "facts": 213,
+ "dossiers": {
+  "review_ready_draft": 29,
+  "limited_report": 31
+ },
+ "ledger": {
+  "checked": 476
+ },
+ "topics": {
+  "review_ready_draft": 1,
+  "limited_report": 4
+ },
+ "eventR2E": {
+  "not_found": 2,
+  "local_checked": 18
+ }
+}

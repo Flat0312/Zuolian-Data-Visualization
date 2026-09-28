@@ -1,0 +1,3 @@
+protected recheck bad: 0 of 331
+
+第三核（08:00，第二轮收尾）：bad=0 of 331

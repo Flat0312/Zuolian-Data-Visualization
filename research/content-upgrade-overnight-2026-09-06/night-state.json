@@ -1,0 +1,40 @@
+{
+ "run_id": "night-20260906-a",
+ "started_at": "2026-09-06T12:59:00+08:00",
+ "deadline": "2026-09-06T20:59:00+08:00",
+ "timezone": "Asia/Shanghai",
+ "research_cutoff": "2026-09-06T20:29:00+08:00",
+ "last_checkpoint_at": "2026-09-06T14:50:00+08:00",
+ "current_phase": "delivered",
+ "current_batch": "rework complete (all 6 acceptance blockers addressed)",
+ "completed_ids": [
+  "task0-verify",
+  "task1-ledger-fkeys",
+  "task2-claim-rebuild-60",
+  "task3-support-review-58+topics",
+  "task4-selfcheck+injections+gates"
+ ],
+ "next_ids": [
+  "主Agent复验改判",
+  "T2-T5独立非重复审核",
+  "240条insufficient人工裁决或授权新来源族(自REL-00036)",
+  "26条associated改标待人工(associated_review.jsonl)",
+  "3条事件not_found原刊补证(自EVT-00030)"
+ ],
+ "output_paths": {
+  "root": "research/content-upgrade-overnight-2026-09-06"
+ },
+ "counts": {
+  "relations": "support 56 / associated 115 / insufficient 240 (union 411)",
+  "facts": 213,
+  "dossiers": "RRD 34 / LR 26",
+  "topics": "RRD 1 (T1) / LR 4 (T2-T5降级)",
+  "ledger": "476 checked",
+  "search_logs": 770,
+  "support_semantic_review": 58,
+  "associated_review_flagged_for_human": 26
+ },
+ "run_status": "not_complete → repair_completed_pending_independent_acceptance",
+ "head": "6c6a12becbfa805733ef0beb959beb3d2c599625",
+ "ai_executor": "ZCode GLM-5.3-Flash (AI executor, autonomous overnight run)"
+}

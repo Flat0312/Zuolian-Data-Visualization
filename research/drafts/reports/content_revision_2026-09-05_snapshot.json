@@ -1,0 +1,113 @@
+{
+  "checked_on": "2026-09-05",
+  "scope": "content revision only; candidate quote corrections; no production or publish writes",
+  "head": "6c6a12becbfa805733ef0beb959beb3d2c599625",
+  "hashes": {
+    "data/processed/event_evidences.json": "2d8d7abb1ef75f30ceca49fbafbac1535a1a74c6c35ef4dea21b97b80906844f",
+    "data/processed/event_participants.csv": "ff65fa38f9669c01ff1663e1d18b0db2f58e102eb9cff09097759ce430fd3aa9",
+    "data/processed/events.csv": "41f0cb69eefa326b5a181bb36e3441546aad456949ef3daa5248ddb9607fe1fd",
+    "data/processed/fact_evidences.csv": "9989298c9a6fff90e90be5102c74b4d9f2ee8d6e29098bdc68e253d0b23d6653",
+    "data/processed/org_membership_evidences.csv": "02b34196928aa5400f53b3e33d69e19dd892f814b474c7cfcaf180eb121c12cb",
+    "data/processed/org_memberships.csv": "aeffaffe4972ea28e8f57c2e715fea3afa5d4a3b9d1d078163a59d89be6fdbc4",
+    "data/processed/organizations.csv": "bb66434b757743a2339ffacc18c225116d464f2e017fc6f8795bae79438ad80a",
+    "data/processed/person_relations.csv": "b2a8db0a8147f5e01fcd7ab025d2f01accf5bfa44c7ae418885d46adfcee20d3",
+    "data/processed/persons.csv": "76dd3be11c33cde7d1ddaecc152461162b23729166736a73b46aa1cb9cb4f782",
+    "data/processed/places.csv": "4b25cc7583d34fbb54ab311084e53b69a59bc4ba53835747f4df189859886711",
+    "data/processed/relation_evidences.csv": "17e942111c385f3e087ff6b4f29eaaf59a043ec9c066726ef6282afe4717adb0",
+    "data/processed/runtime_sources/左联史.txt": "13968935ec647f0b5bbcceee40d6cd9d6bfb3ffcf5ea9b562e3ce12bba4db5d2",
+    "data/processed/runtime_sources/左联回忆录_ocr_text.json": "6601c38811e98630ad1b8768a4e7e3411e67c23d3e5cf417c94f478670a6247b",
+    "data/processed/runtime_sources/左联词典.txt": "a57277ad95da90fb1c44ba581396e38495c7cef4f1388fd0b1fa9c602d9e322a",
+    "data/processed/source_passages.csv": "1040ca398c64f0214c82a6f65f9ceb932de343732726d7b728130925ebaeec06",
+    "data/processed/source_works.csv": "d718c449c2aace8a59fa2674b9d4988c5b013889d1d1f05fb8fe2b740fe1ff83",
+    "data/processed/sources.csv": "227e7313ebe5e64c9501599c88f61098c7810ba99200e281735741848746545b",
+    "data/publish/event_participants.csv": "f28626cde3fc00d3177f7842b132643695d98ec8ae78402bbe9d337072abfff8",
+    "data/publish/events.csv": "a2af6d248774b9bf4f9260d59ace6eec0367dd63ae2c54f48a2e488e2c9bb6bf",
+    "data/publish/fact_evidences.csv": "30663e9f4f9d9331a5b37558323d23a6dea2058886013d501ea79d9358bbcd31",
+    "data/publish/org_membership_evidences.csv": "9b87ef89be334a5e794cd85eb37b0f51daaaa9058b0be307fc09df70c94ff131",
+    "data/publish/org_memberships.csv": "742583cfe3fe53157814a9194b59ecad1a83da6dc9772ce20e46a68f8ec7e0cc",
+    "data/publish/organizations.csv": "25237899823b1e3165627c63d98fc72c82323650bee92286060931a6ec6548ad",
+    "data/publish/person_relations.csv": "af94af7661cf3c9b9b48caabae5c5984f2239f3a971bcdeb5d80d3170ec371e9",
+    "data/publish/persons.csv": "81995679b61588a290831a05d0cb97493fae9d9ca6ebe2afc9d64ce38c27412c",
+    "data/publish/places.csv": "fbe06da536a899598ab0eb05b3b9a9648517c7414fd90a5c8890b91738b706c3",
+    "data/publish/publish_manifest.json": "b43c87a3720e8b774fae0a73a60287dc4b51c56159d209a5d8c237faa44dfca4",
+    "data/publish/relation_evidences.csv": "aae909111005a6a3c3b5bcdc9e76cd6b357ca50bea3bf6366200af2eb486e325",
+    "data/publish/source_passages.csv": "d6cb2f9e39511cdf5463ecb8ba3c350752ec0d1854d713530d24f094b54b64cf",
+    "data/publish/source_works.csv": "f2ff80fa293d6e692d1cc999d78a5ed40002b215d0ce641654cd33ba8e4c7785",
+    "data/publish/sources.csv": "8a8bfd463434dc6bc36726b3c654465a43c04f48ce24985277e4ed6bc84ee008"
+  },
+  "summary": {
+    "counts": {
+      "event_participants": 222,
+      "events": 147,
+      "fact_evidences": 626,
+      "org_membership_evidences": 581,
+      "org_memberships": 150,
+      "organizations": 36,
+      "person_relations": 4238,
+      "persons": 162,
+      "places": 41,
+      "relation_evidences": 10249,
+      "source_passages": 1177,
+      "source_works": 65,
+      "sources": 1177
+    },
+    "source_families": 30,
+    "membership_types": {
+      "confirmed_member": 45,
+      "candidate": 77,
+      "related_person": 28
+    },
+    "relation_status": {
+      "pending_review": 2451,
+      "inferred": 1787
+    },
+    "shanghai_events": 83,
+    "auto_coordinates": 41,
+    "event_dates": {
+      "年": 115,
+      "月": 3,
+      "日": 29
+    }
+  },
+  "network_recomputed_matches_existing": true,
+  "event_coverage": {
+    "attached": 26,
+    "direct_support": 21,
+    "confirmed": 26,
+    "total": 147
+  },
+  "source_checks": {
+    "local_diary_sha256": "22819f64addecb1529bc4c92e655f0589c26dd44203cc9dcba155123ab6be000",
+    "phase7_quotes_checked_in_dated_entries": 8,
+    "academic_source": {
+      "url": "https://xbzs.ecnu.edu.cn/CN/html/201306007.htm",
+      "http_status": 200,
+      "response_sha256": "ce4ea3b00b34f693ccc28021f11ca5349a8557bb9950594f9d85b3d42c46c29f"
+    },
+    "diary_1928": "web tool could read canonical traditional-title URL; direct HTTP returned 403",
+    "diary_1935": "web open failed; direct HTTP returned 403; local dated entry checked only"
+  },
+  "final_checks": {
+    "protected_files_unchanged": 31,
+    "candidate_records_pending": 12,
+    "dated_quote_checks": 8,
+    "candidate_regeneration_matches_saved": true,
+    "candidate_second_run_byte_identical": true,
+    "local_links_checked": 27,
+    "local_links_missing": 0,
+    "full_pytest": "107 passed in 47.58s",
+    "schema": {
+      "errors": 0,
+      "warnings": 13
+    },
+    "static_build": {
+      "people": 162,
+      "relation_cards": 0,
+      "events": 147
+    },
+    "spoken_script_han_characters": 988,
+    "actual_speech_timing": "not_performed",
+    "git_diff_check": "passed",
+    "ruff": "passed"
+  }
+}

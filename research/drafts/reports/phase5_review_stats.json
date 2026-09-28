@@ -1,33 +1,436 @@
 {
-  "total": 400,
-  "verdict_total": {
-    "needs_human": 252,
-    "plausible": 148
+  "n_total": 400,
+  "n_adjudicated": 400,
+  "n_pending": 0,
+  "verdict_counts": {
+    "correct": 135,
+    "wrong_type": 26,
+    "not_supported": 239,
+    "contradicted": 0
   },
-  "method_total": {
-    "no_corroboration": 127,
-    "context_match": 81,
-    "context_match_partial": 22,
-    "type_flag": 103,
-    "org_corroborated": 67
-  },
-  "downgrade_recs": 17,
-  "verdict_by_risk": {
+  "pair_accuracy": 0.4025,
+  "type_accuracy": 0.3375,
+  "not_supported_rate": 0.5975,
+  "contradicted_rate": 0.0,
+  "ai_agreement_rate": 1.0,
+  "by_risk": {
+    "critical": {
+      "n": 184,
+      "verdict_counts": {
+        "correct": 81,
+        "wrong_type": 7,
+        "not_supported": 96
+      },
+      "pair_accuracy": 0.4783,
+      "type_accuracy": 0.4402
+    },
     "high": {
-      "needs_human": 25,
-      "plausible": 21
+      "n": 46,
+      "verdict_counts": {
+        "correct": 6,
+        "wrong_type": 3,
+        "not_supported": 37
+      },
+      "pair_accuracy": 0.1957,
+      "type_accuracy": 0.1304
     },
     "low": {
-      "plausible": 72,
-      "needs_human": 88
-    },
-    "critical": {
-      "needs_human": 133,
-      "plausible": 51
+      "n": 160,
+      "verdict_counts": {
+        "correct": 47,
+        "wrong_type": 16,
+        "not_supported": 97
+      },
+      "pair_accuracy": 0.3937,
+      "type_accuracy": 0.2938
     },
     "medium": {
-      "needs_human": 6,
-      "plausible": 4
+      "n": 10,
+      "verdict_counts": {
+        "correct": 1,
+        "not_supported": 9
+      },
+      "pair_accuracy": 0.1,
+      "type_accuracy": 0.1
     }
-  }
+  },
+  "by_confidence": {
+    "low": {
+      "n": 170,
+      "verdict_counts": {
+        "correct": 72,
+        "wrong_type": 5,
+        "not_supported": 93
+      },
+      "pair_accuracy": 0.4529,
+      "type_accuracy": 0.4235
+    },
+    "medium": {
+      "n": 230,
+      "verdict_counts": {
+        "correct": 63,
+        "wrong_type": 21,
+        "not_supported": 146
+      },
+      "pair_accuracy": 0.3652,
+      "type_accuracy": 0.2739
+    }
+  },
+  "by_support": {
+    "associated": {
+      "n": 113,
+      "verdict_counts": {
+        "correct": 91,
+        "wrong_type": 22
+      },
+      "pair_accuracy": 1.0,
+      "type_accuracy": 0.8053
+    },
+    "insufficient": {
+      "n": 239,
+      "verdict_counts": {
+        "not_supported": 239
+      },
+      "pair_accuracy": 0.0,
+      "type_accuracy": 0.0
+    },
+    "support": {
+      "n": 48,
+      "verdict_counts": {
+        "correct": 44,
+        "wrong_type": 4
+      },
+      "pair_accuracy": 1.0,
+      "type_accuracy": 0.9167
+    }
+  },
+  "by_type": {
+    "交往": {
+      "n": 2,
+      "verdict_counts": {
+        "correct": 2
+      },
+      "pair_accuracy": 1.0,
+      "type_accuracy": 1.0
+    },
+    "交游": {
+      "n": 112,
+      "verdict_counts": {
+        "correct": 35,
+        "wrong_type": 12,
+        "not_supported": 65
+      },
+      "pair_accuracy": 0.4196,
+      "type_accuracy": 0.3125
+    },
+    "亲属关系": {
+      "n": 5,
+      "verdict_counts": {
+        "wrong_type": 2,
+        "not_supported": 3
+      },
+      "pair_accuracy": 0.4,
+      "type_accuracy": 0.0
+    },
+    "创作合作": {
+      "n": 13,
+      "verdict_counts": {
+        "correct": 2,
+        "wrong_type": 3,
+        "not_supported": 8
+      },
+      "pair_accuracy": 0.3846,
+      "type_accuracy": 0.1538
+    },
+    "合作": {
+      "n": 31,
+      "verdict_counts": {
+        "correct": 10,
+        "wrong_type": 2,
+        "not_supported": 19
+      },
+      "pair_accuracy": 0.3871,
+      "type_accuracy": 0.3226
+    },
+    "同属组织": {
+      "n": 67,
+      "verdict_counts": {
+        "correct": 37,
+        "not_supported": 30
+      },
+      "pair_accuracy": 0.5522,
+      "type_accuracy": 0.5522
+    },
+    "地下通讯": {
+      "n": 10,
+      "verdict_counts": {
+        "correct": 1,
+        "not_supported": 9
+      },
+      "pair_accuracy": 0.1,
+      "type_accuracy": 0.1
+    },
+    "师生关系": {
+      "n": 4,
+      "verdict_counts": {
+        "not_supported": 4
+      },
+      "pair_accuracy": 0.0,
+      "type_accuracy": 0.0
+    },
+    "待核验": {
+      "n": 103,
+      "verdict_counts": {
+        "correct": 35,
+        "wrong_type": 5,
+        "not_supported": 63
+      },
+      "pair_accuracy": 0.3883,
+      "type_accuracy": 0.3398
+    },
+    "文学论战": {
+      "n": 9,
+      "verdict_counts": {
+        "correct": 1,
+        "not_supported": 8
+      },
+      "pair_accuracy": 0.1111,
+      "type_accuracy": 0.1111
+    },
+    "时空共现": {
+      "n": 1,
+      "verdict_counts": {
+        "wrong_type": 1
+      },
+      "pair_accuracy": 1.0,
+      "type_accuracy": 0.0
+    },
+    "空间共现": {
+      "n": 2,
+      "verdict_counts": {
+        "correct": 2
+      },
+      "pair_accuracy": 1.0,
+      "type_accuracy": 1.0
+    },
+    "签名联署": {
+      "n": 19,
+      "verdict_counts": {
+        "correct": 6,
+        "not_supported": 13
+      },
+      "pair_accuracy": 0.3158,
+      "type_accuracy": 0.3158
+    },
+    "纪念/悼念": {
+      "n": 15,
+      "verdict_counts": {
+        "correct": 3,
+        "not_supported": 12
+      },
+      "pair_accuracy": 0.2,
+      "type_accuracy": 0.2
+    },
+    "论战": {
+      "n": 4,
+      "verdict_counts": {
+        "wrong_type": 1,
+        "not_supported": 3
+      },
+      "pair_accuracy": 0.25,
+      "type_accuracy": 0.0
+    },
+    "通信": {
+      "n": 3,
+      "verdict_counts": {
+        "correct": 1,
+        "not_supported": 2
+      },
+      "pair_accuracy": 0.3333,
+      "type_accuracy": 0.3333
+    }
+  },
+  "revision_rules": [
+    {
+      "dimension": "risk",
+      "value": "critical",
+      "n": 184,
+      "errors": 103,
+      "error_rate": 0.5598,
+      "dominant_error": "not_supported",
+      "suggestion": "critical 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "risk",
+      "value": "high",
+      "n": 46,
+      "errors": 40,
+      "error_rate": 0.8696,
+      "dominant_error": "not_supported",
+      "suggestion": "high 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "risk",
+      "value": "low",
+      "n": 160,
+      "errors": 113,
+      "error_rate": 0.7063,
+      "dominant_error": "not_supported",
+      "suggestion": "low 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "risk",
+      "value": "medium",
+      "n": 10,
+      "errors": 9,
+      "error_rate": 0.9,
+      "dominant_error": "not_supported",
+      "suggestion": "medium 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "confidence",
+      "value": "low",
+      "n": 170,
+      "errors": 98,
+      "error_rate": 0.5765,
+      "dominant_error": "not_supported",
+      "suggestion": "low 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "confidence",
+      "value": "medium",
+      "n": 230,
+      "errors": 167,
+      "error_rate": 0.7261,
+      "dominant_error": "not_supported",
+      "suggestion": "medium 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "support",
+      "value": "associated",
+      "n": 113,
+      "errors": 22,
+      "error_rate": 0.1947,
+      "dominant_error": "wrong_type",
+      "suggestion": "associated 层以 wrong_type 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "support",
+      "value": "insufficient",
+      "n": 239,
+      "errors": 239,
+      "error_rate": 1.0,
+      "dominant_error": "not_supported",
+      "suggestion": "insufficient 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "type",
+      "value": "交游",
+      "n": 112,
+      "errors": 77,
+      "error_rate": 0.6875,
+      "dominant_error": "not_supported",
+      "suggestion": "交游 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "type",
+      "value": "亲属关系",
+      "n": 5,
+      "errors": 5,
+      "error_rate": 1.0,
+      "dominant_error": "not_supported",
+      "suggestion": "亲属关系 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "type",
+      "value": "创作合作",
+      "n": 13,
+      "errors": 11,
+      "error_rate": 0.8462,
+      "dominant_error": "not_supported",
+      "suggestion": "创作合作 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "type",
+      "value": "合作",
+      "n": 31,
+      "errors": 21,
+      "error_rate": 0.6774,
+      "dominant_error": "not_supported",
+      "suggestion": "合作 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "type",
+      "value": "同属组织",
+      "n": 67,
+      "errors": 30,
+      "error_rate": 0.4478,
+      "dominant_error": "not_supported",
+      "suggestion": "同属组织 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "type",
+      "value": "地下通讯",
+      "n": 10,
+      "errors": 9,
+      "error_rate": 0.9,
+      "dominant_error": "not_supported",
+      "suggestion": "地下通讯 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "type",
+      "value": "师生关系",
+      "n": 4,
+      "errors": 4,
+      "error_rate": 1.0,
+      "dominant_error": "not_supported",
+      "suggestion": "师生关系 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "type",
+      "value": "待核验",
+      "n": 103,
+      "errors": 68,
+      "error_rate": 0.6602,
+      "dominant_error": "not_supported",
+      "suggestion": "待核验 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "type",
+      "value": "文学论战",
+      "n": 9,
+      "errors": 8,
+      "error_rate": 0.8889,
+      "dominant_error": "not_supported",
+      "suggestion": "文学论战 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "type",
+      "value": "签名联署",
+      "n": 19,
+      "errors": 13,
+      "error_rate": 0.6842,
+      "dominant_error": "not_supported",
+      "suggestion": "签名联署 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "type",
+      "value": "纪念/悼念",
+      "n": 15,
+      "errors": 12,
+      "error_rate": 0.8,
+      "dominant_error": "not_supported",
+      "suggestion": "纪念/悼念 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    },
+    {
+      "dimension": "type",
+      "value": "论战",
+      "n": 4,
+      "errors": 4,
+      "error_rate": 1.0,
+      "dominant_error": "not_supported",
+      "suggestion": "论战 层以 not_supported 为主，建议整层按裁决模式修订（降级待证 / 改类型）后复算"
+    }
+  ],
+  "warnings": []
 }

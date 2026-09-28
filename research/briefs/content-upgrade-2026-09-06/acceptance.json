@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "purpose": "内容研究包的冻结验收契约。执行者在R内实现自检；机器检查不能替代独立史料语义复核。",
+  "output_root": "research/content-upgrade-2026-09-06",
+  "baseline": "research/briefs/content-upgrade-2026-09-06/baseline.json",
+  "required_outputs": [
+    "INDEX.md",
+    "PROGRESS.md",
+    "BLOCKED.md",
+    "selection.json",
+    "facts.jsonl",
+    "evidence.jsonl",
+    "relations.jsonl",
+    "dossiers.jsonl",
+    "topics.json",
+    "change_proposals.csv",
+    "search_log.jsonl",
+    "validation_report.md",
+    "verification/"
+  ],
+  "selection": {
+    "persons": "baseline.selection.person_ids；恰30个不重复ID",
+    "events": "baseline.selection.event_ids；恰20个不重复ID",
+    "places": "baseline.selection.place_ids；恰10个不重复ID",
+    "relation_sample": "baseline.selection.relation_sample_ids；400个唯一ID，不得重抽",
+    "phase7": "baseline.selection.phase7_relation_ids；12个唯一ID，不得换样",
+    "relation_union": "两组并集411；交集仅REL-00097；每条结果注明所属组",
+    "extra_entities": "允许研究背景实体，另列，不替换冻结对象或重复计入60份档案"
+  },
+  "enums": {
+    "evidence_support": [
+      "support",
+      "associated",
+      "conflict",
+      "insufficient"
+    ],
+    "review_status": [
+      "pending_human_review"
+    ],
+    "content_status": [
+      "review_ready_draft",
+      "limited_report"
+    ],
+    "retrieval_status": [
+      "retrieved",
+      "local_checked",
+      "not_found",
+      "access_failed",
+      "not_attempted"
+    ]
+  },
+  "records": {
+    "facts.jsonl": {
+      "required": [
+        "claim_id",
+        "entity_type",
+        "entity_id",
+        "statement",
+        "evidence_support",
+        "evidence_ids",
+        "search_log_ids",
+        "review_status",
+        "scope_note"
+      ],
+      "rules": [
+        "claim_id唯一；同一事实跨专题复用ID",
+        "support必须有可定位证据；conflict须列冲突陈述与相关来源",
+        "insufficient若记完成研究，必须有与该事实对应的检索或访问失败回执",
+        "一份候选证据不自动证明人物身份、时间、地址和因果等所有字段"
+      ]
+    },
+    "evidence.jsonl": {
+      "required": [
+        "evidence_id",
+        "source_title",
+        "author_or_institution",
+        "version",
+        "source_family",
+        "source_level",
+        "source_type",
+        "source_url",
+        "local_path",
+        "accessed_at",
+        "locator",
+        "quote",
+        "locator_context",
+        "content_hash",
+        "hash_basis",
+        "quote_sha256",
+        "retrieval_status",
+        "review_status"
+      ],
+      "rules": [
+        "URL与local_path至少一个；author/version未知时明确unknown，不编造",
+        "quote为连续短引文；省略或字形规范化另记说明，不冒充逐字原文",
+        "locator_context包含核对年/月/日或页码所需上下文，不能拼接无关段落",
+        "hash_basis明确response_bytes、local_file_bytes或retained_excerpt；不得混称",
+        "仅保存必要短摘录；不将完整原书复制到R",
+        "同一日记的不同年份、转载或转录不计为独立原始来源；论文复述同一日记不构成该通信的第二见证",
+        "source_level按现有项目规则评估，不因政府/大学域名自动视为一手档案"
+      ]
+    },
+    "relations.jsonl": {
+      "required": [
+        "relation_id",
+        "groups",
+        "source_person_id",
+        "target_person_id",
+        "original_relation_type",
+        "proposed_relation_type",
+        "evidence_support",
+        "reason",
+        "evidence_ids",
+        "search_log_ids",
+        "review_status",
+        "ai_executor",
+        "checked_at",
+        "human_verdict",
+        "human_reviewer",
+        "human_reviewed_at"
+      ],
+      "rules": [
+        "恰411个唯一ID，与冻结并集完全相等",
+        "三个人工字段必须为空；AI执行身份另记",
+        "support需原文支持双方及具体关系，不能只因同组织、共现、低风险或高分判定",
+        "关联、冲突、不足不能被改写成已证实的交往",
+        "400样本、12候选、411合计分别统计；禁止输出伪造准确率"
+      ]
+    },
+    "dossiers.jsonl": {
+      "required": [
+        "entity_type",
+        "entity_id",
+        "document_path",
+        "claim_ids",
+        "gaps",
+        "content_status"
+      ],
+      "rules": [
+        "恰30个人物、20个事件、10个地点；ID分别与冻结集合相等",
+        "人物覆盖姓名/别名、与左联关系、生卒、研究时段活动、作品刊物职责、交往七类检查项，缺项具体列出",
+        "事件覆盖存在、日期精度、地点、参与者角色、经过与意义；意义是解释时标明",
+        "地点覆盖名称、有效年代、历史地址、现代对应、沿革、活动、坐标来源与精度",
+        "档案正文有实质内容和证据链接；仅模板、名单或通用段落不得标review_ready_draft"
+      ]
+    },
+    "topics.json": {
+      "required_per_topic": [
+        "topic_id",
+        "title",
+        "research_question",
+        "document_path",
+        "claim_ids",
+        "entity_ids",
+        "content_status",
+        "limits"
+      ],
+      "required_topics": [
+        "书信、书刊与出版往来",
+        "左联成立及组织演变",
+        "龙华事件相关人物与记载",
+        "女性作家的活动与交往",
+        "上海文化空间与机构迁移"
+      ],
+      "rules": [
+        "恰5个专题入口；不能改成5个人物简介冒充5个专题",
+        "review_ready_draft至少有5件可定位具体材料，具有叙事过程；同时由独立审核确认非重复灌水",
+        "limited_report包括已查材料、负面发现、剩余问题和失败回执",
+        "单源专题标明来源视角；所有新历史解释仍待人工复核",
+        "完整专题和受限专题分别计数；任何未研究任务或缺口均须在整体状态中如实披露"
+      ]
+    },
+    "change_proposals.csv": {
+      "required": [
+        "proposal_id",
+        "entity_type",
+        "entity_id",
+        "field",
+        "old_value",
+        "proposed_value",
+        "evidence_ids",
+        "reason",
+        "uncertainty",
+        "affected_ids",
+        "review_status"
+      ],
+      "rules": [
+        "只提出建议，不运行生产写入；已有旧值要从冻结基线读取",
+        "事件删除、改名、合并必须列出参与者/事实证据/展示层影响，不实际执行",
+        "没有建议时允许仅表头，另在报告说明未获得足够依据"
+      ]
+    },
+    "search_log.jsonl": {
+      "required": [
+        "search_id",
+        "claim_or_relation_ids",
+        "round",
+        "query_or_local_probe",
+        "source_url_or_path",
+        "attempted_at",
+        "result",
+        "failure_detail",
+        "receipt_path"
+      ],
+      "rules": [
+        "按未解决事实最多两轮；每轮最多3次不同查询、阅读最多3份新材料",
+        "不能把一次搜索摘要当作已阅读全文",
+        "每条不足记录有针对该对象的检索过程；可复用同一来源回执，但不能批量套同一无关失败理由",
+        "访问失败、未检索到、尚未尝试分开；未尝试不能当作已完成"
+      ]
+    }
+  },
+  "baseline_checks": {
+    "protected_files": "逐个核对baseline.protected_sha256，任何变化失败；输入目录有新增/删除也须识别并报告",
+    "allowed_writes": "仅R；B中的冻结规格不得由执行者改写；原工作树未提交成果全部保留",
+    "pytest": "至少107 passed；0 failed/0 skipped/0 xfailed",
+    "schema": "0 errors；warnings不大于13；禁止为通过此项改正式数据",
+    "static": "输出到R/verification/static；162 people/0 relation cards/147 events；不得将候选专题混入正式静态构建",
+    "phase7_validator": "既有候选校验通过",
+    "local_links": "档案、专题、索引内部链接全部存在；不可逃逸输出目录以引用不存在的伪文件；可链接原始只读项目资料",
+    "reproducibility": "固定证据和输入生成的结构化产物二跑一致；运行时间等变化字段单独存日志",
+    "counterexamples": [
+      "副本中support引文置空应失败",
+      "副本中定位日期换成不支持该摘录的日期，应由定位检查或有原文对照的语义审计失败",
+      "副本中复制ID并漏掉一个冻结ID应失败"
+    ]
+  },
+  "completion": {
+    "complete_for_review": "冻结范围全部经过实质调查；5个review_ready_draft专题及60份有内容档案；411条完成预审；机器守门通过。这里只表示可交人工复核，不表示史实已转正。",
+    "limited_delivery": "达到约定检索上限仍缺证、访问失败、输入漂移或专题材料不足，逐项保留回执并披露距离目标的差额；不得称全面完成。",
+    "not_complete": "仍有未处理条目、只填空模板、批量missing无对应检索、伪造引用或人工签字、验证未完成。"
+  }
+}

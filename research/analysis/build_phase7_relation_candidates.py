@@ -12,7 +12,7 @@
 
 开始查证后不得换样本；二跑相同12条和相同顺序。
 
-证据核验结论（VERIFIED_EVIDENCE）为人工逐条核验后登记的常量：
+证据核验结论（VERIFIED_EVIDENCE）为 AI 辅助查证后登记的候选常量，未经人工裁决：
 - 只允许 support / associated / conflict / insufficient；
 - support 要求原文直接证明该具体关系，且 locator、逐字短引文均非空；
 - 共现/同组织/背景一律记 associated，不得标 support；
@@ -95,7 +95,7 @@ PENDING = "pending_human_review"
 MAX_SOURCES_PER_RELATION = 2
 MAX_SOURCES_TOTAL = 30
 
-# 人工逐条核验登记：relation_id -> 证据清单（按核验顺序，最多2个独立来源族）。
+# AI 辅助查证登记：relation_id -> 候选证据清单（最多2个独立来源族）。
 # 引文均在本地保存的原文中逐字复核；P7-001 的公开转录页面本轮 HTTP 200，
 # 其余公开链接保留为人工复开入口。这里不把同组织共现升级为交游。
 VERIFIED_EVIDENCE: dict[str, list[dict[str, str]]] = {
@@ -116,9 +116,9 @@ VERIFIED_EVIDENCE: dict[str, list[dict[str, str]]] = {
         "candidate_source_id": "CAND-SRC-P7-001", "source_title": "鲁迅日记·日记十七（1928年）",
         "source_path_or_url": "https://zh.wikisource.org/zh-hans/鲁迅日记/日记十七",
         "source_family": "鲁迅日记", "source_level": "B（公开转录的一手日记；本地逐字核对）",
-        "locator": "1928年2月26日条", "quote": "晚复。寄霁野信。",
+        "locator": "1928年2月26日条", "quote": "寄霁野信。",
         "access_date": "2026-09-04", "receipt_id": "P7-RCP-001",
-        "researcher_note": "直接记录寄信，支持通信。",
+        "researcher_note": "直接记录寄信，支持通信。2026-09-05按日期重核：仅摘取寄霁野信，去掉指向上一位通信对象的晚复。",
     }],
     "REL-00109": [{
         "proposed_relation_type": "通信", "evidence_support": "support",
@@ -143,9 +143,9 @@ VERIFIED_EVIDENCE: dict[str, list[dict[str, str]]] = {
         "candidate_source_id": "CAND-SRC-P7-001", "source_title": "鲁迅日记·日记十七（1928年）",
         "source_path_or_url": "https://zh.wikisource.org/zh-hans/鲁迅日记/日记十七",
         "source_family": "鲁迅日记", "source_level": "B（公开转录的一手日记；本地逐字核对）",
-        "locator": "1928年4月2日条", "quote": "达夫招饮于陶乐春，与广平同往。",
+        "locator": "1928年4月2日条", "quote": "达夫招饮于陶乐春，与广平同往",
         "access_date": "2026-09-04", "receipt_id": "P7-RCP-001",
-        "researcher_note": "直接共同活动记录，支持此条交游；不据此断言私人关系性质。",
+        "researcher_note": "直接共同活动记录，支持此条交游；不据此断言私人关系性质。2026-09-05按日期重核：截取连续原文片段，不把后续逗号改写为句号。",
     }],
     "REL-00097": [{
         "proposed_relation_type": "通信", "evidence_support": "support",
@@ -374,7 +374,7 @@ def _write_report(
         "",
         f"- 数据快照说明：只读生产数据（{SNAPSHOT_NOTE}实测基线）；本轮不写生产数据，公开关系仍为0。",
         f"- 冻结样本：{len(selection)} 条关系（见 phase7_relation_selection.csv，开始查证后未替换）。",
-        f"- 候选行：{len(cand_df)} 行；独立来源（回执）：{len(receipt_df)} 个（上限30，每条关系最多2个来源族）。",
+        f"- 候选行：{len(cand_df)} 行；来源回执：{len(receipt_df)} 个；非空来源族：{cand_df.loc[cand_df['source_family'].ne(''), 'source_family'].nunique()} 个。不同年份的《鲁迅日记》不算相互独立的来源族。",
         "- 结论口径（仅计数，非准确率、非总体可信度）：",
     ]
     for label in ("support", "associated", "conflict", "insufficient"):

@@ -1,0 +1,13 @@
+﻿evidence_id,date,person_ids,quote,source_ref,source_url,locator,source_family,statement_scope,review_status
+CAND-RELE-P7-001,1928-11-26,ZLH-001;ZLH-124,夜得小峰信及《而已集》、《语丝》。,research/raw_texts/日记全编：全2册 (鲁迅 著) (Z-Library).txt,https://zh.wikisource.org/zh-hans/鲁迅日记/日记十七,1928年11月26日条,鲁迅日记,直接记录收信，支持通信；不外推通信频率。,pending_human_review
+CAND-RELE-P7-002,1928-02-26,ZLH-001;ZLH-071,寄霁野信。,research/raw_texts/日记全编：全2册 (鲁迅 著) (Z-Library).txt,https://zh.wikisource.org/zh-hans/鲁迅日记/日记十七,1928年2月26日条,鲁迅日记,直接记录寄信，支持通信。,pending_human_review
+CAND-RELE-P7-003,1928-09-26,ZLH-001;ZLH-139,午后寄陈望道信并稿。,research/raw_texts/日记全编：全2册 (鲁迅 著) (Z-Library).txt,https://zh.wikisource.org/zh-hans/鲁迅日记/日记十七,1928年9月26日条,鲁迅日记,直接记录寄信，支持通信。,pending_human_review
+CAND-RELE-P7-004,1928-04-01,ZLH-001;ZLH-015,得郁达夫信。,research/raw_texts/日记全编：全2册 (鲁迅 著) (Z-Library).txt,https://zh.wikisource.org/zh-hans/鲁迅日记/日记十七,1928年4月1日条,鲁迅日记,直接记录收信，支持通信。,pending_human_review
+CAND-RELE-P7-005,1928-04-02,ZLH-001;ZLH-122,达夫招饮于陶乐春，与广平同往,research/raw_texts/日记全编：全2册 (鲁迅 著) (Z-Library).txt,https://zh.wikisource.org/zh-hans/鲁迅日记/日记十七,1928年4月2日条,鲁迅日记,直接共同活动记录，支持此条交游；不据此断言私人关系性质。,pending_human_review
+CAND-RELE-P7-006,1928-11-24,ZLH-001;ZLH-128,午后寄语堂信。,research/raw_texts/日记全编：全2册 (鲁迅 著) (Z-Library).txt,https://zh.wikisource.org/zh-hans/鲁迅日记/日记十七,1928年11月24日条,鲁迅日记,直接记录寄信，支持通信。,pending_human_review
+CAND-RELE-P7-007,1935-02-21,ZLH-001;ZLH-009,午后寄郑伯奇信。,research/raw_texts/日记全编：全2册 (鲁迅 著) (Z-Library).txt,https://zh.wikisource.org/zh-hans/鲁迅日记/日记二十四,1935年2月21日条,鲁迅日记,直接记录寄信，支持通信。,pending_human_review
+CAND-RELE-P7-008,1928-07-20,ZLH-001;ZLH-005,复冯雪峰信。,research/raw_texts/日记全编：全2册 (鲁迅 著) (Z-Library).txt,https://zh.wikisource.org/zh-hans/鲁迅日记/日记十七,1928年7月20日条,鲁迅日记,直接记录复信，支持通信。,pending_human_review
+TOPIC-001,1928-09-26,ZLH-001;ZLH-139;ZLH-124;ZLH-005,午后寄陈望道信并稿。下午得小峰信并《奔流》、《语丝》、《北新》。得冯雪峰信，晚复。,research/raw_texts/日记全编：全2册 (鲁迅 著) (Z-Library).txt,https://zh.wikisource.org/zh-hans/魯迅日記/日記十七,1928-09-26日记条,鲁迅日记,同日三项往来；稿件篇名未核，不据此确认多人合作,pending_human_review
+TOPIC-002,1928-11-27,ZLH-001;ZLH-016;ZLH-124,午后同柔石往北新书局访小峰，又至商务印书馆阅书。,research/raw_texts/日记全编：全2册 (鲁迅 著) (Z-Library).txt,https://zh.wikisource.org/zh-hans/魯迅日記/日記十七,1928-11-27日记条,鲁迅日记,一次同行访人与阅书；机构身份及准确地址另核,pending_human_review
+TOPIC-003,1928-11-24,ZLH-001,往内山书店取《世界美術全集》（23）一本，一元七角,research/raw_texts/日记全编：全2册 (鲁迅 著) (Z-Library).txt,https://zh.wikisource.org/zh-hans/魯迅日記/日記十七,1928-11-24日记条,鲁迅日记,日记字形照录；取书活动，不确认历史地址,pending_human_review
+TOPIC-004,1932,ZLH-139,《修辞学发凡》初版于1932年,https://xbzs.ecnu.edu.cn/CN/html/201306007.htm,https://xbzs.ecnu.edu.cn/CN/html/201306007.htm,二（一）关于《修辞学发凡》版本的沿革及选取，第1段；陈望道与鲁迅往来讨论段,ecnu_201306007,具名研究文献记载该书1932年初版由大江书铺出版；不证明1928年9月26日稿件篇名,pending_human_review
