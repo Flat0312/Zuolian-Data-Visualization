@@ -3,6 +3,10 @@ from __future__ import annotations
 import unicodedata
 from pathlib import Path
 
+import pytest
+
+from conftest import requires_local_texts
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REVIEW_PATH = (
     REPO_ROOT
@@ -32,6 +36,7 @@ def test_review_file_covers_four_topics_with_verdicts() -> None:
         assert banned not in text
 
 
+@requires_local_texts(HISTORY, DICTIONARY)
 def test_review_cites_verifiable_ocr_originals_from_sources() -> None:
     text = REVIEW_PATH.read_text(encoding="utf-8")
     history = _normalize(HISTORY.read_text(encoding="utf-8", errors="ignore"))

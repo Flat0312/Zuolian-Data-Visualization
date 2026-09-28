@@ -24,7 +24,7 @@ from collections import Counter
 from pathlib import Path
 
 import pytest
-from conftest import PROJECT_ROOT
+from conftest import PROJECT_ROOT, requires_local_texts
 
 # 用 append 而非 insert(0)：避免改变 sys.path 顺序影响其他测试对 app 模块的解析。
 _ANALYSIS = str(PROJECT_ROOT / "research" / "analysis")
@@ -48,6 +48,25 @@ BATCH_MARKER = "P5-LANDING-2026-09-28"
 EXPECTED_LANDED = 20
 EXPECTED_PUBLIC = 5
 EXPECTED_QUEUE = 28
+
+
+def _required_local_texts() -> list[Path]:
+    """本批证据涉及的本地版权全文；按 .gitignore 政策不入库，缺失时相关测试跳过。"""
+    paths: set[Path] = set()
+    if EVIDENCE_JSONL.exists():
+        with open(EVIDENCE_JSONL, encoding="utf-8") as fh:
+            for line in fh:
+                if not line.strip():
+                    continue
+                raw = str(json.loads(line).get("local_path") or "").strip()
+                if raw:
+                    candidate = Path(raw)
+                    paths.add(candidate if candidate.is_absolute() else PROJECT_ROOT / raw)
+    return sorted(paths)
+
+
+LOCAL_TEXTS = _required_local_texts()
+requires_texts = requires_local_texts(*LOCAL_TEXTS)
 
 
 def _rows(path: Path) -> list[dict[str, str]]:
@@ -114,6 +133,7 @@ def test_name_candidates_filters_single_char_aliases() -> None:
 # ------------------------------------------------- 生产层独立复核（不信任脚本）
 
 
+@requires_texts
 def test_public_relations_support_quotes_attest_both_parties(bundles) -> None:
     """公开层每条关系，其本批 support 引文必须同时记载双方当事人。"""
     persons = {r["person_id"]: r for r in _rows(DATA / "persons.csv")}
@@ -136,6 +156,7 @@ def test_public_relations_support_quotes_attest_both_parties(bundles) -> None:
         assert ok, f"{rid} 公开引文未同时记载双方：{basis}"
 
 
+@requires_texts
 def test_landed_support_evidence_is_verbatim_in_local_source(overnight_evidence, bundles) -> None:
     """本批落地的每条 support 证据，引文必须逐字命中本地原文且哈希自洽。"""
     ledger = _rows(LEDGER)
@@ -216,6 +237,7 @@ def _load_module():
     return module
 
 
+@requires_texts
 def test_replay_from_pinned_pre_landing_commit(tmp_path: Path) -> None:
     """红→绿：旧基线公开关系为 0，落地后恰为 5；二跑零写入。"""
     dest = tmp_path / "baseline"

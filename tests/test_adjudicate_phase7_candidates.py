@@ -5,8 +5,13 @@ import unicodedata
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
+from conftest import RUNTIME_TEXTS, requires_local_texts
 from research.analysis.adjudicate_phase7_candidates import adjudicate
+
+# adjudicate() 内部要读本地《左联史》《左联词典》做逐字回定位；这些文件按政策不入库。
+pytestmark = requires_local_texts(*RUNTIME_TEXTS)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]

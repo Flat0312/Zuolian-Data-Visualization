@@ -17,6 +17,24 @@ if str(FRONTEND_DIR) not in sys.path:
     sys.path.insert(0, str(FRONTEND_DIR))
 
 
+# 版权全文按 .gitignore 政策只留本地、不入库（research/raw_texts/ 与
+# data/processed/runtime_sources/*.txt）。依赖它们做逐字复核的测试在缺少文件时
+# 必须跳过而不是失败——CI 与全新克隆本来就拿不到这些文件。
+RUNTIME_HISTORY = PROJECT_ROOT / "data" / "processed" / "runtime_sources" / "左联史.txt"
+RUNTIME_DICTIONARY = PROJECT_ROOT / "data" / "processed" / "runtime_sources" / "左联词典.txt"
+RUNTIME_TEXTS = (RUNTIME_HISTORY, RUNTIME_DICTIONARY)
+
+
+def requires_local_texts(*paths: Path):
+    """生成 skipif 标记：任一本地版权全文缺失即跳过该测试。"""
+    candidates = [Path(p) for p in paths] or [Path(p) for p in RUNTIME_TEXTS]
+    missing = [p.name for p in candidates if not p.exists()]
+    return pytest.mark.skipif(
+        bool(missing),
+        reason="本地版权全文不入库（.gitignore 政策），缺少：" + ", ".join(missing),
+    )
+
+
 def write_csv(path: Path, rows: list[dict], columns: list[str]) -> None:
     frame = pd.DataFrame(rows, columns=columns)
     path.parent.mkdir(parents=True, exist_ok=True)

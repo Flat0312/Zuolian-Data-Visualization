@@ -53,6 +53,14 @@ research/notebooks/.ipynb_checkpoints/
 # Register metadata/page locators/short quotes instead; see research/drafts/reports/
 research/raw_texts/
 
+# Same policy for the runtime OCR full texts used by verbatim re-verification
+# (quote_attestation / apply_phase5_relation_landing / adjudicate_phase7_candidates).
+# These two books were tracked by mistake from 3e31647 and untracked on 2026-09-28;
+# the blobs still exist in history before that date. Keep them local, cite by
+# locator + short quote + sha256 instead. The .json here is a table of contents,
+# not full text, and stays tracked.
+data/processed/runtime_sources/*.txt
+
 # Generated site output
 docs/
 
