@@ -1,5 +1,56 @@
 # Progress Log - 左联知识库
 
+## 2026-09-28（第二批）- 推送上线、版权全文停止入库、CI 修绿、引文重捕候选包
+
+**A. 推送与线上生效**：内层仓库推送至 `origin/main`（`53ccf9c..feaaf10`，后接 `c7835e7`），
+GitHub Pages 已重新部署。线上实测 `relations/index.html` 显示「共 5 组人物关系」并列出
+张庚×陈白尘、鲁迅×王任叔、鲁迅×林语堂、郭沫若×夏征农、鲁迅×李霁野；
+`assets/graph-data.json` 为 162 节点 / 5 条边。公开关系图谱首次非空。
+
+**B. 版权全文停止入库**：`data/processed/runtime_sources/` 下《左联史》《左联词典》两份 OCR 全文
+（blob 4,227,686 B / 1,981,658 B）自 `3e31647` 起被跟踪并已在公开远端，与 `.gitignore` 里
+「版权原文只留本地、绝不推送公开仓库」的政策冲突。已 `git rm --cached` 并补
+`data/processed/runtime_sources/*.txt` 忽略规则；磁盘文件保留（逐字复核仍需在本地读取）；
+同目录 `左联回忆录_ocr_text.json` 只是篇目目录（3.8 KB），继续跟踪。
+**历史中的 blob 仍可取回**——彻底清除需重写历史并强推，会打断 4 处钉住历史提交的测试锚点，未获授权不做。
+外层 `D:\1大创` 的 `origin` 已按指示摘除（本地 4 个提交与索引完好，可 `git remote add` 复原），
+"一次 `git push -f` 就用 23 文件旧快照覆盖真实项目并推送版权全文"的风险解除。
+
+**C. CI 修绿（smoke-check 自 8 月起就是红的）**：推送后核查发现 11 failed / 5 errors；
+再查上一个远端提交 `53ccf9c`（2026-08-27）的 check-run，`quality` 作业结论当时已是 failure，
+即 CI 红不是本轮引入。三类根因分别修掉：①`actions/checkout` 默认 `fetch-depth: 1` 浅克隆，
+取不到被测试钉住的历史提交，`git archive <sha>` 一律 exit 128（影响 batch4a 4 项、
+batch3_real_baseline 1 项，以及本轮新增的 2 项）→ 改为 `fetch-depth: 0`；
+②`test_phase7_independent_audit`（5 项）依赖 `.gitignore` 排除的鲁迅日记全文 → 整模块加
+`requires_local_texts` 跳过守卫，`conftest` 增补 `RAW_DIARY` 常量；
+③`test_batch4a_candidate_audit` 断言 `Path(target).is_absolute()`，而凭据记的是本机 Windows
+绝对路径，Linux runner 上 `PosixPath` 判假 → 改用 `PureWindowsPath` 判定，不放宽语义。
+实测：临时移走全部三份版权全文后 **129 passed / 12 skipped / 0 failed**（跳过原因逐条可读），
+文件已还原；本地全文齐备时 147 passed。推送后 `quality`／`build`／`deploy` 三个作业全部 success。
+另修掉 1 处既有 lint 债务（`validate_phase7_relation_candidates.py` import 块空行，ruff I001），
+使 README 写明的验收命令恢复全绿。
+
+**D. 引文重捕候选包（下一批的输入，生产层零改动）**：`build_phase5_quote_recapture_candidates.py`
+把队列里 9 条 `recapture_quote_then_regrade` 按**句读边界**重切，并加两道硬门：
+重切片段必须是归一化文本中的连续片段（记录起止偏移＋quote_sha256）、且必须落在夜间轮登记的
+**同一页**——页码不一致即判为"全书别处的另一段共现"而非同一处引文的重捕。
+结果只有 **2 条**通过：REL-00622（周扬—邵荃麟，左联史 第504页，叙述性同往内山书店，
+名单句式 no，投影 supported）、REL-01368（郁达夫—陈望道，左联词典 第132页，名单句式 yes，
+投影 supported）。被拒 7 条：3 条页码不一致（阳翰笙—林淡秋 189 人签名名单、殷夫—李辉英 冯铿词条、
+叶紫—戴望舒 书目提要，全部名单句式）、3 条句子跨页标记、1 条纯顿号罗列。
+新增 `name_list_pattern` 标注列（识别「等N人／等共N人」收束与长串顿号并列），
+因为名单句式对 `签名联署` 可能是直接证据、对 `交游/同属组织` 只是共现，属人工判断而非自动否决。
+**REL-01368 另有隐患已在报告与 BLOCKED 中标红**：重切段落是 1933-05-23 营救丁玲、潘梓年的
+38 人联名致电，而夜间轮 `reason` 指《为横死之小林遗族募捐启》9 人名单——两者都真但不是同一份文献。
+产物：`phase5_quote_recapture_candidates.csv`（28 行 × 29 列，全部 `pending_human_review`）
+＋ `phase5_quote_recapture_report.md`（含逐条引文、偏移、哈希、投影与人工需回答的五问）。
+守门测试 `tests/test_phase5_quote_recapture.py` 6 项：名单句式与句边界扩切的纯函数、
+候选包覆盖队列且全 pending、未重捕成功者不得带哈希、生成过程生产层 SHA256 零变化、
+重捕引文按偏移可原样取回且哈希自洽且不跨页且仍过双方佐证门、页码不一致者不得成为可发布候选。
+
+**验收**：全量 pytest **147 passed**（141＋6）、Schema 0 err / 13 warn、Ruff 全绿、
+`git diff --check` 通过、CI 三作业 success、线上 Pages 已核对。
+
 ## 2026-09-28 - Phase 5 裁决生产层落地：公开关系 0 → 5，并查出引文窗口捕错的系统性缺陷
 
 **范围**：把 2026-09-20 已授权的 400 条裁决中证据合格的部分落入生产层，首次让发布层与静态站的关系图谱非空。授权沿用当日逐字授权语，口径为「授权按建议执行」，非逐条独立人工复核。

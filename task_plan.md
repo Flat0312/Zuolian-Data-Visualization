@@ -27,7 +27,9 @@
 - [x] 400 条关系裁决完成（2026-09-20 授权按建议执行，路径 C；成立率 40.2%／类型准确率 33.8%）。规范审核包 `phase5_relation_review_package.csv` 保持空裁决，如需逐条独立复核可另起并覆盖。
 - [x] 总体与分层准确率、错误率与 19 条修订规则已生成（`phase5_review_accuracy_report.md`）。
 - [x] 裁决落地生产层（2026-09-28）：公开关系 0→5，发布层/静态站/四口径全部重建。
-- [ ] 处理 `phase5_quote_recapture_queue.csv` 的 28 条引文重捕（见 BLOCKED.md 2026-09-28 节）。
+- [ ] 裁决 `phase5_quote_recapture_candidates.csv` 的 2 条重捕候选（REL-00622 叙述性同往、
+      REL-01368 名单句式且与 reason 所指文献不同），其余 26 条按 `recapture_status` 分类处置。
+      候选包生产层零改动、全部 `pending_human_review`；裁决后须另起幂等落地脚本。
 - [x] 界定引文缺陷范围：`research/drafts/reports/evidence_verbatim_audit_2026-09-28.md`——夜间轮 182 条引文逐字全真、选段错误约 56%；事件/人物事实证据层 442 条可核 0 条未命中，覆盖率口径不受影响。
 - [x] 校正研究观察与历史解释的边界，撤下证据不足的强结论。
 - [x] 完成首篇专题初稿、10个人物片段与5个地点或机构内容卡。
