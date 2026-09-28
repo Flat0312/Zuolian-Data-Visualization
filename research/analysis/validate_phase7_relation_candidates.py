@@ -7,7 +7,6 @@ import hashlib
 from collections import Counter
 from pathlib import Path
 
-
 REQUIRED_SUPPORT_FIELDS = ("candidate_source_id", "source_path_or_url", "locator", "quote", "receipt_id")
 ALLOWED_SUPPORT = {"support", "associated", "conflict", "insufficient"}
 
