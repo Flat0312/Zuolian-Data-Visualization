@@ -89,6 +89,31 @@ COLUMNS = [
     "old_attestation_basis", "overnight_reason", "review_status",
 ]
 
+SOURCE_DIRS = (DATA / "runtime_sources", ROOT / "research" / "raw_texts")
+
+
+def resolve_source(raw: str) -> Path:
+    """把队列里记录的来源路径解析成本机可读路径。
+
+    队列的 ``local_file`` 是生成当日的本机绝对路径（含 Windows 盘符），换机器或换系统即失效。
+    因此先按原样试，再按**文件名**在已知源目录里找——与
+    ``audit_phase7_candidates_independent._resolve_source_path`` 同一做法。
+    找不到就抛错，绝不静默跳过（跳过等于让候选包少一行而没人知道）。
+    """
+    text = str(raw or "").strip()
+    if not text:
+        raise SystemExit("队列行缺少 local_file，无法定位原文")
+    direct = Path(text)
+    if direct.exists():
+        return direct
+    name = direct.name
+    for directory in SOURCE_DIRS:
+        candidate = directory / name
+        if candidate.exists():
+            return candidate
+    raise SystemExit(f"来源文件不可用（原样与按文件名均未命中）: {text}")
+
+
 def _read(path: Path) -> list[dict[str, str]]:
     with open(path, encoding="utf-8-sig", newline="") as fh:
         return list(csv.DictReader(fh))
@@ -198,7 +223,7 @@ def recapture_one(
         out["recapture_status"] = "rejected_source_unavailable"
         return out
     text, flat, idx = bundle
-    book = BOOK_BY_FILE.get(Path(src).name, Path(src).stem)
+    book = BOOK_BY_FILE.get(resolve_source(src).name, resolve_source(src).stem)
     pa = persons.get(row["person_a_id"], {})
     pb = persons.get(row["person_b_id"], {})
     na, nb = name_candidates(pa), name_candidates(pb)
@@ -295,10 +320,7 @@ def build(queue_path: Path = QUEUE) -> list[dict[str, str]]:
     for row in queue:
         src = (row.get("local_file") or "").strip()
         if src and src not in bundles:
-            path = Path(src)
-            if not path.exists():
-                raise SystemExit(f"本地原文缺失，无法重捕：{path}")
-            bundles[src] = normalized_bundle(path)
+            bundles[src] = normalized_bundle(resolve_source(src))
 
     out: list[dict[str, str]] = []
     for row in sorted(queue, key=lambda r: r["relation_id"]):

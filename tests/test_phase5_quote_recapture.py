@@ -76,6 +76,7 @@ def test_candidates_cover_queue_and_are_all_pending() -> None:
             assert len(row["quote_sha256"]) == 64
 
 
+@requires_local_texts(*RUNTIME_TEXTS)
 def test_build_writes_nothing_to_production() -> None:
     before = {name: _sha256(DATA / name) for name in WATCHED}
     rows = build(_QUEUE)
