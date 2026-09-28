@@ -770,6 +770,12 @@ def render_relations_index(relations: list[dict[str, object]]) -> str:
       <p class="page-hero__lead">这里展示的是按人物对聚合后的关系摘要，适合快速定位谁和谁之间有何种关联、证据来自哪里。</p>
       <p class="page-hero__lead">默认公开层仅展示 <strong>verified（人工已确认）/ supported（材料支持，待人工确认；须有 support 证据 + locator + 引文/语境）</strong>；
       inferred（推断线索，未经人工核验）/ pending_review（待审核，未经人工核验）/ rejected（已驳回）仅保留在研究层，静态站不提供候选开关。</p>
+      <p class="page-hero__lead">公开层关系卡片全部为 derived <strong>supported</strong>（由证据派生，不含人工确认断言）：
+      每条都有一条 <code>support</code> 级证据，含可定位原文与逐字引文，且引文须同时记载关系双方
+      （鲁迅日记为日记体，作者即甲方，只需引文出现乙方）。同表随附的 <code>associated</code> 行只表示来源关联，
+      不断言支持强度，不得当作支持证据引用。本批人工裁决口径为「授权按建议执行」
+      （2026-09-20 用户会话授权，签核路径 C），非逐条独立人工复核，引用时须保留此口径。
+      critical/high 风险、待核验、推断类型、low 置信以及仅有关联级证据的关系一律不公开。</p>
       {empty_notice}
       <div class="filter-box">
         <label for="relations-filter">按人名、关系类型、证据关键词筛选</label>

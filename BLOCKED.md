@@ -1,5 +1,86 @@
 # BLOCKED
 
+## 2026-09-28 Phase 5 裁决落地：已闭环项与新增待人工项
+
+> **已闭环**：2026-09-20 登记的 queued 项之一「400 条样本裁决的生产层落地」已完成——公开关系 0→5，
+> 发布层/静态站/四口径全部重建，pytest 141 passed、Schema 0 err / 13 warn。
+> **Phase 7 候选裁决的生产层落地仍未做**（属另一批次，须另行幂等脚本与门禁）。
+> 「400 条修订规则应用于全量 4238 关系」仍属 P1 队列作业，本轮未做。
+
+### 待人工 1：28 条引文重捕队列（新增，阻塞关系继续公开）
+
+- `research/drafts/reports/phase5_quote_recapture_queue.csv`（28 行，全部 `pending_human_review`，生产层零改动）。
+- 成因：夜间轮记录的 `quote` 多为按页码截取的固定窗口，与同行 `reason` 描述的史实不一致。
+  48 条候选中仅 20 条引文真正同时记载双方当事人。**不得**据 `reason` 直接补引文，必须以重捕后的逐字复核为准。
+- 三类处置建议（队列 `proposed_action` 列）：`recapture_quote_then_regrade`（原文中存在同时记载两人的叙述性段落，
+  可重捕引文后再评级）、`cooccurrence_only_keep_associated`（同窗共现只是顿号人名罗列，属关联级，不得升 support）、
+  `no_local_support_mark_insufficient`（本地原文找不到任何同窗共现，应判证据不足）。
+- 队列每行附最佳同窗摘录、双方姓名距离与原文路径，可参照 2026-09-20 REL-00523 换引文先例逐条处理。
+- 检索注意：OCR 全文字间带空格（`鲁 迅`），必须先做空白归一化再匹配，否则任何关键词检索都会 0 命中。
+
+### 待人工 2：15 条已过佐证门但被保守规则挡住的关系
+
+- 通过双方佐证门的 20 条中 5 条进入公开层，其余 15 条因 critical/high 风险或推断类型留在 pending_review/inferred。
+- 要公开它们只能走 `human_adjudication` → `verified`，需逐条独立人工复核并写 reviewer/reviewed_at/review_note；
+  一次概括授权不足以代行，且会改变 `test_relation_publication_governance.py` 中「origin 全为 derived」的既有语义。等待明确授权。
+
+### 风险：两本书的 OCR 全文已在公开远端（与 .gitignore 政策冲突）
+
+- `.gitignore` 明写「Copyrighted raw source texts - keep local only, never push to public repo」并忽略 `research/raw_texts/`；
+  但内容完全相同的两份全文被 Git 跟踪且已在 `origin/main`（公开仓库 `Flat0312/Zuolian-Data-Visualization`）：
+  `data/processed/runtime_sources/左联史.txt`（blob 4,227,686 B）、`data/processed/runtime_sources/左联词典.txt`（blob 1,981,658 B），
+  自提交 `3e31647` 起在库；与 `research/raw_texts/` 下同名文件 SHA-256 完全一致（`A57277AD…`／`13968935…`）。
+- 停止跟踪（`git rm --cached` ＋补 .gitignore）只能阻止后续提交，历史里仍可取回；彻底移除需重写历史并强推，
+  会破坏本仓多处钉住历史提交的测试锚点（`30d5f77`、`2a87781`、`0f7d445`、`6c6a12b`）。
+- **未擅自处置**，等待裁决：接受现状 / 只停止跟踪 / 重写历史（须同步改测试锚点）。
+
+### 风险：外层 `D:\1大创` 与内层仓库指向同一 remote
+
+- 内层领先 `origin/main` 多个提交；远端仍停在 `53ccf9c`（2026-08-27），GitHub Pages 公开版本因此早于本地重建结果。
+- 外层 `D:\1大创` 用同一个 remote，HEAD 仅 23 文件、落后 23 个提交，索引中暂存着三本书全文的重命名记录
+  （`数据/原始文本/…`，磁盘上已删）。正常 push 会因非快进被拒，但一次 `git push -f` 就会用旧快照覆盖真实项目
+  并把版权全文推上公开仓库。**未擅自摘除外层 remote**，等待授权。
+
+---
+
+## 2026-09-20 P0 收尾执行：AI 侧完成，待人工裁决事项（置于首部）
+
+> **同日授权闭环**：用户对下列三项待裁决清单整体授权（逐字：「我都没问题，你自己看着办吧」，2026-09-20），当日全部执行完毕——
+> P0-1：400 条按建议全量裁决落地（`phase5_relation_review_adjudicated.csv`＋裁决登记），实测准确率报告已出（成立率 40.2%／类型准确率 33.8%／not_supported 59.8%，授权按建议口径）；
+> P0-2：REL-00523 换引文后升 support（正确段落逐字回定位校验），REL-01219/01743 升 associated，REL-00113 维持，裁决包 `phase7_relation_evidence_candidates_adjudicated.csv`；
+> P0-3：T2–T4 四处引文恢复原文逐字＋〔〕校注，T2–T5 升 review_ready_draft（topics.json 带 status_history）。
+> **剩余 queued**：Phase 7 裁决结果的生产层落地（relation_evidences 写入＋publish_status 转换＋发布层/静态站重建＋README 数据快照同步）属下一批次，须另行幂等脚本与门禁；400 条样本裁决的修订规则应用于全量 4238 关系属 P1 队列作业。以下原文保留作审计痕迹。
+
+### P0-1 四百条关系人工裁决未发生（审核包已就绪）
+
+- `phase5_relation_review_package.csv`（400 条，夜间轮回源分诊并入模板）与签核单已生成，`human_verdict`/`human_note` 全空——执行者不代签。
+- 三条签核路径见签核单 §3（逐条 / 分层批量授权 / 全量按建议授权）；任何授权语需明确点名路径与范围。
+- `analyze_relation_review.py` 已就绪但当前 `n_adjudicated=0`，报告如实输出「尚无人工裁决」，不提供任何预估准确率（吸取旧 AI 预审 `phase5_relation_review_ai_filled.csv` 的教训）。
+
+### P0-2 Phase7 候选冻结包与夜间轮二轮分诊存在口径分歧
+
+- 冻结包 4 条 insufficient 中，二轮已升级 3 条：REL-00523→support、REL-01219→associated、REL-01743→associated；冻结包未同步。
+- 独立审计（`phase7_candidate_independent_audit.csv`）结论：8 条 support 赞成；REL-01219/REL-01743 升级证据逐字核实，赞成；REL-00113 维持 insufficient。
+- **REL-00523 阻塞点**：二轮升级理由与左联史原文相符（「潘汉年就去看望他们」「介绍他俩一同加人左联」段已独立定位），但捕获引文 EVI-N1-E0960180FF3F 摘自同页茅盾段落，不含潘汉年或丁玲。替换引文前，support 升级缺乏逐字证据，不得转正。
+- 12 项裁决全部 pending_human_review。
+
+### P0-3 T2–T5 专题引文静默校改未注明（整改前维持 limited_report）
+
+- 4 处：T2「钱杏邨」（原文「钱杏邱」）、T3「柔石、胡也频」（原文「栖石、胡也频」）、T4「倚重鲁迅」（原文「倚重兼迅」）、T4 诗歌组名单标点归一。
+- 校改内容判断均正确，但违反本专题自身「引用保留原样并注明」承诺；整改二选一（恢复逐字＋括注校读，或明示校注行）后方可讨论升级。
+- 详见 `research/content-upgrade-overnight-2026-09-06/verification/independent_topic_review_2026-09-20.md`。
+
+---
+
+## 2026-09-05 内容修订的待补材料
+
+- 首篇专题的9月26日寄稿尚缺篇名、刊载位置及对应书信；不据相关研究的一般背景补填。
+- 五个地点或机构内容卡尚缺当日历史地址及沿革证据，不使用自动推定坐标生成精确行程。
+- 日记简称“小峰”“广平”与既有候选人物的对应仍需以人名注释复核；内容卡已单列。
+- 本轮按本地全文的年、月、日核对8条既有支持性候选引文。1935年公开页重取仍未成功，直接HTTP为403；该项继续待公开原文或可核验版本复核。1928年转录页可经浏览工具读取，但直接HTTP同为403，不改写为本轮直接请求成功。
+- 原有4条关系的insufficient结论不变。所有关系候选仍待人工裁决；本轮只修正两条摘录范围与候选报告表述，未转正生产史实。
+- 当前答辩文字位于 `research/drafts/defense/`。旧PPTX未重制，尚未实际演练；该状态不影响本轮专题初稿交付。
+
 ## 2026-09-04 Phase7 首批关系候选：待补原文（本轮不影响候选包交付）
 
 - `REL-00113`（鲁迅—巴比塞）、`REL-00523`（潘汉年—丁玲）、`REL-01219`（冯乃超—柔石）、`REL-01743`（丁玲—穆木天）未取得可逐字复核且能直接说明该具体关系的原文。本地《左联词典》OCR 只提供模糊线索，不能据此填引文或确认“交游”，均已如实列为 `insufficient`。

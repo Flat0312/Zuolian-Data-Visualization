@@ -127,33 +127,62 @@ def test_rejected_relation_evidences_excluded_and_fk_valid(sandbox_tmp_path: Pat
 
 
 def test_production_supported_subset_never_contains_risky_records() -> None:
+    """生产层公开子集守门：非空后仍不得含任何保守拦截标记，且每条都有合格 support 证据。
+
+    2026-09-28 P5-LANDING 前公开层恒为 0，本测试退化为计数冻结；公开层非空后改为
+    直接断言其名称承诺的治理规则（不含 critical/high、待核验、推断类型、low 置信、
+    needs_manual_review=yes），并逐条校验合格 support 证据存在。
+    """
     rels = pd.read_csv(PROJECT_ROOT / "data" / "processed" / "person_relations.csv", encoding="utf-8-sig", dtype=str).fillna("")
     assert len(rels) == 4238
     assert "publish_status" in rels.columns
     assert "publish_status_origin" in rels.columns
     counts = rels["publish_status"].value_counts().to_dict()
-    # 返修后：现有 10249 条证据全部 associated + pending + quote 为空，无合格 support；
-    # 故 supported/verified 均为 0，公开层为 0（允许），pending/inferred 覆盖全量。
+    # P5-LANDING：48 条候选经双方佐证门后 20 条落地 support 证据，其中 5 条通过 derived 门禁进入公开层；
+    # 其余 15 条被 critical/high 风险或推断类型挡住，仍留在研究层（未使用 human_adjudication 通道）。
     assert counts.get("verified", 0) == 0
     assert counts.get("rejected", 0) == 0
-    assert counts.get("supported", 0) == 0
+    assert counts.get("supported", 0) == 5
     assert counts.get("pending_review", 0) == 2451
-    assert counts.get("inferred", 0) == 1787
+    assert counts.get("inferred", 0) == 1782
     assert rels["publish_status_origin"].eq("derived").all()
     public = rels[rels["publish_status"].isin({"verified", "supported"})]
-    assert len(public) == 0
+    assert len(public) == 5
     assert len(public) < len(rels)
+    # 公开子集绝不含风险/待核/低置信/推断类型记录
+    assert not public["relation_risk_level"].str.lower().isin(["critical", "high"]).any()
+    assert not public["needs_manual_review"].str.lower().eq("yes").any()
+    assert not public["confidence"].str.lower().eq("low").any()
+    assert not public["final_relation_type"].isin(["待核验", "同属组织", "空间共现", "时空共现"]).any()
     # 风险列未被反向降险改写：critical 仍为 1974
     assert int((rels["relation_risk_level"] == "critical").sum()) == 1974
+    # 每条公开关系都必须有合格 support 证据（support + 未 rejected + locator + quote/context）
+    evid = pd.read_csv(PROJECT_ROOT / "data" / "processed" / "relation_evidences.csv", encoding="utf-8-sig", dtype=str).fillna("")
+    for rid in public["relation_id"].tolist():
+        rows = evid[evid["relation_id"] == rid]
+        assert len(rows) > 0, f"{rid} 公开但无任何关系证据"
+        qualified = rows[
+            (rows["evidence_support"] == "support")
+            & (rows["review_status"] != "rejected")
+            & (rows["locator"].str.strip() != "")
+            & ((rows["quote"].str.strip() != "") | (rows["context"].str.strip() != ""))
+        ]
+        assert len(qualified) >= 1, f"{rid} 公开但缺少合格 support 证据"
 
 
 def test_production_relation_evidences_reference_valid_ids() -> None:
     rels = pd.read_csv(PROJECT_ROOT / "data" / "processed" / "person_relations.csv", encoding="utf-8-sig", dtype=str).fillna("")
     srcs = pd.read_csv(PROJECT_ROOT / "data" / "processed" / "sources.csv", encoding="utf-8-sig", dtype=str).fillna("")
     evid = pd.read_csv(PROJECT_ROOT / "data" / "processed" / "relation_evidences.csv", encoding="utf-8-sig", dtype=str).fillna("")
-    assert len(evid) == 10249
-    assert set(evid["review_status"].unique().tolist()) == {"pending"}
-    assert set(evid["evidence_support"].unique().tolist()) == {"associated"}
+    # 2026-09-28 P5-LANDING：新增 20 条经逐字复核 + 双方佐证门的 support 证据；
+    # 既有 10249 条机器迁移行保持 associated + pending，未被改判（改判等于凭空提升证据等级）。
+    assert len(evid) == 10269
+    assert set(evid["review_status"].unique().tolist()) == {"pending", "reviewed"}
+    assert set(evid["evidence_support"].unique().tolist()) == {"associated", "support"}
+    assert int((evid["evidence_support"] == "support").sum()) == 20
+    assert int((evid["review_status"] == "reviewed").sum()) == 20
+    assert int((evid["evidence_support"] == "associated").sum()) == 10249
+    assert int((evid["review_status"] == "pending").sum()) == 10249
     assert set(evid["relation_id"].tolist()) <= set(rels["relation_id"].tolist())
     assert set(evid["source_id"].tolist()) <= set(srcs["source_id"].tolist())
 

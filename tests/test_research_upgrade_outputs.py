@@ -182,9 +182,12 @@ def test_three_networks_use_different_filters(built_network: Path) -> None:
     supported = nets["evidence_supported"]
     trusted = nets["trusted"]
     weighted = nets["evidence_weighted"]
-    # 低风险启发式保留历史 1760 口径（研究对照，非可信）；证据支持/可信当前为 0 并如实报告样本不足
+    # 低风险启发式为研究对照口径（非可信）；2026-09-28 P5-LANDING 后证据支持/可信为 5 条，
+    # 仍如实标记样本不足（边 <10 不生成排名）；human_verified 为 0（未使用人工裁决通道）。
     assert full["edges"] > low_risk["edges"] > 0, "全量边应大于低风险筛选边"
-    assert supported["edges"] == 0 and trusted["edges"] == 0, "当前无合格 support 证据，可信应为 0"
+    assert supported["edges"] == 5, "本批落地的合格 support 关系应进入证据支持口径"
+    assert trusted["edges"] == 5, "trusted = verified(0) ∪ supported(5)"
+    assert nets["human_verified"]["edges"] == 0, "未使用 human_adjudication 通道，人工确认口径应为 0"
     assert trusted.get("sample_sufficient") is False, "可信样本不足须明确标记"
     assert "样本不足" in str(trusted.get("sample_note", "")), "可信须注明样本不足"
     assert full["total_weight"] >= low_risk["total_weight"]

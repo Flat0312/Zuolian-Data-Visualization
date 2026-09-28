@@ -12,7 +12,10 @@
 import csv
 import hashlib
 import importlib.util
+import io
 import shutil
+import subprocess
+import tarfile
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -33,6 +36,24 @@ BATCH3_DRAFT_FILES = [
 
 # SRC-EVP3-010 复用生产 SRC-1163（同 URL），剥离基线时不得误删该生产行。
 REUSED_SOURCE_URL_SUFFIX = "gdxk.southcn.com/st/ztp/content/post_371048.html"
+
+# 「剥离第三批痕迹后重放」要求第三批来源恰为 SRC 号段最高者（生产中为 SRC-1166..SRC-1177），
+# 这样重放才会分配回同一批 ID、事件里的旧引用才不会悬空。任何后续批次新增来源都会把号段顶端
+# 顶上去（2026-09-28 P5-LANDING 注册 SRC-1178 即触发），使重放分配到 SRC-1179.. 而与仍引用
+# SRC-1166..1177 的事件产生悬空。因此本用例的基线钉在 P5 落地前提交，对未来批次保持稳定；
+# 提交被历史重写时测试失败——与 test_merge_batch3_real_baseline.py 同为有意锚点。
+PINNED_BATCH3_REPLAY_COMMIT = "6c6a12b"
+
+
+def _materialize_pinned_data(root: Path) -> Path:
+    """用 git archive 从固定提交原样取出 data/processed，返回该目录。"""
+    out = subprocess.run(
+        ["git", "archive", "--format=tar", PINNED_BATCH3_REPLAY_COMMIT, "data/processed"],
+        cwd=REPO_ROOT, check=True, capture_output=True,
+    )
+    with tarfile.open(fileobj=io.BytesIO(out.stdout)) as tar:
+        tar.extractall(root, filter="data")
+    return root / "data" / "processed"
 
 
 def _load_module(name: str):
@@ -225,9 +246,8 @@ def test_batch3_fresh_add_counts_merge_and_remap(tmp_path, monkeypatch, capsys):
 
 def test_batch3_merge_schema_clean_no_dangling(tmp_path, monkeypatch):
     """从剥离基线合并后：schema 0 错误、≤13 警告、无悬空 fact 主体。"""
-    data_dir = tmp_path / "data" / "processed"
     drafts_dir = tmp_path / "research" / "drafts" / "reports"
-    shutil.copytree(PROD_DATA, data_dir)
+    data_dir = _materialize_pinned_data(tmp_path)
     drafts_dir.mkdir(parents=True)
     for name in BATCH3_DRAFT_FILES:
         shutil.copyfile(PROD_DRAFTS / name, drafts_dir / name)

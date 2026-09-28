@@ -32,4 +32,6 @@ python -c "from kb_schema import validate_data_dir; r=validate_data_dir('data/pr
 python build_static_site.py
 ```
 
-详细设计与阶段状态见 `docs/superpowers/specs/2026-06-05-research-and-presentation-dual-layer-design.md` 和 `task_plan.md`。
+详细设计与阶段状态见 `research/design/specs/2026-06-05-research-and-presentation-dual-layer-design.md` 和 `task_plan.md`。
+
+设计与方案文档放在受版本管理的 `research/design/`，不放在 `docs/`——`docs/` 是被 Git 忽略的静态站输出目录，放那里的文档在远端是死链。

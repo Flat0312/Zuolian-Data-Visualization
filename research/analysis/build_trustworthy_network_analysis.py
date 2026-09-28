@@ -31,7 +31,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_DATA_DIR = PROJECT_ROOT / "data" / "processed"
 DEFAULT_OUT_DIR = PROJECT_ROOT / "research" / "drafts" / "reports"
 
-SNAPSHOT_DATE = "2026-09-04"
+SNAPSHOT_DATE = "2026-09-28"
 
 TIME_SLICES = (("1928-1930", 1928, 1930), ("1931-1933", 1931, 1933), ("1934-1936", 1934, 1936))
 

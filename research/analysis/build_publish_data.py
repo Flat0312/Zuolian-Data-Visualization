@@ -204,6 +204,11 @@ def build_publish_data(
             "candidate_and_disputed_memberships": "excluded",
             "rejected_fact_evidences": "excluded",
             "rejected_relation_evidences": "excluded",
+            "published_relation_evidences": (
+                "fk_closed_subset_retains_original_evidence_support;"
+                "only_support_not_rejected_with_locator_and_quote_or_context_gates_publication;"
+                "associated_rows_are_source_links_not_support_claims"
+            ),
             "non_public_relations": "excluded_inferred_pending_rejected",
             "relation_gate": "derived_recomputed_with_evidence_no_passthrough_except_human_verified_rejected",
             "supported_requires": "support_not_rejected_with_locator_and_quote_or_context",
@@ -254,6 +259,10 @@ def build_publish_data(
             "associated/pending 证据、无 quote/locator、证据冲突）仅保留在研究层。",
             "- `relation_evidences.csv` 中 `review_status=rejected` 的关系证据不进入发布层；"
             "且仅保留发布层关系的外键闭合子集（公开关系为 0 时为空表头）。",
+            "- 发布层 `relation_evidences.csv` 保留各行的原始 `evidence_support`/`review_status`："
+            "只有 `support` 且未 rejected、带 locator 与 quote/context 的行才是公开关系的定级依据；"
+            "同表的 `associated`/`pending` 行只为外键闭合而保留，语义是「来源关联」，"
+            "**不得当作支持该关系的证据引用**。",
             f"- 来源层级：引文 {source_summary['citations']} 条 / 作品 {source_summary['works']} 种 / "
             f"独立来源族 {source_summary['families']} 个（引用条数≠独立来源作品数，同一来源族不重复计数）。",
         ]

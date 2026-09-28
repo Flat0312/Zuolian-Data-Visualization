@@ -1,5 +1,59 @@
 # Progress Log - 左联知识库
 
+## 2026-09-28 - Phase 5 裁决生产层落地：公开关系 0 → 5，并查出引文窗口捕错的系统性缺陷
+
+**范围**：把 2026-09-20 已授权的 400 条裁决中证据合格的部分落入生产层，首次让发布层与静态站的关系图谱非空。授权沿用当日逐字授权语，口径为「授权按建议执行」，非逐条独立人工复核。
+
+**A. 双方佐证门（本批最重要的产出）**：落地前逐条核对引文是否真的记载该关系，发现夜间轮记录的 `quote` 多数是按页码截取的固定窗口，与 `reason` 描述的史实不一致——48 条候选（support 层 ∧ 裁决成立）中只有 20 条的引文同时出现双方当事人，28 条找不到当事人（16 条两端都缺、11 条只缺乙方、1 条只缺甲方）。该门已固化为 `research/analysis/quote_attestation.py`：引文空白归一后须同时含两端姓名或别名，鲁迅日记按日记体免甲方自名；从严精确匹配、不做 OCR 异体字容错，漏判进重捕队列而不放行。附带查明 OCR 全文**字间带空格**（`鲁 迅`），任何检索必须先归一化，否则全部落空——这也是最初误判「引文全部不可靠」的原因。
+
+**B. 生产落地**：`apply_phase5_relation_landing.py` 幂等执行。新增 20 条 `support`/`reviewed` 关系证据（**不改判**既有 10249 条机器迁移的 `associated` 行，其 reviewer_note 明写「仅表示来源关联，不断言支持强度」，改判等于凭空提升证据等级）；3 条类型更正（REL-00059 时空共现→交往、REL-00309 待核验→同属组织、REL-03518 创作合作→签名联署）；注册 1 条同族来源「鲁迅日记 1928年7月1日」（SRC-1178）并经 `sync_source_layer` 同步（1177→1178）。运行时逐字复核 23/23 通过（quote_sha256 与原文 content_hash 双校验）。四表终值 person_relations 4238 / relation_evidences 10269 / sources 1178 / passages 1178；发布状态 supported 5 / pending_review 2451 / inferred 1782，origin 全为 derived；critical 仍 1974（未反向降险）。二跑输出「无新增/已完成」。
+
+**C. 明确没做的事**：①未把 239 条 `not_supported` 写为 `rejected`——五态中 rejected 语义是「人工否定」（对应 contradicted，本批 0 条），not_supported 只是证据不足，映射会把「未证实」夸大成「已证伪」；②未使用 `human_adjudication` 通道把 critical/high 关系推入公开层（违反保守原则，且会改变既有治理门禁测试语义），已过佐证门但被机器标记挡住的 15 条留在研究层；③未对未过佐证门的 28 条做任何类型更正或降级——引文捕错不等于关系不成立。
+
+**D. 产物与前台**：发布层 person_relations 0→5、relation_evidences 0→46；静态站关系索引 0→5 张卡片（张庚×陈白尘、鲁迅×王任叔、鲁迅×林语堂、郭沫若×夏征农、鲁迅×李霁野），`graph-data.json` 0→5 条边，关系页新增口径说明段。四口径重算 evidence_supported 0→5、trusted 0→5、human_verified 仍 0、low_risk_heuristic 1760→1761（REL-00059 改型带来），可信边 5 仍不足排名（157 个连通分量、最大分量 4 人）。台账 `phase5_relation_landing_ledger.csv`（20 行，每行带 quote_sha256／检索凭据／授权溯源）、报告 `phase5_relation_landing_report.md`、重捕队列 `phase5_quote_recapture_queue.csv`（28 行，pending_human_review，附最佳同窗摘录与三类处置建议）。`build_publish_data.py` 发布契约补记：发布层 relation_evidences 保留原始 evidence_support，只有 support 行才是定级依据。
+
+**E. 测试**：新增 `tests/test_phase5_relation_landing.py` 8 项——佐证门语义（含日记体例外与别名命中）、生产层公开关系引文的独立复核、落地引文逐字回验、28 条未过门关系不得进生产/公开层、当前生产幂等、以 `6c6a12b` 为基线的红→绿重放（落地前公开为 0，落地后恰 5，二跑零写入）。既有基线断言按实际变化更新：1177→1178、luxun_diary 431→432、relation_evidences 10249→10269（其中 support/reviewed 恰 20）、公开关系 0→5 且逐条校验无 critical/high／待核验／推断类型／low 置信、evidence_supported 与 trusted 0→5、启发式 1760→1761。`test_batch3_merge_schema_clean_no_dangling` 改为钉住 `6c6a12b` 基线：该用例「拷贝当前生产再重放第三批」的设计隐含要求第三批来源恰为 SRC 号段最高者（SRC-1166..1177），任何后续批次新增来源都会让重放 ID 后移而产生 19 条悬空引用。全量 pytest **141 passed**（133+8）、Schema 0 err / 13 warn、Ruff 全绿。
+
+**F. 落地脚本的一处副作用已修**：模块级 `sys.path.insert(0, ROOT)` 会让根目录的 `app.py` 垫片遮蔽 `app/frontend/app.py`，导致 `test_utils_and_views.py` 的 `from app import pair_summary_from_profiles` 失败；改为优先按包路径导入、仅脚本直跑时 `append` 自身目录。
+
+**待人工（登记 BLOCKED.md 2026-09-28 节）**：28 条引文重捕；15 条已过佐证门但需逐条独立复核才能走 verified 通道；两本书 OCR 全文已在公开远端与 .gitignore 政策冲突；外层 `D:\1大创` 与内层同 remote 的强推风险。
+
+## 2026-09-20 - 授权落地：400 条裁决、Phase7 候选裁决包、T2–T5 整改升级（同日闭环）
+
+**授权登记（逐字）**：用户对当日 P0 收尾交付的三项待裁决清单整体授权——「我都没问题，你自己看着办吧」（2026-09-20）。授权语境：400 条关系裁决、12 条候选裁决（含 REL-00523 换引文）、T2–T4 整改升级。生产层在本轮仍然零改动（三项授权均落研究层裁决产物）。
+
+**A. 400 条按建议全量裁决（路径 C）**：`apply_review_authorization.py` 拒绝空授权语与执行者自授占位、拒绝对已填包重复落地；产出 `phase5_relation_review_adjudicated.csv`（human_verdict=ai_suggested_verdict，wrong_type 行附建议类型，每行 authorized_by/at/quote 溯源列）＋裁决登记 `phase5_review_adjudication_record.md`。分布 correct 135 / wrong_type 26 / not_supported 239 / contradicted 0。4 项守门测试先红（`%TEMP%\codex-zuolian-p0apply-red.log`）后绿。
+
+**B. 实测准确率报告（P0.2 出数）**：`analyze_relation_review.py --package …adjudicated.csv`——**关系成立率 40.2%（161/400）、类型准确率 33.8%（135/400）、not_supported 率 59.8%、contradicted 0**；分层：support 层成立率 100%（类型 91.7%）、associated 层 100%（80.5%）、insufficient 层 0%；风险层 critical 47.8% / high 19.6% / low 39.4% / medium 10%；修订规则按阈值确定性生成 19 条（high 层错误率 87%、insufficient 层 100% 为最突出）。口径声明：本组数字为「授权按建议执行」口径（非逐条独立人工复核），报告头部标注实际输入文件名。
+
+**C. Phase 7 候选裁决包（研究层）**：`adjudicate_phase7_candidates.py` 产出 `phase7_relation_evidence_candidates_adjudicated.csv`（12 条，review_status=adjudicated_authorized）＋裁决登记。**REL-00523 换引文后升 support**：替换引文自左联史原文连续切取（133 字，含「潘汉年就去看望他们」「介绍他俩一同加人左联」与「丁玲」，OCR「加人」原样，运行时逐字回定位＋sha256 校验；旧引文 EVI-N1-E0960180FF3F 弃用存档于审计报告）；REL-01219/01743 升 associated（二轮证据逐字＋哈希校验通过）；REL-00113 维持 insufficient。终态 **support 9 / associated 2 / insufficient 1**。3 项守门测试先红后绿。生产层落地（relation_evidences＋publish_status＋发布层重建）留待下一批次。
+
+**D. T2–T4 引文整改＋T2–T5 升级**：四处静默校改恢复原文逐字＋〔〕校注——T2「钱杏邱〔邨，即阿英〕」、T3「栖石〔柔石〕」、T4「倚重兼迅〔鲁迅〕」「穆木天.柳倩」（注明原文标点）；各专题头部追加整改记录行；`topics.json` TOPIC-02–05 content_status limited_report→review_ready_draft（带 status_history 溯源）。独立审核报告补记整改执行节（审核结论保持时点原样）。仓库内无测试钉住 limited_report（已核查）。
+
+**验收**：新增 7 项测试（4+3）全绿；全量 pytest **133 passed**（126+7）、Schema 0 err / 13 warn、Ruff 全绿、`git diff --check` 通过（详见当日执行记录）。规范审核包 `phase5_relation_review_package.csv` 保持空裁决状态（可另起逐条复核覆盖）。
+
+## 2026-09-20 - P0 收尾：审核包、准确率工具、候选与专题独立审计（AI 侧全绿，待人工裁决）
+
+**范围**：task_plan P0 三项未完成条目的 AI 侧执行。生产层零改动，全部产物在 `research/`；先红后绿守门测试固化，红灯日志存 `%TEMP%\codex-zuolian-p0{pkg,ana,aud,top}-red.log`。
+
+**P0.1 审核包**：确认夜间轮 `relations.jsonl` sample400 组 400/400 全覆盖 Phase 5 模板（union 411=400+phase7 12，1 条重叠）；`build_phase5_review_package.py` 幂等产出 `phase5_relation_review_package.csv`（模板列原样＋夜间轮证据/回执/理由＋`ai_suggested_verdict`）与签核单。建议分布 correct 135 / wrong_type 26 / not_supported 239（insufficient 优先于改型；28 条类型分歧中 2 条属 insufficient）。`human_verdict`/`human_note` 全空，6 项守门测试（含防代签、覆盖拒绝、字节确定性）全绿。旧启发式预审 `phase5_relation_review_ai_filled.csv` 被本包取代，保留历史。
+
+**P0.2 准确率工具**：`analyze_relation_review.py` 输入审核包人工裁决列，产出总体/分层（风险×置信×证据分诊×类型）关系成立率、类型准确率、AI 一致率、按阈值（错误≥3 且 ≥10%）确定性生成的修订规则与警告。当前 0 裁决：报告输出「尚无人工裁决」哨兵，全部率值 None，无预估数字。6 项测试（空态/满填精确数/部分填/非法裁决拒绝/规则阈值/确定性）全绿。
+
+**P0.3a Phase7 候选独立审计**（主 Agent，非执行者自检）：`audit_phase7_candidates_independent.py`——8 条 support 哈希＋OCR 容差逐字定位＋剥离邮戳后的年月日锚定（含 REL-00060「寄霁野信。」18 处命中中精确锚定 1928-02-26）＋人物词元全过；4 条 insufficient 中 REL-00113 三轮回执在案维持。**抓到实质问题**：REL-00523 二轮升级 support 理由与左联史原文相符（「潘汉年就去看望他们」段已独立定位验证），但捕获引文 EVI-N1-E0960180FF3F 摘自同页茅盾段落、不含潘汉年/丁玲，判 issue_found（换引文前不得转正）；REL-01219/01743 升级 associated 新证据逐字命中且含双方，判赞成。5 项测试全绿。
+
+**P0.3b T2–T5 专题独立非重复审核**（夜间轮遗留待办）：18 处载重引文回源＋5 条关系引用回查（REL-01133/01293/00518/00622/00465 全 support 一致）＋topics.json 状态核对。结论：T5 pass_with_notes（7/7 逐字命中，公唯异写注明是正面样板）；T2/T3/T4 issues_found（轻微）——各 1–2 处引文静默校改未注明（原文「钱杏邱」「栖石」「兼迅」被校作「钱杏邨」「柔石」「鲁迅」，判断正确但违反逐字纪律与自身局限声明）。整改前维持 limited_report。报告落 `research/content-upgrade-overnight-2026-09-06/verification/independent_topic_review_2026-09-20.md`，2 项守门测试（含 OCR 原文锚防漂移）全绿。
+
+**验收**：新增 13 项测试（6+6+5+2）全绿；全量 pytest、Schema、Ruff、`git diff --check` 见下方当日记录。**待人工**：400 条裁决（三路径任选）、12 候选裁决（含 REL-00523 换引文决定）、T2–T5 整改后升级决定——均已登记 BLOCKED.md 首部。
+
+## 2026-09-05 - 内容修订与首篇专题初稿
+
+**已交付**：研究观察与解释边界、新版答辩文字稿、首篇《鲁迅日记里的书信、书刊与书店》初稿，以及10个人物片段、5个地点或机构内容卡、12行专题证据表。文字稿保存至 `research/drafts/defense/`；旧docs入口改为指向新版。旧PPTX未重制，未演练、未发布。
+
+**候选修订**：按本地日记具体日期核对8条支持性候选摘录，修正李霁野条摘录范围、许广平条截句标点；同步候选生成器，纠正两份回执被称作两份独立来源的文案。12条样本、8支持候选/4不足及pending_human_review状态不变，未转正生产史实。
+
+**验证**：网络JSON复算一致，事件三口径26/21/26、分母147；pytest 107 passed；Schema 0错误/13警告；静态站162人/0关系卡/147事件。详见 `research/drafts/reports/content_revision_2026-09-05.md` 及对应快照。下面各节为历史执行记录，旧关系卡数和旧研究解释不能作为当前口径。
+
 ## 2026-08-27 - 第五批：第四批A五项裁决安全落地（生产执行）
 
 **开工回执**：目标=按人工批准「5项全部按推荐方案执行」把 EVT-00001/00004/00005/00017/00029 五项裁决落入生产层，清除虚假挂接并保留审计链；顺序=任务0基线(已核相符)→新增重放测试先红→幂等脚本apply_batch4a_decisions.py→执行并二跑零变化→覆盖率排除rejected/发布层过滤/队列闭合/closeout测试同步(28/22/23→26/21/26,注记冻结改前缀锚)→重建发布层与报告→文档与执行报告→验收七连；最大风险=FE-EVP3-0005 从 EVT-00006 改指 EVT-00004 牵动第三批治理守门（生产resolved conflict 9→8）与注记冻结约束的相容性——处置为只允许追加裁决出处、冻结测试改为基线前缀锚，pinned旧提交重放保持9不削弱。

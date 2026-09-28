@@ -2,6 +2,8 @@
 
 > 从目录卡片、文献摘录与表格记录出发，把左联历史转成可查询、可解释、可视化的知识网络。
 
+2026-09-05 内容入口：[研究观察与解释边界](research/drafts/reports/phase6_research_findings.md) · [首篇专题初稿](research/drafts/topics/1928-correspondence/专题初稿.md) · [人物与地点内容卡](research/drafts/topics/1928-correspondence/人物与地点内容卡.md) · [答辩文字稿](research/drafts/defense/答辩大纲.md)。专题仍待人工复核，尚未公开。
+
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](#快速开始)
 [![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white)](#快速开始)
 [![Data](https://img.shields.io/badge/Knowledge%20Data-Structured-0A7F5A)](#数据快照)
@@ -69,7 +71,16 @@
 | `org_membership_evidences.csv` | 581 |
 | `fact_evidences.csv` | 626 |
 | `event_participants.csv` | 222 |
-| `sources.csv` | 1177 |
+| `relation_evidences.csv` | 10269 |
+| `sources.csv` | 1178 |
+| `source_passages.csv` | 1178 |
+| `source_works.csv` | 65 |
+
+以上为研究层行数。1178条是引用记录，对应65条作品级记录和30个非空来源族，不能理解为1178份独立史料。
+
+4238条人物关系中，满足公开条件的为**5条**（`publish_status=supported`，全部由证据派生，`publish_status_origin=derived`）；人工确认口径（`verified`）为0条，本批未使用人工裁决通道。其余为 `pending_review` 2451条、`inferred` 1782条，只留在研究层。`relation_evidences.csv` 的10269行中只有20行是经逐字复核与「双方佐证门」的 `support` 级证据，其余10249行为机器迁移生成的 `associated` 行，语义是「来源关联」，**不断言支持强度**，不得当作支持证据引用。组织身份有45条正式、28条相关、77条候选，前两类共73条进入展示层。
+
+关系公开的收敛链为：4238条 → 抽样400条人工裁决 → 48条判为直接支持且裁决成立 → 20条通过双方佐证门（引文确实同时记载当事人）→ 5条通过发布门禁的保守规则（排除 critical/high 风险、待核验、推断类型、low 置信）。台账见 [`phase5_relation_landing_ledger.csv`](research/drafts/reports/phase5_relation_landing_ledger.csv)，口径与未做事项见 [`phase5_relation_landing_report.md`](research/drafts/reports/phase5_relation_landing_report.md)。以上数字于2026-09-28读取本地数据核对。
 
 ---
 
@@ -250,6 +261,9 @@ OPENAI_MODEL=gpt-4o
 ├─ data/
 │  └─ processed/                  # 运行期标准数据与证据索引
 └─ research/                      # 原始数据、清洗中间表、研究脚本与草稿
+   ├─ analysis/                   # 数据构建、发布门禁与校验脚本
+   ├─ design/                     # 双层架构设计与各阶段实施方案（受版本管理）
+   └─ drafts/reports/             # 阶段报告、审核队列、裁决与落地台账
 ```
 
 ---
@@ -268,8 +282,11 @@ OPENAI_MODEL=gpt-4o
 - ✅ 已完成：事件地点质量治理、人物关系分层抽样和基础网络分析。
 - ✅ 已完成：标准知识库、Streamlit 应用与 GitHub Pages 静态阅读版。
 - ✅ 已完成：第三批事件史料 20 条证据按事件级审核决策合并转正（人工授权状态：**已追认**，追认日期 2026-08-27，见审核表第 7 节）。第四批A 5 项裁决已按授权落入生产层，当前事件覆盖率为 17.7%（26/147）；覆盖率报告已区分「已挂接 26/147 / 直接支持 21/147 / 已确认 26/147」三种口径，拒绝证据不进入覆盖率和发布层。
-- 🔜 收尾重点：完成 400 条人物关系人工判定，并生成准确率与错误分析。
-- 🔜 收尾重点：形成至少 3 项可复核研究发现，完成答辩 PPT 与 5 分钟演示脚本。
+- ✅ 已完成：400 条人物关系裁决（成立率 40.2%／类型准确率 33.8%，口径为「授权按建议执行」）与分层准确率、修订规则。
+- ✅ 2026-09-28 已完成：裁决的生产层落地。新增「双方佐证门」逐条复核引文，公开关系 0→5，发布层与静态站关系图谱首次非空；同时查出夜间轮引文按页码窗口截取导致 `reason` 与 `quote` 不一致的系统性缺陷，28 条转入重捕队列（生产层零改动）。
+- 🔜 收尾重点：处理 28 条引文重捕队列；如需公开其余 15 条已过佐证门但被保守规则挡住的关系，须逐条独立人工复核后走 `human_adjudication` 通道。
+- ✅ 2026-09-05 已校正研究结论和答辩文字稿，完成首篇交往专题初稿、10个人物片段与5个地点或机构内容卡；候选证据未转正。旧版“桥接者”“三条工作线”“多中心领导”等强解释不再作为已证实结论。
+- 🔜 收尾重点：核准首批关系候选，补查稿件与历史地址，再形成有史料支撑的专题研究。按新版文字大纲更新答辩PPT并实际演练；既有PPTX为旧版，本轮未重制。
 
 详细状态、验收命令和剩余任务见 [`task_plan.md`](task_plan.md)。
 

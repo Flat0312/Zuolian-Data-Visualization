@@ -12,8 +12,9 @@ def test_source_work_passage_mapping_complete() -> None:
     srcs = pd.read_csv(base / "sources.csv", encoding="utf-8-sig", dtype=str).fillna("")
     works = pd.read_csv(base / "source_works.csv", encoding="utf-8-sig", dtype=str).fillna("")
     passages = pd.read_csv(base / "source_passages.csv", encoding="utf-8-sig", dtype=str).fillna("")
-    assert len(srcs) == 1177
-    assert len(passages) == 1177
+    # 2026-09-28 P5-LANDING：为「鲁迅日记 1928年7月1日」注册 1 条同族引文（1177 -> 1178）。
+    assert len(srcs) == 1178
+    assert len(passages) == 1178
     # 每条引文恰好映射一条 source，且每条 work 存在
     assert set(passages["source_id"].tolist()) == set(srcs["source_id"].tolist())
     assert set(passages["work_id"].tolist()) <= set(works["work_id"].tolist())
@@ -27,9 +28,10 @@ def test_same_family_not_counted_as_independent_sources() -> None:
     srcs = pd.read_csv(
         PROJECT_ROOT / "data" / "processed" / "sources.csv", encoding="utf-8-sig", dtype=str
     ).fillna("")
-    # 反例：鲁迅日记本地 428 条引文 + 3 条维基文库转录同属一个来源族，不得计为 431 个独立来源
+    # 反例：鲁迅日记本地 429 条引文 + 3 条维基文库转录同属一个来源族，不得计为 432 个独立来源
+    # （2026-09-28 P5-LANDING 新注册「鲁迅日记 1928年7月1日」1 条，428 -> 429）
     luxun = srcs[srcs["source_family"] == "luxun_diary"]
-    assert len(luxun) == 431
+    assert len(luxun) == 432
     assert luxun["source_family"].nunique() == 1
     # 独立来源族计数必须去重，而非引用条数
     citations = len(srcs)
@@ -38,9 +40,9 @@ def test_same_family_not_counted_as_independent_sources() -> None:
     assert families < citations
     # 同族内不同 source_id 不得被当作独立来源累加
     per_family = srcs.groupby("source_family")["source_id"].nunique()
-    assert int(per_family.loc["luxun_diary"]) == 431
+    assert int(per_family.loc["luxun_diary"]) == 432
     assert int(per_family.loc["luxun_diary"]) > 1
-    # 以族为单位的独立计数为 1，而非 431
+    # 以族为单位的独立计数为 1，而非 432
     assert 1 < families < citations
 
 
@@ -73,6 +75,6 @@ def test_publish_manifest_reports_works_citations_families(sandbox_tmp_path: Pat
 
     prod_manifest = json.loads((PROJECT_ROOT / "data" / "publish" / "publish_manifest.json").read_text(encoding="utf-8"))
     summary = prod_manifest["source_summary"]
-    assert summary["citations"] == 1177
+    assert summary["citations"] == 1178
     assert summary["works"] == 65
     assert summary["families"] == 30
