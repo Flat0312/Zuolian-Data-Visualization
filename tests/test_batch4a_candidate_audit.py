@@ -8,7 +8,7 @@ pending_human_review 合法；报告含 5 项事件与"待人工决定"签核表
 from __future__ import annotations
 
 import csv
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REPORTS = REPO_ROOT / "research" / "drafts" / "reports"
@@ -180,7 +180,11 @@ def test_receipts_pair_one_to_one_with_audit_rows() -> None:
         assert r["checked_at"].strip() and r["target"].strip() and r["locator"].strip()
         assert re.fullmatch(r"[0-9a-f]{64}", r["context_sha256"]), f"{r['receipt_id']} sha256 格式非法"
         if r["access_method"] == "local_text":
-            assert Path(r["target"]).is_absolute(), f"{r['receipt_id']} 本地凭据必须记绝对路径"
+            # 凭据记录的是本机 Windows 绝对路径；在 Linux runner 上 Path(...).is_absolute 为假，
+            # 故按 Windows 语义判定，保留「本地凭据必须记绝对路径」的原意。
+            assert PureWindowsPath(r["target"]).is_absolute(), (
+                f"{r['receipt_id']} 本地凭据必须记绝对路径"
+            )
         else:
             assert r["target"].startswith("http"), f"{r['receipt_id']} 网页凭据必须记原URL"
 

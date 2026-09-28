@@ -12,6 +12,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # 多个测试用 `git archive <pinned-sha>` 钉住历史提交做红→绿重放
+          # （30d5f77 / 0f7d445 / 6c6a12b），默认的 fetch-depth: 1 浅克隆取不到这些提交，
+          # 会让它们以 exit 128 失败。此处取全量历史。
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5

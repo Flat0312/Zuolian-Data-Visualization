@@ -22,6 +22,7 @@ if str(FRONTEND_DIR) not in sys.path:
 # 必须跳过而不是失败——CI 与全新克隆本来就拿不到这些文件。
 RUNTIME_HISTORY = PROJECT_ROOT / "data" / "processed" / "runtime_sources" / "左联史.txt"
 RUNTIME_DICTIONARY = PROJECT_ROOT / "data" / "processed" / "runtime_sources" / "左联词典.txt"
+RAW_DIARY = PROJECT_ROOT / "research" / "raw_texts" / "日记全编：全2册 (鲁迅 著) (Z-Library).txt"
 RUNTIME_TEXTS = (RUNTIME_HISTORY, RUNTIME_DICTIONARY)
 
 

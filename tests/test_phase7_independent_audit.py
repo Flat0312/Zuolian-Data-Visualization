@@ -4,8 +4,14 @@ import hashlib
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
+from conftest import RAW_DIARY, RUNTIME_TEXTS, requires_local_texts
 from research.analysis.audit_phase7_candidates_independent import audit
+
+# audit() 内部要读 research/raw_texts/ 的鲁迅日记全文与 runtime_sources 的两本书做逐字回定位；
+# 这些版权全文按 .gitignore 政策不入库，缺失时跳过而非失败。
+pytestmark = requires_local_texts(RAW_DIARY, *RUNTIME_TEXTS)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CANDIDATES_PATH = REPO_ROOT / "research" / "drafts" / "reports" / "phase7_relation_evidence_candidates.csv"
