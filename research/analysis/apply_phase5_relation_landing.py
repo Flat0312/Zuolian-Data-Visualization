@@ -552,12 +552,14 @@ def apply_landing(data_dir: Path, dry_run: bool = False) -> dict:
     pas_cols, pas_rows = _read(data_dir / "source_passages.csv")
 
     if already_landed(ev_rows):
-        _check_counts({
-            "person_relations.csv": len(rel_rows),
-            "relation_evidences.csv": len(ev_rows),
-            "sources.csv": len(src_rows),
-            "source_passages.csv": len(pas_rows),
-        }, EXPECTED_POST, "二跑幂等校验")
+        # 幂等校验只看「本批标记行恰 20 条」，不看全局四表计数：全局 EXPECTED_POST 钉的是本批首跑的
+        # 后置条件，后续批次（如 P5-RECAPTURE-2026-10-08 追加证据行）必然使其偏离——改按 BATCH_MARKER
+        # 计数后，本脚本对后续批次免疫。首跑基线与后置条件不动。
+        marker_rows = sum(1 for r in ev_rows if BATCH_MARKER in (r.get("reviewer_note") or ""))
+        if marker_rows != EXPECTED_NEW_EVIDENCE_ROWS:
+            raise LandingError(
+                f"二跑幂等校验：带 {BATCH_MARKER} 的行应为 {EXPECTED_NEW_EVIDENCE_ROWS} 条，实际 {marker_rows} 条"
+            )
         return {"status": "no-op",
                 "message": "无新增/已完成：本批落地痕迹已存在且计数符合预期，跳过写入。"}
 

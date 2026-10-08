@@ -1,7 +1,7 @@
 # 可信网络分析报告（返修版）
 
-- 数据快照日期：2026-09-28（只读；未修改生产数据）
-- 数据状态：{'relations_total': 4238, 'relations_low_risk_heuristic': 1761, 'relations_evidence_supported': 5, 'relations_human_verified': 0, 'relations_trusted': 5, 'luxun_only_trusted_edges': 2, 'low_grade_trusted_edges': 0, 'publish_status_column': True, 'relation_evidences_table': True, 'source_family_column': True}
+- 数据快照日期：2026-10-08（只读；未修改生产数据）
+- 数据状态：{'relations_total': 4238, 'relations_low_risk_heuristic': 1761, 'relations_evidence_supported': 7, 'relations_human_verified': 0, 'relations_trusted': 7, 'luxun_only_trusted_edges': 2, 'low_grade_trusted_edges': 0, 'publish_status_column': True, 'relation_evidences_table': True, 'source_family_column': True}
 - 口径降级说明：无（三层证据表齐备）
 - 可信样本：样本不足：可信边不足以计算稳定排名，不强行生成 Top10（见下）
 
@@ -11,10 +11,10 @@
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 全量探索网络 | — | 162 | 4227 | 41 | 122 | 44 | 样本充足 |
 | 较低风险规则筛选网络（原 1760 启发式，不得称为可信） | — | 162 | 1758 | 49 | 114 | 52 | 样本充足 |
-| 证据支持网络（derived supported，真满足证据条件） | — | 162 | 5 | 157 | 4 | 157 | 样本不足：边 <10 或有边节点 <10，不生成 Top10 排名 |
+| 证据支持网络（derived supported，真满足证据条件） | — | 162 | 7 | 155 | 4 | 155 | 样本不足：边 <10 或有边节点 <10，不生成 Top10 排名 |
 | 人工确认网络（human verified） | — | 162 | 0 | 162 | 1 | 0 | 样本不足：边 <10 或有边节点 <10，不生成 Top10 排名 |
-| 可信关系网络（verified ∪ 证据支持） | — | 162 | 5 | 157 | 4 | 157 | 样本不足：边 <10 或有边节点 <10，不生成 Top10 排名 |
-| 证据加权网络（可信加权） | — | 162 | 5 | 157 | 4 | 157 | 样本不足：边 <10 或有边节点 <10，不生成 Top10 排名 |
+| 可信关系网络（verified ∪ 证据支持） | — | 162 | 7 | 155 | 4 | 155 | 样本不足：边 <10 或有边节点 <10，不生成 Top10 排名 |
+| 证据加权网络（可信加权） | — | 162 | 7 | 155 | 4 | 155 | 样本不足：边 <10 或有边节点 <10，不生成 Top10 排名 |
 
 > **样本不足**：当前可信关系（verified + 真满足证据条件的 supported）不足以计算稳定排名，
 > 本报告不对可信口径输出 Top10 中心性排名；下表可信/加权列以“—（样本不足）”占位。
@@ -46,7 +46,7 @@
 
 ## 三、敏感性分析（仅数据观察，不得写成历史重要性结论）
 
-1. **移除待审核关系前后（全量 vs 可信）**：Top10 度中心性重合 0.0（共同 0/10）；社区数 44 → 157；最大分量 122 → 4 人。
+1. **移除待审核关系前后（全量 vs 可信）**：Top10 度中心性重合 0.0（共同 0/10）；社区数 44 → 155；最大分量 122 → 4 人。
 2. **启发式 vs 证据支持**：较低风险筛选 vs 证据支持 Top10 重合 0.0（共同 0/10）。原 1760 条启发式结果不得称为可信，仅作对照。
 3. **《鲁迅日记》单一来源降权前后**（加权网络）：Top10 加权度重合 0.0。
 4. **低等级来源（C/D）降权前后**（加权网络）：Top10 加权度重合 0.0。

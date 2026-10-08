@@ -42,11 +42,16 @@ REPORTS = PROJECT_ROOT / "research" / "drafts" / "reports"
 EVIDENCE_JSONL = PROJECT_ROOT / "research" / "content-upgrade-overnight-2026-09-06" / "evidence.jsonl"
 LEDGER = REPORTS / "phase5_relation_landing_ledger.csv"
 QUEUE = REPORTS / "phase5_quote_recapture_queue.csv"
+ADJUDICATED = REPORTS / "phase5_quote_recapture_adjudicated.csv"
 
 PINNED_PRE_LANDING_COMMIT = "6c6a12b"
 BATCH_MARKER = "P5-LANDING-2026-09-28"
+RECAPTURE_MARKER = "P5-RECAPTURE-2026-10-08"
 EXPECTED_LANDED = 20
-EXPECTED_PUBLIC = 5
+# 公开层 5→7：第二批（2026-10-08 逐条独立裁决）追加 REL-00622、REL-01368。
+EXPECTED_PUBLIC = 7
+# 第一批红→绿重放只重演第一批落地（隔离在 tmp 基线上），公开层恰为 5。
+EXPECTED_BATCH1_PUBLIC = 5
 EXPECTED_QUEUE = 28
 
 
@@ -135,7 +140,11 @@ def test_name_candidates_filters_single_char_aliases() -> None:
 
 @requires_texts
 def test_public_relations_support_quotes_attest_both_parties(bundles) -> None:
-    """公开层每条关系，其本批 support 引文必须同时记载双方当事人。"""
+    """公开层每条关系都必须存在合格 support 证据，且其引文过双方佐证门（不限批次标记）。
+
+    2026-10-08 起公开层同时含两批落地行（第一批 5 条 + 第二批 2 条），按单一批次标记过滤
+    会漏掉第二批；改为「不限批次、但对每条公开关系都实际校验佐证门」，比原断言更强。
+    """
     persons = {r["person_id"]: r for r in _rows(DATA / "persons.csv")}
     rels = {r["relation_id"]: r for r in _rows(DATA / "person_relations.csv")}
     evid = _rows(DATA / "relation_evidences.csv")
@@ -143,17 +152,23 @@ def test_public_relations_support_quotes_attest_both_parties(bundles) -> None:
     assert len(public) == EXPECTED_PUBLIC
     for row in public:
         rid = row["relation_id"]
-        batch = [
+        qualified = [
             e for e in evid
             if e["relation_id"] == rid and e["evidence_support"] == "support"
-            and BATCH_MARKER in e["reviewer_note"]
+            and e["review_status"] != "rejected"
+            and e["locator"].strip() and (e["quote"].strip() or e["context"].strip())
         ]
-        assert batch, f"{rid} 公开但无本批 support 证据"
+        assert qualified, f"{rid} 公开但无合格 support 证据"
         na = name_candidates(persons[row["source_person_id"]])
         nb = name_candidates(persons[row["target_person_id"]])
-        diary = any("鲁迅日记" in e["locator"] for e in batch)
-        ok, basis = quote_attests_pair(batch[0]["quote"], na, nb, diary_author_implicit=diary)
-        assert ok, f"{rid} 公开引文未同时记载双方：{basis}"
+        passed = [
+            e for e in qualified
+            if quote_attests_pair(
+                e["quote"], na, nb,
+                diary_author_implicit="鲁迅日记" in e["locator"],
+            )[0]
+        ]
+        assert passed, f"{rid} 公开关系的合格 support 引文均未同时记载双方"
 
 
 @requires_texts
@@ -179,13 +194,27 @@ def test_landed_support_evidence_is_verbatim_in_local_source(overnight_evidence,
 
 
 def test_unattested_relations_stay_out_of_production_and_public() -> None:
-    """28 条引文未佐证双方的关系：全部 pending、不得公开、不得留下本批证据痕迹。"""
+    """重捕队列 28 条：扣除已裁决落地的 3 条后，其余 25 条仍不得公开、不得留下任何批次落地证据。
+
+    2026-10-08 第二批把 REL-00622 / REL-01368 / REL-01161 裁决落地（REL-01891 判证据不足、
+    生产层零改动，仍在 25 条断言内）；裁决状态只登记在
+    ``phase5_quote_recapture_adjudicated.csv``，队列文件本身未被改动。
+    """
     queue = _rows(QUEUE)
     assert len(queue) == EXPECTED_QUEUE
     assert {r["review_status"] for r in queue} == {"pending_human_review"}
     rels = {r["relation_id"]: r for r in _rows(DATA / "person_relations.csv")}
     evid = _rows(DATA / "relation_evidences.csv")
-    batch_rids = {e["relation_id"] for e in evid if BATCH_MARKER in e["reviewer_note"]}
+    landed = {r["relation_id"] for r in _rows(ADJUDICATED) if r.get("evidence_landed") == "yes"}
+    assert landed == {"REL-00622", "REL-01161", "REL-01368"}
+    batch2_rids = {e["relation_id"] for e in evid if RECAPTURE_MARKER in e["reviewer_note"]}
+    assert batch2_rids == landed, "第二批证据痕迹必须与裁决落地行严格一致"
+    batch_rids = {
+        e["relation_id"] for e in evid
+        if BATCH_MARKER in e["reviewer_note"] or RECAPTURE_MARKER in e["reviewer_note"]
+    }
+    remaining = [row for row in queue if row["relation_id"] not in landed]
+    assert len(remaining) == EXPECTED_QUEUE - 3
     actions = Counter(r["proposed_action"] for r in queue)
     assert set(actions) <= {
         "recapture_quote_then_regrade",
@@ -193,9 +222,9 @@ def test_unattested_relations_stay_out_of_production_and_public() -> None:
         "no_local_support_mark_insufficient",
     }
     assert actions["no_local_support_mark_insufficient"] >= 1
-    for row in queue:
+    for row in remaining:
         rid = row["relation_id"]
-        assert rid not in batch_rids, f"{rid} 未过佐证门却留下本批证据"
+        assert rid not in batch_rids, f"{rid} 未落地却留下任一批次落地证据"
         assert rels[rid]["publish_status"] not in ("supported", "verified"), f"{rid} 未过佐证门却进入公开层"
         assert rels[rid]["publish_status_origin"] == "derived"
 
@@ -256,14 +285,14 @@ def test_replay_from_pinned_pre_landing_commit(tmp_path: Path) -> None:
     assert result["status"] == "applied"
     assert result["attested"] == EXPECTED_LANDED
     assert result["unattested"] == EXPECTED_QUEUE
-    assert result["public_supported"] == EXPECTED_PUBLIC
+    assert result["public_supported"] == EXPECTED_BATCH1_PUBLIC
     assert result["type_corrections"] == 3
     assert result["new_evidence_rows"] == EXPECTED_LANDED
     assert len(result["queue"]) == EXPECTED_QUEUE
 
     after = _rows(data_dir / "person_relations.csv")
     dist = Counter(r["publish_status"] for r in after)
-    assert dist["supported"] == EXPECTED_PUBLIC
+    assert dist["supported"] == EXPECTED_BATCH1_PUBLIC
     assert dist["pending_review"] == 2451
     assert dist["inferred"] == 1782
     assert len(after) == 4238

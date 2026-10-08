@@ -1,5 +1,21 @@
 # Progress Log - 左联知识库
 
+## 2026-10-08 - 重捕候选第二批逐条裁决落地：公开关系 5→7（REL-01891 证据不足零改动）
+
+**授权（逐字）**：用户本日逐条裁决「第一优先REL-00622 和 REL-01368直接过，REL-01891判"证据不足"，REL-01161 成立但不影响公开层」。这是逐条独立裁决，口径强于 2026-09-20 第一批的「授权按建议执行」概括授权；两批口径在台账、裁决记录与站点文案中已分别说明、不得混同。
+
+**处置四条**：
+- **REL-00622 周扬—邵荃麟（过）**：新增 support 证据 RELE-10270（复用 SRC-0779，未注册新来源），derived `supported` 进公开层。
+- **REL-01368 郁达夫—陈望道（过）**：新增 support 证据 RELE-10272（SRC-0054），类型 交游→签名联署（standard/final 同步改，correction_reason 追加不覆盖）；进公开层。
+- **REL-01161 阳翰笙—林淡秋（成立但不进公开层）**：新增 support 证据 RELE-10271（SRC-0739），被发布门禁自然挡在 `pending_review`（critical + low 置信 + 同属组织推断类型三重拦截）；**未**使用 human_adjudication 通道。
+- **REL-01891 叶紫—萧军（证据不足）**：**生产表零改动**，保持 `inferred`；未写 rejected（rejected 语义是人工否定，「未证实」不得夸大成「已证伪」）。重切段落实为书目著录（"…李克因作，载《东方纪事》1987年…叙述…叶紫同…萧军…的交往"），二手记载强度不足定为 support——引文本身逐字复核真实，「引文可取回」与「证据等级够」是两回事。
+
+**运行时校验**：四条引文全部按候选包 `source_file`+`normalized_start/end` 在空白归一后的本地原文中逐字回定位取回（本地 OCR 字间带空格，复用 `quote_attestation.normalized_bundle`）、`quote_sha256` 自洽；三条落地引文另过双方佐证门；locator 均唯一命中预期既有来源。硬后置条件不符即整体退出、零写入。
+
+**实测终值**：person_relations 4238（supported 7 / pending_review 2451 / inferred 1780，origin 全 derived）；relation_evidences 10269→**10272**（support 20→23、associated 仍 10249、reviewed 20→23）；sources/passages/works **1178/1178/65 未动**、零新注册来源；critical 仍 **1974**（未反向降险）；类型更正恰 1 条。发布层关系 5→7、证据 46→54（外键闭合重算）；静态站关系卡 5→7、graph-data.json 边 5→7；四口径 evidence_supported/trusted 5→**7**、human_verified 仍 **0**、low_risk_heuristic 仍 **1761**、样本仍不足（7<10）不生成排名。Schema 0 err / 13 warn；全量 pytest **163 passed**；幂等二跑输出「无新增/已完成」零写入。
+
+**产物**：新脚本 `research/analysis/apply_phase5_recapture_landing.py` + 新测试 `tests/test_phase5_recapture_landing.py`（含 f011d92 基线红→绿重放）；裁决文件 `phase5_quote_recapture_adjudicated.csv` / `_adjudication_record.md`；台账 `phase5_recapture_landing_ledger.csv`、报告 `phase5_recapture_landing_report.md`。既有改动：第一批脚本幂等校验由全局四表计数改为「本批标记行恰 20 条」（对后续批次免疫）；公开层佐证测试改为「每条公开关系不限批次都须有过双方佐证门的合格 support 引文」（更强）；重捕队列守门测试读取裁决文件扣除已落地 3 条、其余 25 条断言不变；治理/口径测试数字同步 5→7；`build_static_site.py` 关系页口径文案改为两批**分别说明**；网络分析 `SNAPSHOT_DATE`→2026-10-08。
+
 ## 2026-10-08 - 重捕选择器修正：4 条候选可裁决，REL-01368 文献归属歧义消除
 
 **范围**：只改重捕候选包生成器与其守门测试，生产层零改动、公开层仍为 5 条。触发点是复核 9 月 28 日留下的 2 条候选时发现选择器有缺陷。

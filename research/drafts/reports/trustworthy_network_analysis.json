@@ -4,11 +4,11 @@
     "luxun_only_trusted_edges": 2,
     "publish_status_column": true,
     "relation_evidences_table": true,
-    "relations_evidence_supported": 5,
+    "relations_evidence_supported": 7,
     "relations_human_verified": 0,
     "relations_low_risk_heuristic": 1761,
     "relations_total": 4238,
-    "relations_trusted": 5,
+    "relations_trusted": 7,
     "source_family_column": true
   },
   "family_fallback_note": "",
@@ -39,13 +39,29 @@
         {
           "index": 2,
           "members": [
+            "ZLH-007",
+            "ZLH-046"
+          ],
+          "size": 2
+        },
+        {
+          "index": 3,
+          "members": [
+            "ZLH-015",
+            "ZLH-139"
+          ],
+          "size": 2
+        },
+        {
+          "index": 4,
+          "members": [
             "ZLH-058",
             "ZLH-120"
           ],
           "size": 2
         },
         {
-          "index": 3,
+          "index": 5,
           "members": [
             "ZLH-069",
             "ZLH-081"
@@ -53,55 +69,41 @@
           "size": 2
         },
         {
-          "index": 4,
+          "index": 6,
           "members": [
             "ZLH-002"
           ],
           "size": 1
         },
         {
-          "index": 5,
+          "index": 7,
           "members": [
             "ZLH-003"
           ],
           "size": 1
         },
         {
-          "index": 6,
+          "index": 8,
           "members": [
             "ZLH-004"
           ],
           "size": 1
-        },
-        {
-          "index": 7,
-          "members": [
-            "ZLH-005"
-          ],
-          "size": 1
-        },
-        {
-          "index": 8,
-          "members": [
-            "ZLH-006"
-          ],
-          "size": 1
         }
       ],
-      "community_count": 157,
-      "components": 157,
-      "edges": 5,
-      "isolated_nodes": 154,
+      "community_count": 155,
+      "components": 155,
+      "edges": 7,
+      "isolated_nodes": 150,
       "largest_component": 4,
-      "mean_degree": 0.061728,
+      "mean_degree": 0.08642,
       "nodes": 162,
-      "nodes_with_edges": 8,
+      "nodes_with_edges": 12,
       "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
       "sample_sufficient": false,
       "top_betweenness": [],
       "top_degree": [],
       "top_weighted_degree": [],
-      "total_weight": 32.0
+      "total_weight": 44.0
     },
     "evidence_weighted": {
       "communities": [
@@ -118,13 +120,29 @@
         {
           "index": 2,
           "members": [
+            "ZLH-007",
+            "ZLH-046"
+          ],
+          "size": 2
+        },
+        {
+          "index": 3,
+          "members": [
+            "ZLH-015",
+            "ZLH-139"
+          ],
+          "size": 2
+        },
+        {
+          "index": 4,
+          "members": [
             "ZLH-058",
             "ZLH-120"
           ],
           "size": 2
         },
         {
-          "index": 3,
+          "index": 5,
           "members": [
             "ZLH-069",
             "ZLH-081"
@@ -132,55 +150,41 @@
           "size": 2
         },
         {
-          "index": 4,
+          "index": 6,
           "members": [
             "ZLH-002"
           ],
           "size": 1
         },
         {
-          "index": 5,
+          "index": 7,
           "members": [
             "ZLH-003"
           ],
           "size": 1
         },
         {
-          "index": 6,
+          "index": 8,
           "members": [
             "ZLH-004"
           ],
           "size": 1
-        },
-        {
-          "index": 7,
-          "members": [
-            "ZLH-005"
-          ],
-          "size": 1
-        },
-        {
-          "index": 8,
-          "members": [
-            "ZLH-006"
-          ],
-          "size": 1
         }
       ],
-      "community_count": 157,
-      "components": 157,
-      "edges": 5,
-      "isolated_nodes": 154,
+      "community_count": 155,
+      "components": 155,
+      "edges": 7,
+      "isolated_nodes": 150,
       "largest_component": 4,
-      "mean_degree": 0.061728,
+      "mean_degree": 0.08642,
       "nodes": 162,
-      "nodes_with_edges": 8,
+      "nodes_with_edges": 12,
       "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
       "sample_sufficient": false,
       "top_betweenness": [],
       "top_degree": [],
       "top_weighted_degree": [],
-      "total_weight": 30.9
+      "total_weight": 39.3
     },
     "full_exploratory": {
       "communities": [
@@ -559,13 +563,29 @@
         {
           "index": 2,
           "members": [
+            "ZLH-007",
+            "ZLH-046"
+          ],
+          "size": 2
+        },
+        {
+          "index": 3,
+          "members": [
+            "ZLH-015",
+            "ZLH-139"
+          ],
+          "size": 2
+        },
+        {
+          "index": 4,
+          "members": [
             "ZLH-058",
             "ZLH-120"
           ],
           "size": 2
         },
         {
-          "index": 3,
+          "index": 5,
           "members": [
             "ZLH-069",
             "ZLH-081"
@@ -573,55 +593,41 @@
           "size": 2
         },
         {
-          "index": 4,
+          "index": 6,
           "members": [
             "ZLH-002"
           ],
           "size": 1
         },
         {
-          "index": 5,
+          "index": 7,
           "members": [
             "ZLH-003"
           ],
           "size": 1
         },
         {
-          "index": 6,
+          "index": 8,
           "members": [
             "ZLH-004"
           ],
           "size": 1
-        },
-        {
-          "index": 7,
-          "members": [
-            "ZLH-005"
-          ],
-          "size": 1
-        },
-        {
-          "index": 8,
-          "members": [
-            "ZLH-006"
-          ],
-          "size": 1
         }
       ],
-      "community_count": 157,
-      "components": 157,
-      "edges": 5,
-      "isolated_nodes": 154,
+      "community_count": 155,
+      "components": 155,
+      "edges": 7,
+      "isolated_nodes": 150,
       "largest_component": 4,
-      "mean_degree": 0.061728,
+      "mean_degree": 0.08642,
       "nodes": 162,
-      "nodes_with_edges": 8,
+      "nodes_with_edges": 12,
       "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
       "sample_sufficient": false,
       "top_betweenness": [],
       "top_degree": [],
       "top_weighted_degree": [],
-      "total_weight": 30.9
+      "total_weight": 39.3
     },
     "low_risk_heuristic": {
       "communities": [
@@ -975,13 +981,29 @@
         {
           "index": 2,
           "members": [
+            "ZLH-007",
+            "ZLH-046"
+          ],
+          "size": 2
+        },
+        {
+          "index": 3,
+          "members": [
+            "ZLH-015",
+            "ZLH-139"
+          ],
+          "size": 2
+        },
+        {
+          "index": 4,
+          "members": [
             "ZLH-058",
             "ZLH-120"
           ],
           "size": 2
         },
         {
-          "index": 3,
+          "index": 5,
           "members": [
             "ZLH-069",
             "ZLH-081"
@@ -989,55 +1011,41 @@
           "size": 2
         },
         {
-          "index": 4,
+          "index": 6,
           "members": [
             "ZLH-002"
           ],
           "size": 1
         },
         {
-          "index": 5,
+          "index": 7,
           "members": [
             "ZLH-003"
           ],
           "size": 1
         },
         {
-          "index": 6,
+          "index": 8,
           "members": [
             "ZLH-004"
           ],
           "size": 1
-        },
-        {
-          "index": 7,
-          "members": [
-            "ZLH-005"
-          ],
-          "size": 1
-        },
-        {
-          "index": 8,
-          "members": [
-            "ZLH-006"
-          ],
-          "size": 1
         }
       ],
-      "community_count": 157,
-      "components": 157,
-      "edges": 5,
-      "isolated_nodes": 154,
+      "community_count": 155,
+      "components": 155,
+      "edges": 7,
+      "isolated_nodes": 150,
       "largest_component": 4,
-      "mean_degree": 0.061728,
+      "mean_degree": 0.08642,
       "nodes": 162,
-      "nodes_with_edges": 8,
+      "nodes_with_edges": 12,
       "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
       "sample_sufficient": false,
       "top_betweenness": [],
       "top_degree": [],
       "top_weighted_degree": [],
-      "total_weight": 25.9
+      "total_weight": 34.3
     },
     "trusted": {
       "communities": [
@@ -1054,13 +1062,29 @@
         {
           "index": 2,
           "members": [
+            "ZLH-007",
+            "ZLH-046"
+          ],
+          "size": 2
+        },
+        {
+          "index": 3,
+          "members": [
+            "ZLH-015",
+            "ZLH-139"
+          ],
+          "size": 2
+        },
+        {
+          "index": 4,
+          "members": [
             "ZLH-058",
             "ZLH-120"
           ],
           "size": 2
         },
         {
-          "index": 3,
+          "index": 5,
           "members": [
             "ZLH-069",
             "ZLH-081"
@@ -1068,55 +1092,41 @@
           "size": 2
         },
         {
-          "index": 4,
+          "index": 6,
           "members": [
             "ZLH-002"
           ],
           "size": 1
         },
         {
-          "index": 5,
+          "index": 7,
           "members": [
             "ZLH-003"
           ],
           "size": 1
         },
         {
-          "index": 6,
+          "index": 8,
           "members": [
             "ZLH-004"
           ],
           "size": 1
-        },
-        {
-          "index": 7,
-          "members": [
-            "ZLH-005"
-          ],
-          "size": 1
-        },
-        {
-          "index": 8,
-          "members": [
-            "ZLH-006"
-          ],
-          "size": 1
         }
       ],
-      "community_count": 157,
-      "components": 157,
-      "edges": 5,
-      "isolated_nodes": 154,
+      "community_count": 155,
+      "components": 155,
+      "edges": 7,
+      "isolated_nodes": 150,
       "largest_component": 4,
-      "mean_degree": 0.061728,
+      "mean_degree": 0.08642,
       "nodes": 162,
-      "nodes_with_edges": 8,
+      "nodes_with_edges": 12,
       "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
       "sample_sufficient": false,
       "top_betweenness": [],
       "top_degree": [],
       "top_weighted_degree": [],
-      "total_weight": 32.0
+      "total_weight": 44.0
     }
   },
   "sample_note_trusted": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
@@ -1143,13 +1153,29 @@
           {
             "index": 2,
             "members": [
+              "ZLH-007",
+              "ZLH-046"
+            ],
+            "size": 2
+          },
+          {
+            "index": 3,
+            "members": [
+              "ZLH-015",
+              "ZLH-139"
+            ],
+            "size": 2
+          },
+          {
+            "index": 4,
+            "members": [
               "ZLH-058",
               "ZLH-120"
             ],
             "size": 2
           },
           {
-            "index": 3,
+            "index": 5,
             "members": [
               "ZLH-069",
               "ZLH-081"
@@ -1157,55 +1183,41 @@
             "size": 2
           },
           {
-            "index": 4,
+            "index": 6,
             "members": [
               "ZLH-002"
             ],
             "size": 1
           },
           {
-            "index": 5,
+            "index": 7,
             "members": [
               "ZLH-003"
             ],
             "size": 1
           },
           {
-            "index": 6,
+            "index": 8,
             "members": [
               "ZLH-004"
             ],
             "size": 1
-          },
-          {
-            "index": 7,
-            "members": [
-              "ZLH-005"
-            ],
-            "size": 1
-          },
-          {
-            "index": 8,
-            "members": [
-              "ZLH-006"
-            ],
-            "size": 1
           }
         ],
-        "community_count": 157,
-        "components": 157,
-        "edges": 5,
-        "isolated_nodes": 154,
+        "community_count": 155,
+        "components": 155,
+        "edges": 7,
+        "isolated_nodes": 150,
         "largest_component": 4,
-        "mean_degree": 0.061728,
+        "mean_degree": 0.08642,
         "nodes": 162,
-        "nodes_with_edges": 8,
+        "nodes_with_edges": 12,
         "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
         "sample_sufficient": false,
         "top_betweenness": [],
         "top_degree": [],
         "top_weighted_degree": [],
-        "total_weight": 32.0
+        "total_weight": 44.0
       },
       "heuristic": {
         "communities": [
@@ -1561,13 +1573,29 @@
           {
             "index": 2,
             "members": [
+              "ZLH-007",
+              "ZLH-046"
+            ],
+            "size": 2
+          },
+          {
+            "index": 3,
+            "members": [
+              "ZLH-015",
+              "ZLH-139"
+            ],
+            "size": 2
+          },
+          {
+            "index": 4,
+            "members": [
               "ZLH-058",
               "ZLH-120"
             ],
             "size": 2
           },
           {
-            "index": 3,
+            "index": 5,
             "members": [
               "ZLH-069",
               "ZLH-081"
@@ -1575,55 +1603,41 @@
             "size": 2
           },
           {
-            "index": 4,
+            "index": 6,
             "members": [
               "ZLH-002"
             ],
             "size": 1
           },
           {
-            "index": 5,
+            "index": 7,
             "members": [
               "ZLH-003"
             ],
             "size": 1
           },
           {
-            "index": 6,
+            "index": 8,
             "members": [
               "ZLH-004"
             ],
             "size": 1
-          },
-          {
-            "index": 7,
-            "members": [
-              "ZLH-005"
-            ],
-            "size": 1
-          },
-          {
-            "index": 8,
-            "members": [
-              "ZLH-006"
-            ],
-            "size": 1
           }
         ],
-        "community_count": 157,
-        "components": 157,
-        "edges": 5,
-        "isolated_nodes": 154,
+        "community_count": 155,
+        "components": 155,
+        "edges": 7,
+        "isolated_nodes": 150,
         "largest_component": 4,
-        "mean_degree": 0.061728,
+        "mean_degree": 0.08642,
         "nodes": 162,
-        "nodes_with_edges": 8,
+        "nodes_with_edges": 12,
         "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
         "sample_sufficient": false,
         "top_betweenness": [],
         "top_degree": [],
         "top_weighted_degree": [],
-        "total_weight": 30.9
+        "total_weight": 39.3
       },
       "before": {
         "communities": [
@@ -1640,13 +1654,29 @@
           {
             "index": 2,
             "members": [
+              "ZLH-007",
+              "ZLH-046"
+            ],
+            "size": 2
+          },
+          {
+            "index": 3,
+            "members": [
+              "ZLH-015",
+              "ZLH-139"
+            ],
+            "size": 2
+          },
+          {
+            "index": 4,
+            "members": [
               "ZLH-058",
               "ZLH-120"
             ],
             "size": 2
           },
           {
-            "index": 3,
+            "index": 5,
             "members": [
               "ZLH-069",
               "ZLH-081"
@@ -1654,55 +1684,41 @@
             "size": 2
           },
           {
-            "index": 4,
+            "index": 6,
             "members": [
               "ZLH-002"
             ],
             "size": 1
           },
           {
-            "index": 5,
+            "index": 7,
             "members": [
               "ZLH-003"
             ],
             "size": 1
           },
           {
-            "index": 6,
+            "index": 8,
             "members": [
               "ZLH-004"
             ],
             "size": 1
-          },
-          {
-            "index": 7,
-            "members": [
-              "ZLH-005"
-            ],
-            "size": 1
-          },
-          {
-            "index": 8,
-            "members": [
-              "ZLH-006"
-            ],
-            "size": 1
           }
         ],
-        "community_count": 157,
-        "components": 157,
-        "edges": 5,
-        "isolated_nodes": 154,
+        "community_count": 155,
+        "components": 155,
+        "edges": 7,
+        "isolated_nodes": 150,
         "largest_component": 4,
-        "mean_degree": 0.061728,
+        "mean_degree": 0.08642,
         "nodes": 162,
-        "nodes_with_edges": 8,
+        "nodes_with_edges": 12,
         "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
         "sample_sufficient": false,
         "top_betweenness": [],
         "top_degree": [],
         "top_weighted_degree": [],
-        "total_weight": 30.9
+        "total_weight": 39.3
       },
       "weighted_degree_top10_overlap": {
         "common_count": 0,
@@ -1726,13 +1742,29 @@
           {
             "index": 2,
             "members": [
+              "ZLH-007",
+              "ZLH-046"
+            ],
+            "size": 2
+          },
+          {
+            "index": 3,
+            "members": [
+              "ZLH-015",
+              "ZLH-139"
+            ],
+            "size": 2
+          },
+          {
+            "index": 4,
+            "members": [
               "ZLH-058",
               "ZLH-120"
             ],
             "size": 2
           },
           {
-            "index": 3,
+            "index": 5,
             "members": [
               "ZLH-069",
               "ZLH-081"
@@ -1740,55 +1772,41 @@
             "size": 2
           },
           {
-            "index": 4,
+            "index": 6,
             "members": [
               "ZLH-002"
             ],
             "size": 1
           },
           {
-            "index": 5,
+            "index": 7,
             "members": [
               "ZLH-003"
             ],
             "size": 1
           },
           {
-            "index": 6,
+            "index": 8,
             "members": [
               "ZLH-004"
             ],
             "size": 1
-          },
-          {
-            "index": 7,
-            "members": [
-              "ZLH-005"
-            ],
-            "size": 1
-          },
-          {
-            "index": 8,
-            "members": [
-              "ZLH-006"
-            ],
-            "size": 1
           }
         ],
-        "community_count": 157,
-        "components": 157,
-        "edges": 5,
-        "isolated_nodes": 154,
+        "community_count": 155,
+        "components": 155,
+        "edges": 7,
+        "isolated_nodes": 150,
         "largest_component": 4,
-        "mean_degree": 0.061728,
+        "mean_degree": 0.08642,
         "nodes": 162,
-        "nodes_with_edges": 8,
+        "nodes_with_edges": 12,
         "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
         "sample_sufficient": false,
         "top_betweenness": [],
         "top_degree": [],
         "top_weighted_degree": [],
-        "total_weight": 25.9
+        "total_weight": 34.3
       },
       "before": {
         "communities": [
@@ -1805,13 +1823,29 @@
           {
             "index": 2,
             "members": [
+              "ZLH-007",
+              "ZLH-046"
+            ],
+            "size": 2
+          },
+          {
+            "index": 3,
+            "members": [
+              "ZLH-015",
+              "ZLH-139"
+            ],
+            "size": 2
+          },
+          {
+            "index": 4,
+            "members": [
               "ZLH-058",
               "ZLH-120"
             ],
             "size": 2
           },
           {
-            "index": 3,
+            "index": 5,
             "members": [
               "ZLH-069",
               "ZLH-081"
@@ -1819,55 +1853,41 @@
             "size": 2
           },
           {
-            "index": 4,
+            "index": 6,
             "members": [
               "ZLH-002"
             ],
             "size": 1
           },
           {
-            "index": 5,
+            "index": 7,
             "members": [
               "ZLH-003"
             ],
             "size": 1
           },
           {
-            "index": 6,
+            "index": 8,
             "members": [
               "ZLH-004"
             ],
             "size": 1
-          },
-          {
-            "index": 7,
-            "members": [
-              "ZLH-005"
-            ],
-            "size": 1
-          },
-          {
-            "index": 8,
-            "members": [
-              "ZLH-006"
-            ],
-            "size": 1
           }
         ],
-        "community_count": 157,
-        "components": 157,
-        "edges": 5,
-        "isolated_nodes": 154,
+        "community_count": 155,
+        "components": 155,
+        "edges": 7,
+        "isolated_nodes": 150,
         "largest_component": 4,
-        "mean_degree": 0.061728,
+        "mean_degree": 0.08642,
         "nodes": 162,
-        "nodes_with_edges": 8,
+        "nodes_with_edges": 12,
         "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
         "sample_sufficient": false,
         "top_betweenness": [],
         "top_degree": [],
         "top_weighted_degree": [],
-        "total_weight": 30.9
+        "total_weight": 39.3
       },
       "weighted_degree_top10_overlap": {
         "common_count": 0,
@@ -1891,13 +1911,29 @@
           {
             "index": 2,
             "members": [
+              "ZLH-007",
+              "ZLH-046"
+            ],
+            "size": 2
+          },
+          {
+            "index": 3,
+            "members": [
+              "ZLH-015",
+              "ZLH-139"
+            ],
+            "size": 2
+          },
+          {
+            "index": 4,
+            "members": [
               "ZLH-058",
               "ZLH-120"
             ],
             "size": 2
           },
           {
-            "index": 3,
+            "index": 5,
             "members": [
               "ZLH-069",
               "ZLH-081"
@@ -1905,55 +1941,41 @@
             "size": 2
           },
           {
-            "index": 4,
+            "index": 6,
             "members": [
               "ZLH-002"
             ],
             "size": 1
           },
           {
-            "index": 5,
+            "index": 7,
             "members": [
               "ZLH-003"
             ],
             "size": 1
           },
           {
-            "index": 6,
+            "index": 8,
             "members": [
               "ZLH-004"
             ],
             "size": 1
-          },
-          {
-            "index": 7,
-            "members": [
-              "ZLH-005"
-            ],
-            "size": 1
-          },
-          {
-            "index": 8,
-            "members": [
-              "ZLH-006"
-            ],
-            "size": 1
           }
         ],
-        "community_count": 157,
-        "components": 157,
-        "edges": 5,
-        "isolated_nodes": 154,
+        "community_count": 155,
+        "components": 155,
+        "edges": 7,
+        "isolated_nodes": 150,
         "largest_component": 4,
-        "mean_degree": 0.061728,
+        "mean_degree": 0.08642,
         "nodes": 162,
-        "nodes_with_edges": 8,
+        "nodes_with_edges": 12,
         "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
         "sample_sufficient": false,
         "top_betweenness": [],
         "top_degree": [],
         "top_weighted_degree": [],
-        "total_weight": 32.0
+        "total_weight": 44.0
       },
       "before": {
         "communities": [
@@ -2312,7 +2334,7 @@
       }
     }
   },
-  "snapshot": "2026-09-28",
+  "snapshot": "2026-10-08",
   "time_slices": {
     "1928-1930": {
       "communities": [

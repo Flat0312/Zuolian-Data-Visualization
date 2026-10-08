@@ -773,8 +773,11 @@ def render_relations_index(relations: list[dict[str, object]]) -> str:
       <p class="page-hero__lead">公开层关系卡片全部为 derived <strong>supported</strong>（由证据派生，不含人工确认断言）：
       每条都有一条 <code>support</code> 级证据，含可定位原文与逐字引文，且引文须同时记载关系双方
       （鲁迅日记为日记体，作者即甲方，只需引文出现乙方）。同表随附的 <code>associated</code> 行只表示来源关联，
-      不断言支持强度，不得当作支持证据引用。本批人工裁决口径为「授权按建议执行」
-      （2026-09-20 用户会话授权，签核路径 C），非逐条独立人工复核，引用时须保留此口径。
+      不断言支持强度，不得当作支持证据引用。公开层裁决口径分两批、<strong>不得混为一谈</strong>：
+      其中 5 条来自 2026-09-20「授权按建议执行」概括授权（用户会话授权，签核路径 C，
+      非逐条独立人工复核，口径较弱，引用时须保留此口径）；2 条来自 2026-10-08
+      逐条独立人工裁决（REL-00622 周扬—邵荃麟、REL-01368 郁达夫—陈望道，口径较强，
+      授权语原文见 phase5_quote_recapture_adjudication_record.md）。
       critical/high 风险、待核验、推断类型、low 置信以及仅有关联级证据的关系一律不公开。</p>
       {empty_notice}
       <div class="filter-box">

@@ -2,8 +2,8 @@
   "generated_at": "unstamped",
   "publish_dir": "D:\\1大创\\左联知识库项目\\data\\publish",
   "publish_warning_breakdown": {
-    "isolated_person": 63,
-    "orphan_source": 975
+    "isolated_person": 62,
+    "orphan_source": 969
   },
   "research_schema_errors": 0,
   "research_schema_warnings": 13,
@@ -22,13 +22,14 @@
       "supported",
       "verified"
     ],
+    "published_relation_evidences": "fk_closed_subset_retains_original_evidence_support;only_support_not_rejected_with_locator_and_quote_or_context_gates_publication;associated_rows_are_source_links_not_support_claims",
     "rejected_fact_evidences": "excluded",
     "rejected_relation_evidences": "excluded",
     "relation_gate": "derived_recomputed_with_evidence_no_passthrough_except_human_verified_rejected",
     "supported_requires": "support_not_rejected_with_locator_and_quote_or_context"
   },
   "schema_errors": 0,
-  "schema_warnings": 1038,
+  "schema_warnings": 1031,
   "source_dir": "D:\\1大创\\左联知识库项目\\data\\processed",
   "source_summary": {
     "citations": 1178,
@@ -68,9 +69,9 @@
       "output": 36
     },
     "person_relations.csv": {
-      "filtered": 4233,
+      "filtered": 4231,
       "input": 4238,
-      "output": 5
+      "output": 7
     },
     "persons.csv": {
       "filtered": 0,
@@ -83,9 +84,9 @@
       "output": 41
     },
     "relation_evidences.csv": {
-      "filtered": 10223,
-      "input": 10269,
-      "output": 46
+      "filtered": 10218,
+      "input": 10272,
+      "output": 54
     },
     "source_passages.csv": {
       "filtered": 0,

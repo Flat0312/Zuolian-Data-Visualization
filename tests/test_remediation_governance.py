@@ -307,8 +307,8 @@ def test_candidate_heuristic_label_not_credible(tmp_path: Path) -> None:
     """小范围返修：候选 priority_reason 须用“较低风险启发式关系度”，不得写“可信关系度”。
 
     数值沿用现有较低风险筛选算法（排序/名单/score 不变）；启发式口径不得变成
-    evidence-supported 口径。2026-09-28 P5-LANDING 后 evidence_supported/trusted 为 5，
-    human_verified 仍为 0（本批未使用 human_adjudication 通道）。
+    evidence-supported 口径。2026-10-08 P5-RECAPTURE 第二批落地后
+    evidence_supported/trusted 为 7，human_verified 仍为 0（两批均未使用 human_adjudication 通道）。
     """
     from conftest import PROJECT_ROOT
 
@@ -337,11 +337,12 @@ def test_candidate_heuristic_label_not_credible(tmp_path: Path) -> None:
     nout = tmp_path / "net"
     nout.mkdir()
     summary = net.build(PROJECT_ROOT / "data" / "processed", nout)
-    # P5-LANDING：5 条关系经「双方佐证门」+ derived 门禁进入证据支持口径；
-    # trusted = verified ∪ supported = 0 ∪ 5；样本仍不足（边 <10），不得生成排名。
-    assert summary["evidence_supported"] == 5
+    # P5-LANDING + P5-RECAPTURE：7 条关系经「双方佐证门」+ derived 门禁进入证据支持口径
+    # （第一批 5 条概括授权 + 第二批 2 条逐条独立裁决）；
+    # trusted = verified ∪ supported = 0 ∪ 7；样本仍不足（边 <10），不得生成排名。
+    assert summary["evidence_supported"] == 7
     assert summary["human_verified"] == 0
-    assert summary["trusted"] == 5
+    assert summary["trusted"] == 7
     # 1760 -> 1761：P5-LANDING 把 REL-00059 的类型由「时空共现」（推断类，启发式口径排除）
     # 更正为「交往」，该行因此进入较低风险启发式口径。其余更正不影响该口径。
     assert summary["low_risk_heuristic"] == 1761
