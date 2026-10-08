@@ -46,7 +46,6 @@ OUT_MD = REPORTS / "phase5_quote_recapture_report.md"
 _ANALYSIS_DIR = Path(__file__).resolve().parent
 try:
     from research.analysis.quote_attestation import (
-        find_cooccurrence,
         looks_like_name_list,
         name_candidates,
         normalized_bundle,
@@ -60,7 +59,6 @@ except ImportError:
     if str(_ANALYSIS_DIR) not in sys.path:
         sys.path.append(str(_ANALYSIS_DIR))
     from quote_attestation import (  # noqa: E402
-        find_cooccurrence,
         looks_like_name_list,
         name_candidates,
         normalized_bundle,
@@ -71,11 +69,22 @@ except ImportError:
         assign_relation_status_columns,
     )
 
-SENTENCE_DELIMS = "。；！？"
+# 这两本书的 OCR 大量用 ASCII 句点 "." 当句号（如"…联名签署.同年12月,…"），
+# 只认 "。；！？" 会让句子向左扩张成一整页、随后因超长被拒，反而丢掉正确的那一处。
+SENTENCE_DELIMS = "。；！？.．"
 PAGE_MARKER = "────"
 MAX_QUOTE_CHARS = 400
 PAGE_RE = re.compile(r"第(\d{1,4})页")
 ENUM_TAIL_RE = re.compile(r"等共?\d{1,4}[余位人]?")
+TITLE_RE = re.compile(r"《([^》]{2,40})》")
+# 同一页里可能有多处同窗共现（REL-01368 即命中两份不同的联名名单）。
+# 只按"姓名距离最近"挑会挑错，因此多取几个候选再按下面三条排序。
+COOCCURRENCE_CANDIDATES = 12
+# 对这些关系类型而言，"同列一份具体文件的签署名单"本身就是直接证据，
+# 不能按"纯人名罗列＝只是共现"一律否决（REL-01368 即被误杀：
+# 《为横死之小林遗族募捐启》9 人签署名单正是 签名联署 的直接记载）。
+# 其余类型（交游／交往／通信／创作合作…）里名单只算共现，仍然否决。
+LIST_ACCEPTABLE_TYPES = ("签名联署", "同属组织")
 BOOK_BY_FILE = {"左联史.txt": "左联史", "左联词典.txt": "左联词典"}
 
 COLUMNS = [
@@ -84,7 +93,7 @@ COLUMNS = [
     "queue_proposed_action", "recapture_status", "recaptured_quote", "quote_char_len",
     "quote_form", "quote_sha256", "derived_locator", "recorded_locator", "locator_agrees",
     "source_file", "normalized_start", "normalized_end", "attestation_basis", "list_like",
-    "name_list_pattern",
+    "name_list_pattern", "secondary_description",
     "projected_publish_status", "projected_public", "old_recorded_quote",
     "old_attestation_basis", "overnight_reason", "review_status",
 ]
@@ -140,6 +149,119 @@ def _derive_locator(flat: str, pos: int, book: str) -> str:
     if last is None:
         return f"{book} 页码未识别"
     return f"{book} 第{last.group(1)}页"
+
+
+SECONDARY_MARKERS = (
+    "传记小说", "评传", "年谱", "论文", "书评", "研究资料", "回忆录", "摘编", "转载",
+    "一书", "文中", "记述", "著录", "李克因作", "作,载", "载《",
+)
+SECONDARY_YEAR_RE = re.compile(r"载\d{4}")
+
+
+def secondary_description(text: str) -> bool:
+    """粗判该段是否为**书目著录／二手评述**而非原始记载。
+
+    实测教训：REL-01891（叶紫—萧军）切到的是《左联词典》第587页的书目条——
+    "叶紫——一颗富有而又饥饿的星 传记小说。李克因作，载《东方纪事》1987年3、4期合刊。
+    叙述……叶紫同陈企霞、聂绀弩、周颖夫妇、萧军、萧红夫妇等的交往"。
+    它确实同时提到两人且不是纯名单，但语义是"某本传记小说描写了他们的交往"，
+    属二手著录，证据强度低于原始记载，不应径直定为 support。
+    本函数只做**标注**，是否可用交人工判断。
+    """
+    flat = re.sub(r"\s+", "", str(text or ""))
+    if SECONDARY_YEAR_RE.search(flat):
+        return True
+    return any(marker in flat for marker in SECONDARY_MARKERS)
+
+
+def enumerate_page_candidates(
+    flat: str,
+    names_a: list[str],
+    names_b: list[str],
+    book: str,
+    recorded_locator: str,
+    window: int = 200,
+    cap: int = 40,
+) -> list[dict]:
+    """枚举登记页上所有 A/B 同窗共现，各自扩成句子并算出页码。
+
+    必须自己枚举而不能用 quote_attestation.find_cooccurrence：后者按"姓名距离最近"
+    排序后截断到 limit 条，而同一页里往往有多处共现（REL-01368 的第132页既有
+    《为横死之小林遗族募捐启》9 人名单，也有营救丁潘的 38 人联名致电），
+    正确的那处可能因距离略远被截断挤掉，选择器就再也看不到它。
+    """
+    positions: dict[str, list[int]] = {}
+    for name in dict.fromkeys([*names_a, *names_b]):
+        found: list[int] = []
+        start = 0
+        while True:
+            pos = flat.find(name, start)
+            if pos < 0:
+                break
+            found.append(pos)
+            start = pos + 1
+        if found:
+            positions[name] = found
+    seen: set[tuple[int, int]] = set()
+    out: list[dict] = []
+    for a in names_a:
+        for pa in positions.get(a, []):
+            for b in names_b:
+                for pb in positions.get(b, []):
+                    if abs(pa - pb) > window:
+                        continue
+                    lo, hi = min(pa, pb), max(pa + len(a), pb + len(b))
+                    key = (lo, hi)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    left, right = _expand_sentence(flat, lo, hi)
+                    quote = flat[left:right]
+                    out.append({
+                        "left": left, "right": right, "quote": quote,
+                        "locator": _derive_locator(flat, left, book),
+                        "distance": abs(pa - pb),
+                    })
+                    if len(out) >= cap:
+                        return out
+    return out
+
+
+def reason_titles(reason: str) -> list[str]:
+    """从夜间轮 reason 里抽出《篇名》，用作同页多候选的消歧锚。
+
+    reason 是转述、不能当引文用，但它提到的**篇名**是可核对的客观锚点：
+    同页若有多处共现，优先取含该篇名的那处，否则可能切到另一份文献
+    （REL-01368 的实测教训：同页既有《为横死之小林遗族募捐启》9 人名单，
+    也有营救丁玲潘梓年的 38 人联名致电，两者都真但不是同一件事）。
+    """
+    return [t.strip() for t in TITLE_RE.findall(str(reason or "")) if len(t.strip()) >= 2]
+
+
+def pick_cooccurrence(cands: list[dict], reason: str, recorded_locator: str) -> dict | None:
+    """在同页多个同窗候选里选最可能是 reason 所指那一处。
+
+    排序键（依次）：①页码与夜间轮登记一致 → ②命中 reason 里的《篇名》 →
+    ③非名单句式 → ④非书目著录／二手评述 → ⑤片段更短（更聚焦） → ⑥双方姓名距离更近。
+
+    ①必须排在最前：同一份文献在全书会出现多次（不同人物词条各引一次），
+    只按篇名挑会挑到别的词条页上，随后被同页硬门拒绝，反而丢掉本来正确的那一处。
+    返回 None 表示无候选。
+    """
+    if not cands:
+        return None
+    titles = reason_titles(reason)
+    recorded = (recorded_locator or "").strip()
+
+    def key(c: dict):
+        quote = c["quote"]
+        page_ok = 0 if (not recorded or c["locator"] == recorded) else 1
+        title_ok = 0 if any(t in quote for t in titles) else 1
+        listed = 1 if looks_like_name_list(quote) else 0
+        secondary = 1 if secondary_description(quote) else 0
+        return (page_ok, title_ok, listed, secondary, len(quote), int(c["distance"]))
+
+    return min(cands, key=key)
 
 
 def name_list_pattern(text: str) -> bool:
@@ -205,7 +327,7 @@ def recapture_one(
         "derived_locator": "", "recorded_locator": row.get("recorded_locator", ""),
         "locator_agrees": "", "source_file": row.get("local_file", ""),
         "normalized_start": "", "normalized_end": "", "attestation_basis": "",
-        "list_like": "", "name_list_pattern": "",
+        "list_like": "", "name_list_pattern": "", "secondary_description": "",
         "projected_publish_status": "", "projected_public": "",
         "old_attestation_basis": row.get("attestation_basis", ""),
         "old_recorded_quote": row.get("recorded_evidence_id", ""),
@@ -229,19 +351,17 @@ def recapture_one(
     na, nb = name_candidates(pa), name_candidates(pb)
     diary = book == "鲁迅日记"
 
-    hits = find_cooccurrence((text, flat, idx), na, nb, limit=1)
-    if not hits:
+    recorded = (row.get("recorded_locator") or "").strip()
+    cands = enumerate_page_candidates(flat, na, nb, book, recorded)
+    if not cands:
         out["recapture_status"] = "rejected_no_cooccurrence"
         return out
-    hit = hits[0]
-    pos_a = int(hit["normalized_pos"])
-    span_lo, span_hi = pos_a, pos_a + len(str(hit["name_a"]))
-    bpos = flat.find(str(hit["name_b"]), max(0, span_lo - 260))
-    if bpos >= 0:
-        span_lo = min(span_lo, bpos)
-        span_hi = max(span_hi, bpos + len(str(hit["name_b"])))
-    left, right = _expand_sentence(flat, span_lo, span_hi)
-    quote = flat[left:right]
+    chosen = pick_cooccurrence(cands, row.get("overnight_reason", ""), recorded)
+    if chosen is None:
+        out["recapture_status"] = "rejected_no_cooccurrence"
+        return out
+    left, right = chosen["left"], chosen["right"]
+    quote = chosen["quote"]
 
     if PAGE_MARKER in quote:
         out["recapture_status"] = "rejected_crosses_page_marker"
@@ -254,16 +374,18 @@ def recapture_one(
         out["recaptured_quote"] = quote[:MAX_QUOTE_CHARS]
         out["normalized_start"], out["normalized_end"] = str(left), str(right)
         return out
-    if looks_like_name_list(quote):
+    effective_type = corrected_type or (rel_row.get("final_relation_type") or "").strip()
+    listed = looks_like_name_list(quote)
+    if listed and effective_type not in LIST_ACCEPTABLE_TYPES:
         out["recapture_status"] = "rejected_name_list_only"
         out["list_like"] = "yes"
         out["name_list_pattern"] = "yes" if name_list_pattern(quote) else "no"
+        out["secondary_description"] = "yes" if secondary_description(quote) else "no"
         out["recaptured_quote"] = quote
         out["quote_char_len"] = str(len(quote))
         out["normalized_start"], out["normalized_end"] = str(left), str(right)
         return out
-    locator = _derive_locator(flat, left, book)
-    recorded = (row.get("recorded_locator") or "").strip()
+    locator = chosen["locator"]
     if recorded and locator != recorded:
         # 页码不一致意味着这不是「同一处引文重切」，而是在全书别处找到了另一段共现。
         # 实测这类段落全部不成立（阳翰笙—林淡秋 189 人签名名单、殷夫—李辉英 冯铿词条、
@@ -275,6 +397,7 @@ def recapture_one(
         out["quote_char_len"] = str(len(quote))
         out["normalized_start"], out["normalized_end"] = str(left), str(right)
         out["name_list_pattern"] = "yes" if name_list_pattern(quote) else "no"
+        out["secondary_description"] = "yes" if secondary_description(quote) else "no"
         return out
     ok, basis = quote_attests_pair(quote, na, nb, diary_author_implicit=diary)
     if not ok:
@@ -300,6 +423,7 @@ def recapture_one(
         "attestation_basis": basis,
         "list_like": "no",
         "name_list_pattern": "yes" if name_list_pattern(quote) else "no",
+        "secondary_description": "yes" if secondary_description(quote) else "no",
         "projected_publish_status": status,
         "projected_public": "yes" if status in PUBLIC_RELATION_STATUSES else "no",
     })
@@ -416,10 +540,12 @@ def write_report(rows: list[dict[str, str]], path: Path) -> None:
         ]
         if r["name_list_pattern"] == "yes":
             lines += [
-                "> ⚠ **名单句式**：本段以「等N人」类并列名单收束。若该关系类型是 `签名联署`，"
-                "同列一份名单可以是直接证据；若是 `交游`/`同属组织`，同列名单只算共现，"
-                "不足以支持。**还须核对重切段落与夜间轮 `reason` 所指是否为同一份文献**——"
-                "本批已出现 reason 指甲文献、重切段落实为乙文献的情况，两者都真但不是同一件事。",
+                "> ⚠ **名单句式**：本段以「等N人」类并列名单收束。若该关系类型是 `签名联署` 或 `同属组织`，"
+                "同列一份**具体文件**的签署名单／任职名单可以是直接证据；若是 `交游`／`交往`／`通信`，"
+                "同列名单只算共现，不足以支持（这类已被自动否决，不会出现在这里）。"
+                "选择器已优先取命中 reason 里《篇名》的同页段落，但仍须人工确认这份名单"
+                "就是该关系记录所指的那一份——同一页可能并列多份名单（REL-01368 的第132页"
+                "同时有《为横死之小林遗族募捐启》9 人名单与营救丁潘的 38 人联名致电）。",
                 "",
             ]
     lines += [

@@ -124,3 +124,49 @@ def test_page_mismatch_rejections_are_not_publishable_candidates() -> None:
         assert row["derived_locator"] != row["recorded_locator"]
         assert not row["quote_sha256"]
         assert row["projected_publish_status"] == ""
+
+
+# ------------------------------------- 本轮踩到的三个坑，固化为防回归断言
+
+
+def test_reason_title_wins_over_other_same_page_lists() -> None:
+    """reason 点名《篇名》时必须选中含该篇名的同页段落。
+
+    REL-01368 的教训：第132页同时有《为横死之小林遗族募捐启》9 人签署名单与
+    营救丁玲、潘梓年的 38 人联名致电，两份都真但不是同一件事。只按"姓名距离最近"
+    挑会选到 38 人电报，与 reason 所指不符。
+    """
+    cand = {r["relation_id"]: r for r in _rows(_CAND)}
+    row = cand["REL-01368"]
+    assert row["recapture_status"] == "recaptured"
+    assert "为横死之小林遗族募捐启" in row["recaptured_quote"]
+    assert "营救丁" not in row["recaptured_quote"], "又切回 38 人联名致电了"
+    assert row["locator_agrees"] == "yes"
+
+
+def test_secondary_bibliographic_passages_are_flagged() -> None:
+    """书目著录／二手评述必须标注，不得与原始记载混同。
+
+    REL-01891 切到的是《左联词典》第587页的书目条——"…传记小说。李克因作，载《东方纪事》
+    1987年…叙述…叶紫同…萧军、萧红夫妇等的交往"。它确实同页、非纯名单、双方都在，
+    但语义是"某本传记小说描写了他们的交往"，属二手著录，证据强度低于原始记载。
+    """
+    cand = {r["relation_id"]: r for r in _rows(_CAND)}
+    row = cand["REL-01891"]
+    assert row["recapture_status"] == "recaptured"
+    assert row["secondary_description"] == "yes", "书目著录未被标注"
+    assert row["review_status"] == "pending_human_review"
+
+
+def test_name_list_rejection_is_relation_type_aware() -> None:
+    """名单句式只对 交游/交往/通信 一类否决；签名联署/同属组织 保留并标注。"""
+    cand = _rows(_CAND)
+    by_id = {r["relation_id"]: r for r in cand}
+    # 同属组织 + 名单：保留（左联常委/行政书记任职名单正是该关系的直接记载）
+    assert by_id["REL-01161"]["recapture_status"] == "recaptured"
+    assert by_id["REL-01161"]["name_list_pattern"] == "yes"
+    # 被名单门否决的，其类型不得属于可接受名单的类型
+    for row in cand:
+        if row["recapture_status"] == "rejected_name_list_only":
+            effective = row["proposed_relation_type"] or row["current_final_relation_type"]
+            assert effective not in ("签名联署", "同属组织"), row["relation_id"]
