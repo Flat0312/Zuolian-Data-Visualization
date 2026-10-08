@@ -337,14 +337,15 @@ def test_candidate_heuristic_label_not_credible(tmp_path: Path) -> None:
     nout = tmp_path / "net"
     nout.mkdir()
     summary = net.build(PROJECT_ROOT / "data" / "processed", nout)
-    # P5-LANDING + P5-RECAPTURE：7 条关系经「双方佐证门」+ derived 门禁进入证据支持口径
-    # （第一批 5 条概括授权 + 第二批 2 条逐条独立裁决）；
-    # trusted = verified ∪ supported = 0 ∪ 7；样本仍不足（边 <10），不得生成排名。
-    assert summary["evidence_supported"] == 7
+    # P5-LANDING + P5-RECAPTURE + P5-SWEEP-BATCH1：25 条关系经「双方佐证门」+ derived 门禁进入证据支持口径
+    # （第一批 5 条概括授权 + 第二批 2 条逐条独立裁决 + 第三批 18 条双 Agent 交叉验证）；
+    # trusted = verified ∪ supported = 0 ∪ 25；样本已过 10 条门槛，排名生成与否由分析脚本口径决定。
+    assert summary["evidence_supported"] == 25
     assert summary["human_verified"] == 0
-    assert summary["trusted"] == 7
+    assert summary["trusted"] == 25
     # 1760 -> 1761：P5-LANDING 把 REL-00059 的类型由「时空共现」（推断类，启发式口径排除）
-    # 更正为「交往」，该行因此进入较低风险启发式口径。其余更正不影响该口径。
+    # 更正为「交游」（2026-10-08 词表归并前为「交往」，归并后同义并入交游），该行因此进入较低风险启发式口径。
+    # 其余更正与词表归并（论战→文学论战、交往→交游）均不改变该口径的成员资格。
     assert summary["low_risk_heuristic"] == 1761
     # 同一行：启发式为真、证据支持为假，证明两口径未混同
     low_risk_row = {

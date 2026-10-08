@@ -1,5 +1,23 @@
 # Progress Log - 左联知识库
 
+## 2026-10-08（第四批落地）- 词表归并 + 扫掠第 1 批 18 条落地：公开关系 7→25
+
+**决定（用户本日逐字确认）**：①采用**保守交集**（分歧条目中双方 support 且至少一方判成立者，按现类型不改落地）；②词表**归并到多数标签**：`论战`(39)→`文学论战`(88)、`交往`(8)→`交游`(1206)（方向经用户逐字校准——早前选项描述与实际计数矛盾，以用户确认为准）；③一致 15 条 + 保守交集 3 条 + 同义解锁 3 条**同批落地全部 18 条**。
+
+**A. 词表归并**（`merge_relation_type_vocab.py`，幂等）：只改 `person_relations.csv` 的 `standard_relation_type`/`final_relation_type` 两列共 47 行（94 单元格）；`original/raw/llm_suggested` 历史列逐字节未动（测试以基线提交 `e5ff09f` 逐列比对钉死）；不写 correction_reason（词表规范化 ≠ 类型语义更正）；台账 `vocab_merge_2026-10-08_ledger.csv`。公开层受影响仅 REL-00059（交往→交游，门禁零漂移）。
+
+**B. 合并器升级并重跑**（`merge_sweep_cross_validation.py --allow-conservative-intersection`）：proposed_type 比较一律经别名归一，原 3 条 `type_synonym` 分歧（REL-00011/00038/00088）自动转一致；`--allow-conservative-intersection` 显式开启保守交集（`landable=intersection`，双方都判「类型需改」的不属交集仍搁置）。重跑结果：一致 **38**／分歧 **12**／无效 0；可落地进公开层 **15**（12+3 同义解锁）＋交集 **3**＋仅研究层 1（REL-00085 同属组织）。CI 可复现性测试同步更新：重放带交集开关；已落地行重放按门禁如实回落「已在公开层」。
+
+**C. 第 1 批落地**（`apply_phase5_sweep_batch1_landing.py`，幂等）：18 条 = 一致 15 + 保守交集 3（REL-00029 鲁迅—沙汀、REL-00035 鲁迅—徐懋庸、REL-00089 鲁迅—许广平，按现类型不改）；类型更正恰 **6** 条（REL-00011 通信→交游、REL-00012 创作合作→签名联署、REL-00025 通信→签名联署、REL-00038 交游→文学论战、REL-00061 交游→签名联署、REL-00088 通信→交游，standard/final 同步、correction_reason 追加不覆盖）；新证据 RELE-10273..10290；**新注册来源 5 条**（SRC-1179..1183：左联史 4 页 + 左联词典 1 页，按同族模板、先例 SRC-1178），passage 与 citation_count 由 `sync_source_layer` 统一补齐（左联史 287→291、左联词典 399→400）。授权记录 `phase5_sweep_batch1_authorization_record.md` 为脚本启动前置校验对象（逐字含两条授权语，缺失即拒绝落地）。
+
+**D. 实测终值**：person_relations 4238（supported **25** / pending_review 2451 / inferred **1762**，origin 全 derived）；relation_evidences 10272→**10290**（support 23→**41**、associated 仍 10249、reviewed 41）；sources/passages **1183**/1183、works 65；critical 仍 **1974**（未反向降险）。18 条引文全部按候选池偏移逐字回定位 + `quote_sha256` 自洽 + 过双方佐证门（运行时重验，不信任合并器结论）。发布层关系 25、静态站关系卡 **25**、四口径 evidence_supported/trusted 7→**25**、human_verified 仍 **0**、low_risk_heuristic 仍 1761。Schema 0 err / 13 warn；Ruff 全绿（tests/ 3 处历史 F841/F401 按"历史债务不清理"约定未动）；全量 pytest **191 passed**（含新增 `tests/test_phase5_sweep_batch1_landing.py` 13 项 + `e5ff09f` 基线「词表归并→落地」全链红→绿重放）；幂等二跑两个脚本均「无新增/已完成」。
+
+**E. 里程碑**：trusted 口径 **25 条首次过 10 条门槛，样本充足，Top10 中心性排名首次生成**（仍为数据观察口径，不写成历史重要性结论）。公开层 25 条现含**三种口径**，引用时必须分别说明：5 条 2026-09-20 概括授权、2 条 2026-10-08 逐条独立人工裁决、18 条 2026-10-08 双 Agent 交叉验证（非人工复核）。
+
+**F. 修复的缺陷**：词表归并脚本幂等二跑把「归并后、落地前」的瞬时计数（文学论战 127）当永久终值校验，本批类型更正后变 128 即误报「数据漂移」——no-op 分支改为只校验旧标签清零（别名消失是归并的永久效果）。
+
+**搁置与待办**：分歧 12 条中 3 条按保守交集落地，其余 **9 条实质分歧**继续搁置（含双方就「该不该改类型」结论相反、或一方判另一方类型提议不同的情形），`sweep_batch1_disagreements.csv` 原样；第 2 批前需修批次选择缺陷（排除已在公开层的关系、按人物分散取样——本批 50 条全是鲁迅关系）；剩余 24 条重捕候选待处置；答辩 PPT 待按新版文字重制。
+
 ## 2026-10-08（第三批）- 全量关系证据扫掠 + 双 Agent 交叉验证裁决（第 1 批）
 
 **授权与口径**：用户 2026-10-08 授权以交叉验证替代逐条人工裁决（原话「不用我裁，你和zcode交叉验证裁决吧」），并要求不使用 GLM-5.3 系列。zcode 仅提供 GLM-5.3 / GLM-5.3-Flash，后者正是 2026-09-06 夜间轮（本仓引文缺陷来源）的原始执行者，由它裁决等于自我背书，故第二裁决者改为 **antigravity harness 的 Claude Opus 4.6 (Thinking)**，与 GLM／Qwen（本仓实现方）／GPT（主 Agent）血统均不同。**交叉验证不是人工复核**：公开层只走 derived `supported`，禁用 `human_adjudication`/`verified`，全部产物标注本口径。生产层本批零改动。

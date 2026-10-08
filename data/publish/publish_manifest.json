@@ -2,8 +2,8 @@
   "generated_at": "unstamped",
   "publish_dir": "D:\\1大创\\左联知识库项目\\data\\publish",
   "publish_warning_breakdown": {
-    "isolated_person": 62,
-    "orphan_source": 969
+    "isolated_person": 61,
+    "orphan_source": 889
   },
   "research_schema_errors": 0,
   "research_schema_warnings": 13,
@@ -29,10 +29,10 @@
     "supported_requires": "support_not_rejected_with_locator_and_quote_or_context"
   },
   "schema_errors": 0,
-  "schema_warnings": 1031,
+  "schema_warnings": 950,
   "source_dir": "D:\\1大创\\左联知识库项目\\data\\processed",
   "source_summary": {
-    "citations": 1178,
+    "citations": 1183,
     "families": 30,
     "works": 65
   },
@@ -69,9 +69,9 @@
       "output": 36
     },
     "person_relations.csv": {
-      "filtered": 4231,
+      "filtered": 4213,
       "input": 4238,
-      "output": 7
+      "output": 25
     },
     "persons.csv": {
       "filtered": 0,
@@ -84,14 +84,14 @@
       "output": 41
     },
     "relation_evidences.csv": {
-      "filtered": 10218,
-      "input": 10272,
-      "output": 54
+      "filtered": 10106,
+      "input": 10290,
+      "output": 184
     },
     "source_passages.csv": {
       "filtered": 0,
-      "input": 1178,
-      "output": 1178
+      "input": 1183,
+      "output": 1183
     },
     "source_works.csv": {
       "filtered": 0,
@@ -100,8 +100,8 @@
     },
     "sources.csv": {
       "filtered": 0,
-      "input": 1178,
-      "output": 1178
+      "input": 1183,
+      "output": 1183
     }
   }
 }

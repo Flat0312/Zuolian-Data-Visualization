@@ -9,7 +9,8 @@
 4. REL-01368 类型已改（standard/final 同步为 签名联署），`correction_reason` 追加不覆盖；
 5. 公开层 7 条逐条无 critical/high、无 needs_manual_review、无待核验/推断类型、无 low 置信，
    且每条都有本批或第一批合格 support 引文过双方佐证门；
-6. 计数与口径：4238 / 10272（support 23、associated 10249）/ 1178 / 1178 / 65，critical 仍 1974；
+6. 计数与口径：4238 / 10290（support 41、associated 10249）/ 1183 / 1183 / 65，critical 仍 1974
+   （第三批 P5-SWEEP-BATCH1 落地后已随之更新，先例：每批落地更新上一批测试的活数据 pin）；
 7. 幂等：二跑「无新增/已完成」且零写入；
 8. 以 ``f011d92`` 为基线的红→绿重放：落地前 supported=5，落地后 supported=7，二跑 no-op。
 
@@ -57,13 +58,24 @@ requires_texts = requires_local_texts(*RUNTIME_TEXTS)
 
 BATCH_MARKER = "P5-RECAPTURE-2026-10-08"
 PREV_BATCH_MARKER = "P5-LANDING-2026-09-28"
+# 第三批（P5-SWEEP-BATCH1-2026-10-08，双 Agent 交叉验证）落地后，公开层扩至 25 条；
+# 本文件的活数据 pin 已随之更新（先例：每批落地更新上一批测试的活数据断言）。
+NEXT_BATCH_MARKER = "P5-SWEEP-BATCH1-2026-10-08"
+LANDED_BATCH_MARKERS = (PREV_BATCH_MARKER, BATCH_MARKER, NEXT_BATCH_MARKER)
 PINNED_PRE_LANDING_COMMIT = "f011d92"
 
 LAND_IDS = {"REL-00622", "REL-01161", "REL-01368"}
 INSUFFICIENT_ID = "REL-01891"
+# 公开层全集（三批口径不同，逐批溯源）：
+# 第一批 5 条（2026-09-20 概括授权）+ 第二批 2 条（2026-10-08 逐条独立人工裁决）
+# + 第三批 18 条（2026-10-08 双 Agent 交叉验证）。
 EXPECTED_PUBLIC_IDS = {
     "REL-00046", "REL-00059", "REL-00097", "REL-03289", "REL-03518",
     "REL-00622", "REL-01368",
+    # 第三批：双 Agent 交叉验证（一致 15 + 保守交集 3）
+    "REL-00008", "REL-00011", "REL-00012", "REL-00016", "REL-00022", "REL-00025",
+    "REL-00027", "REL-00029", "REL-00032", "REL-00033", "REL-00035", "REL-00036",
+    "REL-00038", "REL-00039", "REL-00061", "REL-00082", "REL-00088", "REL-00089",
 }
 AUTHORIZATION_QUOTE = (
     '第一优先REL-00622 和 REL-01368直接过，REL-01891判"证据不足"，REL-01161 成立但不影响公开层'
@@ -134,21 +146,22 @@ def _qualified_support(rows: list[dict[str, str]], marker: str | None = None) ->
 
 
 def test_post_landing_counts_and_critical_unchanged(rel_rows, ev_rows) -> None:
+    """活数据计数（第三批 P5-SWEEP-BATCH1 落地后更新：10290 / 25 / 41 / 1183）。"""
     assert len(rel_rows) == 4238
-    assert len(ev_rows) == 10272
+    assert len(ev_rows) == 10290
     dist = Counter(r["publish_status"] for r in rel_rows)
-    assert dist["supported"] == 7
+    assert dist["supported"] == 25
     assert dist["pending_review"] == 2451
-    assert dist["inferred"] == 1780
+    assert dist["inferred"] == 1762
     assert {r["publish_status_origin"] for r in rel_rows} == {"derived"}
     assert int(sum(1 for r in rel_rows if r["relation_risk_level"] == "critical")) == 1974
     support_dist = Counter(r["evidence_support"] for r in ev_rows)
-    assert support_dist["support"] == 23
+    assert support_dist["support"] == 41
     assert support_dist["associated"] == 10249
-    assert sum(1 for r in ev_rows if r["review_status"] == "reviewed") == 23
+    assert sum(1 for r in ev_rows if r["review_status"] == "reviewed") == 41
     assert sum(1 for r in ev_rows if r["review_status"] == "pending") == 10249
-    assert len(_rows(DATA / "sources.csv")) == 1178
-    assert len(_rows(DATA / "source_passages.csv")) == 1178
+    assert len(_rows(DATA / "sources.csv")) == 1183
+    assert len(_rows(DATA / "source_passages.csv")) == 1183
     assert len(_rows(DATA / "source_works.csv")) == 65
 
 
@@ -219,9 +232,10 @@ def test_rel_01368_type_corrected_reason_appended(rel_rows) -> None:
 # ---------------------------------------------------------------- 公开层语义
 
 
-def test_public_layer_seven_relations_all_conservative(rel_rows, ev_rows, persons) -> None:
+def test_public_layer_relations_all_conservative(rel_rows, ev_rows, persons) -> None:
+    """公开层 25 条（三批口径）逐条守门；每条合格证据须属三批落地之一。"""
     public = [r for r in rel_rows if r["publish_status"] in ("supported", "verified")]
-    assert len(public) == 7
+    assert len(public) == 25
     assert {r["relation_id"] for r in public} == EXPECTED_PUBLIC_IDS
     by_rel = _by_rel(ev_rows)
     for row in public:
@@ -237,9 +251,9 @@ def test_public_layer_seven_relations_all_conservative(rel_rows, ev_rows, person
         )
         assert qualified, f"{rid} 公开但无合格 support 证据"
         assert any(
-            BATCH_MARKER in e["reviewer_note"] or PREV_BATCH_MARKER in e["reviewer_note"]
+            any(marker in e["reviewer_note"] for marker in LANDED_BATCH_MARKERS)
             for e in qualified
-        ), f"{rid} 合格 support 证据不属于两批落地之一"
+        ), f"{rid} 合格 support 证据不属于三批落地之一"
 
 
 @requires_texts
@@ -251,7 +265,7 @@ def test_public_support_quotes_attest_both_parties(rel_rows, ev_rows, persons) -
         rid = row["relation_id"]
         qualified = [
             e for e in _qualified_support(by_rel[rid])
-            if BATCH_MARKER in e["reviewer_note"] or PREV_BATCH_MARKER in e["reviewer_note"]
+            if any(marker in e["reviewer_note"] for marker in LANDED_BATCH_MARKERS)
         ]
         na = name_candidates(persons[row["source_person_id"]])
         nb = name_candidates(persons[row["target_person_id"]])

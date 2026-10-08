@@ -182,14 +182,15 @@ def test_three_networks_use_different_filters(built_network: Path) -> None:
     supported = nets["evidence_supported"]
     trusted = nets["trusted"]
     weighted = nets["evidence_weighted"]
-    # 低风险启发式为研究对照口径（非可信）；2026-10-08 第二批落地后证据支持/可信为 7 条，
-    # 仍如实标记样本不足（边 <10 不生成排名）；human_verified 为 0（两批均未使用人工裁决通道）。
+    # 低风险启发式为研究对照口径（非可信）；2026-10-08 第三批（双 Agent 交叉验证）落地后
+    # 证据支持/可信为 25 条，首次过 10 条门槛，样本充足、可生成 Top10 排名（仍为数据观察口径）；
+    # human_verified 为 0（三批均未使用人工裁决通道；第三批为交叉验证，非人工复核）。
     assert full["edges"] > low_risk["edges"] > 0, "全量边应大于低风险筛选边"
-    assert supported["edges"] == 7, "两批落地的合格 support 关系应进入证据支持口径"
-    assert trusted["edges"] == 7, "trusted = verified(0) ∪ supported(7)"
+    assert supported["edges"] == 25, "三批落地的合格 support 关系应进入证据支持口径"
+    assert trusted["edges"] == 25, "trusted = verified(0) ∪ supported(25)"
     assert nets["human_verified"]["edges"] == 0, "未使用 human_adjudication 通道，人工确认口径应为 0"
-    assert trusted.get("sample_sufficient") is False, "可信样本不足须明确标记"
-    assert "样本不足" in str(trusted.get("sample_note", "")), "可信须注明样本不足"
+    assert trusted.get("sample_sufficient") is True, "可信边 25 ≥ 10，样本应标记充足"
+    assert "样本充足" in str(trusted.get("sample_note", "")), "样本充足须如实标记"
     assert full["total_weight"] >= low_risk["total_weight"]
     assert set(payload["time_slices"]) == {"1928-1930", "1931-1933", "1934-1936"}
     # 过滤规则在 formulas 中显式登记且四口径互不冒充

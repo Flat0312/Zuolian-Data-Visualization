@@ -13,8 +13,9 @@ def test_source_work_passage_mapping_complete() -> None:
     works = pd.read_csv(base / "source_works.csv", encoding="utf-8-sig", dtype=str).fillna("")
     passages = pd.read_csv(base / "source_passages.csv", encoding="utf-8-sig", dtype=str).fillna("")
     # 2026-09-28 P5-LANDING：为「鲁迅日记 1928年7月1日」注册 1 条同族引文（1177 -> 1178）。
-    assert len(srcs) == 1178
-    assert len(passages) == 1178
+    # 2026-10-08 P5-SWEEP-BATCH1：为左联史 4 页 + 左联词典 1 页注册 5 条同族引文（1178 -> 1183）。
+    assert len(srcs) == 1183
+    assert len(passages) == 1183
     # 每条引文恰好映射一条 source，且每条 work 存在
     assert set(passages["source_id"].tolist()) == set(srcs["source_id"].tolist())
     assert set(passages["work_id"].tolist()) <= set(works["work_id"].tolist())
@@ -75,6 +76,6 @@ def test_publish_manifest_reports_works_citations_families(sandbox_tmp_path: Pat
 
     prod_manifest = json.loads((PROJECT_ROOT / "data" / "publish" / "publish_manifest.json").read_text(encoding="utf-8"))
     summary = prod_manifest["source_summary"]
-    assert summary["citations"] == 1178
+    assert summary["citations"] == 1183
     assert summary["works"] == 65
     assert summary["families"] == 30

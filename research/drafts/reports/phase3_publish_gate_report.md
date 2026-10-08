@@ -14,16 +14,16 @@ associated/pending、无 quote/locator、critical/high、待核验、low、needs
 | `org_membership_evidences.csv` | 581 | 438 | 143 |
 | `org_memberships.csv` | 150 | 73 | 77 |
 | `organizations.csv` | 36 | 36 | 0 |
-| `person_relations.csv` | 4238 | 7 | 4231 |
+| `person_relations.csv` | 4238 | 25 | 4213 |
 | `persons.csv` | 162 | 162 | 0 |
 | `places.csv` | 41 | 41 | 0 |
-| `relation_evidences.csv` | 10272 | 54 | 10218 |
-| `source_passages.csv` | 1178 | 1178 | 0 |
+| `relation_evidences.csv` | 10290 | 184 | 10106 |
+| `source_passages.csv` | 1183 | 1183 | 0 |
 | `source_works.csv` | 65 | 65 | 0 |
-| `sources.csv` | 1178 | 1178 | 0 |
+| `sources.csv` | 1183 | 1183 | 0 |
 
 - 研究层 Schema 严重错误：0；警告：13（{'isolated_person': 12, 'orphan_source': 1}）。
-- 发布层 Schema 严重错误：0；警告：1031（{'isolated_person': 62, 'orphan_source': 969}）。
+- 发布层 Schema 严重错误：0；警告：950（{'isolated_person': 61, 'orphan_source': 889}）。
 - 发布层警告分类：`isolated_person` 增加主要为过滤非公开关系后预期产生（人物失去公开边）；
 `orphan_source` 增加主要为非公开关系证据被过滤后、其来源在发布层暂无公开引用（研究层仍保留）。
 - 真正孤立数据（研究层即孤立/孤儿）见研究层警告明细，不得只隐藏 warning。
@@ -33,4 +33,4 @@ associated/pending、无 quote/locator、critical/high、待核验、low、needs
 - 人物关系仅保留 `publish_status` 为 `verified/supported` 的记录；`pending_review/inferred/rejected`（含 critical/high、待核验、low、needs_manual_review=yes、associated/pending 证据、无 quote/locator、证据冲突）仅保留在研究层。
 - `relation_evidences.csv` 中 `review_status=rejected` 的关系证据不进入发布层；且仅保留发布层关系的外键闭合子集（公开关系为 0 时为空表头）。
 - 发布层 `relation_evidences.csv` 保留各行的原始 `evidence_support`/`review_status`：只有 `support` 且未 rejected、带 locator 与 quote/context 的行才是公开关系的定级依据；同表的 `associated`/`pending` 行只为外键闭合而保留，语义是「来源关联」，**不得当作支持该关系的证据引用**。
-- 来源层级：引文 1178 条 / 作品 65 种 / 独立来源族 30 个（引用条数≠独立来源作品数，同一来源族不重复计数）。
+- 来源层级：引文 1183 条 / 作品 65 种 / 独立来源族 30 个（引用条数≠独立来源作品数，同一来源族不重复计数）。

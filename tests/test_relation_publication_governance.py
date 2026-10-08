@@ -142,14 +142,16 @@ def test_production_supported_subset_never_contains_risky_records() -> None:
     # 其余 15 条被 critical/high 风险或推断类型挡住，仍留在研究层（未使用 human_adjudication 通道）。
     # P5-RECAPTURE-2026-10-08：第二批逐条独立裁决追加 REL-00622/REL-01368 两条 derived supported，
     # REL-01161 落地证据但被门禁挡在 pending_review，公开层 5→7。
+    # P5-SWEEP-BATCH1-2026-10-08：第三批双 Agent 交叉验证（非人工复核）落地 18 条
+    # （一致 15 + 保守交集 3），公开层 7→25。
     assert counts.get("verified", 0) == 0
     assert counts.get("rejected", 0) == 0
-    assert counts.get("supported", 0) == 7
+    assert counts.get("supported", 0) == 25
     assert counts.get("pending_review", 0) == 2451
-    assert counts.get("inferred", 0) == 1780
+    assert counts.get("inferred", 0) == 1762
     assert rels["publish_status_origin"].eq("derived").all()
     public = rels[rels["publish_status"].isin({"verified", "supported"})]
-    assert len(public) == 7
+    assert len(public) == 25
     assert len(public) < len(rels)
     # 公开子集绝不含风险/待核/低置信/推断类型记录
     assert not public["relation_risk_level"].str.lower().isin(["critical", "high"]).any()
@@ -178,12 +180,13 @@ def test_production_relation_evidences_reference_valid_ids() -> None:
     evid = pd.read_csv(PROJECT_ROOT / "data" / "processed" / "relation_evidences.csv", encoding="utf-8-sig", dtype=str).fillna("")
     # 2026-09-28 P5-LANDING 新增 20 条 + 2026-10-08 P5-RECAPTURE 第二批新增 3 条
     # （REL-00622/REL-01161/REL-01368，REL-01891 判证据不足未落地）经逐字复核 + 双方佐证门的 support 证据；
+    # 2026-10-08 P5-SWEEP-BATCH1 第三批双 Agent 交叉验证新增 18 条 support 证据（含新注册 5 来源）；
     # 既有 10249 条机器迁移行保持 associated + pending，未被改判（改判等于凭空提升证据等级）。
-    assert len(evid) == 10272
+    assert len(evid) == 10290
     assert set(evid["review_status"].unique().tolist()) == {"pending", "reviewed"}
     assert set(evid["evidence_support"].unique().tolist()) == {"associated", "support"}
-    assert int((evid["evidence_support"] == "support").sum()) == 23
-    assert int((evid["review_status"] == "reviewed").sum()) == 23
+    assert int((evid["evidence_support"] == "support").sum()) == 41
+    assert int((evid["review_status"] == "reviewed").sum()) == 41
     assert int((evid["evidence_support"] == "associated").sum()) == 10249
     assert int((evid["review_status"] == "pending").sum()) == 10249
     assert set(evid["relation_id"].tolist()) <= set(rels["relation_id"].tolist())

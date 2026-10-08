@@ -10,7 +10,10 @@ Claude Opus 4.6 (Thinking)，与 GLM、Qwen（本仓实现方）、GPT（主 Age
 **这不是人工复核。** 因此：
 - 公开层只接受 derived `supported`，禁止使用 `human_adjudication` / `verified` 通道；
 - 台账、站点与报告必须标注「双 Agent 交叉验证」口径，不得写成「人工已确认」；
-- 只有两名裁决者结论**完全一致**的条目才进入可落地集合，分歧条目搁置且不改任何状态。
+- 只有两名裁决者结论**完全一致**的条目才进入可落地集合，分歧条目搁置且不改任何状态；
+  唯一例外是 2026-10-08 用户决定采用的**保守交集**（须 `--allow-conservative-intersection`
+  显式开启）：分歧中双方都判 support 且至少一方判「成立」的，按现类型不改落地，
+  `landable=intersection`——不超出任何一方认可的范围。
 
 独立性保障
 ----------
@@ -70,8 +73,24 @@ PENDING_REVIEW_TYPE = "待核验"
 # - 同属组织 是词表里的真实历史关系类型（生产数据 730 条在用），人工可以这么判，
 #   只是按发布门禁属推断类、不会进入公开层。
 NOT_ASSIGNABLE_TYPES = (PENDING_REVIEW_TYPE, "空间共现", "时空共现")
-# 词表本身存在同义重复（既有数据里 论战/文学论战、交游/交往 并存）。
-# 这类分歧记为 type_synonym 而非实质分歧，单独统计，避免把词表缺陷算成裁决者不一致。
+# 词表同义归并（2026-10-08 用户决定，执行脚本 merge_relation_type_vocab.py）：
+# `论战`→`文学论战`、`交往`→`交游`（归并到多数标签）。生产数据已全量归一；
+# 本表用于把**历史裁决输入文件**里仍存在的旧标签归一到新词表，使第 1 批的
+# 3 条 `type_synonym` 分歧（REL-00011/00038/00088）按一致处理。
+# 与 merge_relation_type_vocab.TYPE_ALIASES 保持同值（此处不 import，避免落地脚本耦合）。
+TYPE_ALIASES = {"论战": "文学论战", "交往": "交游"}
+
+
+def normalize_type(label: str) -> str:
+    return TYPE_ALIASES.get((label or "").strip(), (label or "").strip())
+
+
+# 保守交集规则（2026-10-08 用户决定采用）：分歧条目中双方都判 support 且至少一方判
+# 「成立」（即接受现类型）的，按**现类型不改**落地——不超出任何一方认可的范围。
+# 由 --allow-conservative-intersection 显式开启；不开时维持原严格口径（分歧一律搁置）。
+CONSERVATIVE_INTERSECTION_FLAG = "--allow-conservative-intersection"
+# 历史兜底：词表归并后 `type_synonym` 分支按理不再触发（别名归一使同义选择自动一致）；
+# 保留检测仅防未来出现**未归一的历史输入**被误算成实质分歧。
 SYNONYM_PAIRS = (("论战", "文学论战"), ("交游", "交往"))
 EXPECTED_COLUMNS = [
     "relation_id", "verdict", "evidence_grade", "proposed_type",
@@ -167,7 +186,10 @@ def _is_synonym(a: str, b: str) -> bool:
     return any({a, b} == set(pair) for pair in SYNONYM_PAIRS)
 
 
-def merge(batch_input: Path, verdict_a: Path, verdict_b: Path, batch_index: int) -> dict:
+def merge(
+    batch_input: Path, verdict_a: Path, verdict_b: Path, batch_index: int,
+    conservative_intersection: bool = False,
+) -> dict:
     with open(batch_input, encoding="utf-8-sig", newline="") as fh:
         inputs = list(csv.DictReader(fh))
     ids = {r["relation_id"] for r in inputs}
@@ -190,10 +212,12 @@ def merge(batch_input: Path, verdict_a: Path, verdict_b: Path, batch_index: int)
             errors += validate_one(rid, b, quote, "opus")
         rel = relations.get(rid, {})
         cur_status = (rel.get("publish_status") or src.get("current_publish_status") or "").strip()
+        # 现类型优先读生产数据当前值（词表归并后可能与历史输入文件不同，如 REL-00059 交往→交游）。
+        cur_type = (rel.get("final_relation_type") or "").strip() or (src["current_final_relation_type"] or "").strip()
         row = {
             "relation_id": rid,
             "person_a_name": src["person_a_name"], "person_b_name": src["person_b_name"],
-            "current_final_relation_type": src["current_final_relation_type"],
+            "current_final_relation_type": cur_type,
             "locator": src["locator"], "quote": src["quote"],
             "current_publish_status": cur_status,
             "review_status": "pending_cross_validation",
@@ -213,7 +237,9 @@ def merge(batch_input: Path, verdict_a: Path, verdict_b: Path, batch_index: int)
             continue
         same_verdict = a["verdict"] == b["verdict"]
         same_grade = a["evidence_grade"] == b["evidence_grade"]
-        same_type = a["proposed_type"] == b["proposed_type"]
+        # proposed_type 比较一律经别名归一：词表已归并（2026-10-08），历史输入里的
+        # 论战/交往 视为 文学论战/交游，不再算分歧。
+        same_type = normalize_type(a["proposed_type"]) == normalize_type(b["proposed_type"])
         if same_verdict and same_grade and (a["verdict"] != "类型需改" or same_type):
             row["agreement"] = "agree"
             row["disagreement_kind"] = ""
@@ -234,7 +260,30 @@ def merge(batch_input: Path, verdict_a: Path, verdict_b: Path, batch_index: int)
 
         landable, block = "no", ""
         if row["agreement"] != "agree":
-            block = "双方裁决不一致"
+            # 保守交集（2026-10-08 用户决定采用，须经 flag 显式开启）：分歧条目中
+            # 双方都判 support 且至少一方判「成立」（接受现类型）的，按现类型不改落地。
+            # 这不超出任何一方认可的范围；双方都判「类型需改」的不属交集（按现类型
+            # 落地等于断言双方都拒绝的标签）。
+            is_common = (
+                conservative_intersection
+                and a["verdict"] in ("成立", "类型需改") and b["verdict"] in ("成立", "类型需改")
+                and "成立" in (a["verdict"], b["verdict"])
+                and a["evidence_grade"] == "support" and b["evidence_grade"] == "support"
+            )
+            if is_common and cur_status in PUBLIC_STATUSES:
+                block = "该关系已在公开层，无需重复落地"
+            elif is_common:
+                if cur_type in INFERRED_TYPES or cur_type in NOT_ASSIGNABLE_TYPES:
+                    landable = "research_only"
+                    block = f"保守交集：按现类型落地，但现类型为推断类（{cur_type}），落研究层、不进公开层"
+                else:
+                    landable = "intersection"
+                    block = (
+                        "保守交集（2026-10-08 用户决定采用）：双方 support 且至少一方判成立，"
+                        "按现类型落地、不改类型"
+                    )
+            else:
+                block = "双方裁决不一致"
         elif a["verdict"] == "证据不足":
             block = "双方一致判证据不足"
         elif a["evidence_grade"] != "support":
@@ -242,7 +291,9 @@ def merge(batch_input: Path, verdict_a: Path, verdict_b: Path, batch_index: int)
         elif cur_status in PUBLIC_STATUSES:
             block = "该关系已在公开层，无需重复落地"
         else:
-            eff_type = a["proposed_type"] if a["verdict"] == "类型需改" else src["current_final_relation_type"]
+            eff_type = (
+                normalize_type(a["proposed_type"]) if a["verdict"] == "类型需改" else cur_type
+            )
             if eff_type in INFERRED_TYPES or eff_type in NOT_ASSIGNABLE_TYPES:
                 # 仍可落地（证据 + 类型更正都是真实改进），只是按门禁不会进入公开层。
                 landable = "research_only"
@@ -257,6 +308,7 @@ def merge(batch_input: Path, verdict_a: Path, verdict_b: Path, batch_index: int)
         "rows": rows, "errors": errors,
         "a_problems": a_problems, "b_problems": b_problems,
         "batch_index": batch_index,
+        "intersection_used": bool(conservative_intersection),
     }
 
 
@@ -269,11 +321,13 @@ def write_csv(rows: list[dict[str, str]], path: Path, columns: list[str]) -> Non
 
 def write_report(result: dict, path: Path, paths: dict[str, Path]) -> None:
     rows = result["rows"]
+    intersection_used = bool(result.get("intersection_used"))
     agree = [r for r in rows if r["agreement"] == "agree"]
     disagree = [r for r in rows if r["agreement"] == "disagree"]
     invalid = [r for r in rows if r["agreement"] == "invalid_missing_verdict"]
     landable = [r for r in rows if r["landable"] == "yes"]
     research_only = [r for r in rows if r["landable"] == "research_only"]
+    intersection_rows = [r for r in rows if r["landable"] == "intersection"]
     kinds = Counter(r["disagreement_kind"] for r in disagree)
     va = Counter(r["codex_verdict"] for r in rows if r["codex_verdict"])
     vb = Counter(r["opus_verdict"] for r in rows if r["opus_verdict"])
@@ -293,6 +347,22 @@ def write_report(result: dict, path: Path, paths: dict[str, Path]) -> None:
         "  夜间轮（本仓引文缺陷的来源）的原始执行者，由它裁决等于自我背书。",
         "- 独立性：双方各自 blind 裁决；Codex 的裁决文件写在仓库外，Opus 结构上无法读取；",
         "  裁决输入不含夜间轮 `reason`。",
+        "- 词表同义归并已于 2026-10-08 完成（`论战`→`文学论战`、`交往`→`交游`，"
+        "`merge_relation_type_vocab.py`）：proposed_type 比较一律经别名归一，"
+        "历史输入里的同义选择不再算分歧。",
+    ]
+    if intersection_used:
+        lines += [
+            f"- **保守交集规则已采用**（2026-10-08 用户决定，运行时以 `{CONSERVATIVE_INTERSECTION_FLAG}` 开启）："
+            "分歧条目中双方都判 support 且至少一方判「成立」的，按现类型不改落地；"
+            "双方都判「类型需改」的不属交集、仍搁置。",
+        ]
+    else:
+        lines += [
+            f"- 保守交集规则未开启（`{CONSERVATIVE_INTERSECTION_FLAG}`）：本报告只统计不采用，"
+            "分歧一律搁置。",
+        ]
+    lines += [
         "",
         "## 1. 结果概览",
         "",
@@ -301,11 +371,12 @@ def write_report(result: dict, path: Path, paths: dict[str, Path]) -> None:
         f"| 输入候选 | {len(rows)} |",
         f"| 双方一致 | {len(agree)} |",
         f"| 双方分歧（搁置） | {len(disagree)} |",
+        f"| 保守交集落地（分歧中，按现类型） | {len(intersection_rows)} |",
         f"| 裁决缺失/无效 | {len(invalid)} |",
         f"| **一致且可落地（会进公开层）** | **{len(landable)}** |",
         f"| 一致且可落地（仅研究层，类型属推断类不公开） | {len(research_only)} |",
         "",
-        f"一致率：{len(agree) / max(1, len(rows)):.1%}（分歧一律搁置，不落地、不改状态）",
+        f"一致率：{len(agree) / max(1, len(rows)):.1%}（未开启交集时分歧一律搁置，不落地、不改状态）",
         "",
         "### 各自 verdict 分布",
         "",
@@ -324,9 +395,11 @@ def write_report(result: dict, path: Path, paths: dict[str, Path]) -> None:
         "",
         f"分歧类型分布：{dict(kinds) or '无'}",
         "",
-        "`type_synonym` 是**词表缺陷**而非实质分歧：现有类型词表里 `论战`/`文学论战`、",
-        "`交游`/`交往` 同义并存（生产数据中四种标签都在用）。双方都认为关系成立且需改类型，",
-        "只是选了同义词里的不同标签。需要项目一次性决定归并到哪个标签，之后这类条目即可落地。",
+        "`type_synonym` 是**词表缺陷**而非实质分歧：词表曾有 `论战`/`文学论战`、`交游`/`交往` 同义并存。"
+        "**已于 2026-10-08 归并**（`论战`→`文学论战`、`交往`→`交游`，多数标签口径，"
+        "`merge_relation_type_vocab.py` 执行）；本报告起 proposed_type 比较经别名归一，"
+        "原 3 条 `type_synonym` 分歧（REL-00011/00038/00088）已按一致处理并计入可落地集合。"
+        "下表如仍出现 `type_synonym`，属未归一的历史输入，需先归一再重跑。",
         "",
         "| relation_id | 人物对 | 现类型 | Codex | Opus | 分歧 |",
         "| --- | --- | --- | --- | --- | --- |",
@@ -361,25 +434,42 @@ def write_report(result: dict, path: Path, paths: dict[str, Path]) -> None:
         if r["current_final_relation_type"] not in INFERRED_TYPES
         and r["current_final_relation_type"] not in NOT_ASSIGNABLE_TYPES
     ]
+    if intersection_used:
+        lines += [
+            "",
+            "### 已采用的规则：保守交集（2026-10-08 用户决定）",
+            "",
+            f"分歧 {len(disagree)} 条中有 {len(common)} 条**双方都认为关系成立且证据够 support**，"
+            "且**至少一方判「成立」**（即接受现类型）——按现类型不改落地，不会超出任何一方认可的范围。"
+            f"其中现类型可进公开层的有 {len(common_public)} 条，本报告起标记为 `landable=intersection`，"
+            "与一致项同批落地（落地脚本按 `landable in (yes, intersection)` 选取）。",
+            "",
+            f"另有 {len(both_type_change)} 条是**双方都判「类型需改」**——这类**不属于交集**："
+            "两人都明确否定了现类型，按现类型落地等于断言一个双方都拒绝的标签，仍一律搁置；"
+            "其中属同义分歧的已随词表归并转为一致并解锁，其余仍搁置。",
+            "",
+        ]
+    else:
+        lines += [
+            "",
+            "### 可选规则：保守交集（本报告只统计，未采用）",
+            "",
+            f"分歧中有 {len(common)} 条**双方都认为关系成立且证据够 support**，且**至少一方判「成立」**"
+            "（即接受现类型）——只有这类才存在真正的交集：按现类型不改落地，不会超出任何一方认可的范围。"
+            f"其中按现类型即可进公开层的有 {len(common_public)} 条。",
+            "",
+            f"另有 {len(both_type_change)} 条是**双方都判「类型需改」**。这类**不属于交集**："
+            "两人都明确否定了现类型，按现类型落地等于断言一个双方都拒绝的标签。其中属同义分歧的"
+            "已随词表归并（2026-10-08）转为一致并解锁；其余仍搁置，不计入可解锁条数。",
+            "",
+            f"若采用「保守交集」规则，这 {len(common_public)} 条可与上表 {len(landable)} 条一起落地"
+            f"（重跑本合并器并加 `{CONSERVATIVE_INTERSECTION_FLAG}`）。**本次运行未采用该规则**，"
+            "当前严格口径下它们仍属分歧、一律搁置。",
+            "",
+        ]
     lines += [
-        "",
-        "### 可选规则：保守交集（本报告只统计，未采用）",
-        "",
-        f"分歧中有 {len(common)} 条**双方都认为关系成立且证据够 support**，且**至少一方判「成立」**"
-        "（即接受现类型）——只有这类才存在真正的交集：按现类型不改落地，不会超出任何一方认可的范围。"
-        f"其中按现类型即可进公开层的有 {len(common_public)} 条。",
-        "",
-        f"另有 {len(both_type_change)} 条是**双方都判「类型需改」**（REL-00011 交游/交往、"
-        "REL-00038 文学论战/论战、REL-00088 交游/交往 之类同义分歧）。这类**不属于交集**："
-        "两人都明确否定了现类型，按现类型落地等于断言一个双方都拒绝的标签。它们只能等词表归并决定后，"
-        "按归并结果重新裁决，不计入可解锁条数。",
-        "",
-        "若项目决定采用「保守交集」规则，"
-        f"这 {len(common_public)} 条可与上表 {len(landable)} 条一起落地。**本脚本未采用该规则**，"
-        "当前严格口径下它们仍属分歧、一律搁置。是否采用请项目一次性决定，之后重跑本合并器即可。",
-        "",
-        "| relation_id | 人物对 | 现类型 | Codex | Opus | 分歧性质 | 属交集 |",
-        "| --- | --- | --- | --- | --- | --- | --- |",
+        "| relation_id | 人物对 | 现类型 | Codex | Opus | 分歧性质 | 属交集 | 本批处置 |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     common_ids = {r["relation_id"] for r in common}
     for r in sorted(common + both_type_change, key=lambda x: x["relation_id"]):
@@ -387,7 +477,8 @@ def write_report(result: dict, path: Path, paths: dict[str, Path]) -> None:
             f"| {r['relation_id']} | {r['person_a_name']}—{r['person_b_name']} | {r['current_final_relation_type']} "
             f"| {r['codex_verdict']}/{r['codex_proposed_type'] or '—'} "
             f"| {r['opus_verdict']}/{r['opus_proposed_type'] or '—'} | {r['disagreement_kind']} "
-            f"| {'是' if r['relation_id'] in common_ids else '否（双方都要改类型）'} |"
+            f"| {'是' if r['relation_id'] in common_ids else '否（双方都要改类型）'} "
+            f"| {r['landable']} |"
         )
     lines += [
         "",
@@ -407,16 +498,25 @@ def write_report(result: dict, path: Path, paths: dict[str, Path]) -> None:
             "",
         ]
     lines += [
-        "## 3. 一致且可落地的条目",
+        "## 3. 可落地条目",
         "",
-        "| relation_id | 人物对 | 现类型 | 裁决 | 更正后类型 | 出处 |",
-        "| --- | --- | --- | --- | --- | --- |",
+        f"一致项 {len(landable)} 条"
+        + (f"；保守交集 {len(intersection_rows)} 条（按现类型、不改类型）" if intersection_rows else "")
+        + "。落地规则：",
+        "",
+        "| relation_id | 人物对 | 现类型 | 裁决 | 更正后类型 | 落地规则 | 出处 |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
     ]
-    for r in sorted(landable, key=lambda x: x["relation_id"]):
-        eff = r["codex_proposed_type"] or r["current_final_relation_type"]
+    for r in sorted(landable + intersection_rows, key=lambda x: x["relation_id"]):
+        if r["landable"] == "intersection":
+            eff = r["current_final_relation_type"]
+            rule = "保守交集"
+        else:
+            eff = normalize_type(r["codex_proposed_type"]) if r["codex_verdict"] == "类型需改" else r["current_final_relation_type"]
+            rule = "双 Agent 一致"
         lines.append(
             f"| {r['relation_id']} | {r['person_a_name']}—{r['person_b_name']} | {r['current_final_relation_type']} "
-            f"| {r['codex_verdict']} | {eff} | {r['locator']} |"
+            f"| {r['codex_verdict']} | {eff} | {rule} | {r['locator']} |"
         )
     blocked = [r for r in agree if r["landable"] not in ("yes", "research_only")]
     lines += [
@@ -444,10 +544,10 @@ def write_report(result: dict, path: Path, paths: dict[str, Path]) -> None:
         "## 5. 产物与下一步",
         "",
         f"- 全量对照表：`{paths['xval'].name}`（{len(rows)} 行，含双方 verdict/grade/类型/key_phrase/理由）",
-        f"- 分歧清单：`{paths['disagree'].name}`（{len(disagree)} 行，搁置，生产层零改动）",
-        "- 落地须另起幂等脚本，只处理 `landable=yes` 的行，运行时重新按偏移逐字回定位并校验 quote_sha256；",
-        "  证据行 reviewer_note 必须写明「双 Agent 交叉验证」口径与两名裁决者标识。",
-        "- `type_synonym` 类分歧需项目先决定词表归并，再重跑本合并器即可解锁。",
+        f"- 分歧清单：`{paths['disagree'].name}`（{len(disagree)} 行，其中保守交集 {len(intersection_rows)} 条标记 `landable=intersection`，其余搁置，生产层零改动）",
+        "- 落地须另起幂等脚本，只处理 `landable in (yes, intersection)` 的行，运行时重新按偏移逐字回定位"
+        "并校验 quote_sha256；证据行 reviewer_note 必须写明「双 Agent 交叉验证」口径与两名裁决者标识。",
+        "- `type_synonym` 分支仅为未归一历史输入兜底；正常输入经别名归一后同义选择自动一致。",
         "",
     ]
     path.write_text("\n".join(lines), encoding="utf-8")
@@ -459,6 +559,14 @@ def main() -> int:
     ap.add_argument("--input", type=Path, default=None)
     ap.add_argument("--verdict-codex", type=Path, default=Path(r"D:/1大创/.xval/verdict_codex.csv"))
     ap.add_argument("--verdict-opus", type=Path, default=None)
+    ap.add_argument(
+        "--allow-conservative-intersection",
+        action="store_true", dest="conservative_intersection",
+        help=(
+            "采用保守交集规则（2026-10-08 用户决定）：分歧条目中双方都判 support 且至少一方判"
+            "「成立」的，按现类型不改落地（landable=intersection）。不开时分歧一律搁置。"
+        ),
+    )
     args = ap.parse_args()
 
     n = args.batch_index
@@ -468,7 +576,7 @@ def main() -> int:
     dis = REPORTS / f"sweep_batch{n}_disagreements.csv"
     rep = REPORTS / f"sweep_batch{n}_cross_validation_report.md"
 
-    result = merge(inp, args.verdict_codex, opus, n)
+    result = merge(inp, args.verdict_codex, opus, n, conservative_intersection=args.conservative_intersection)
     write_csv(result["rows"], xval, XVAL_COLUMNS)
     write_csv([r for r in result["rows"] if r["agreement"] == "disagree"], dis, XVAL_COLUMNS)
     write_report(result, rep, {"input": inp, "xval": xval, "disagree": dis})
@@ -476,7 +584,9 @@ def main() -> int:
     rows = result["rows"]
     print(f"输入 {len(rows)} 条；一致 {sum(1 for r in rows if r['agreement']=='agree')}、"
           f"分歧 {sum(1 for r in rows if r['agreement']=='disagree')}、"
-          f"无效 {sum(1 for r in rows if r['agreement']=='invalid_missing_verdict')}")
+          f"无效 {sum(1 for r in rows if r['agreement']=='invalid_missing_verdict')}；"
+          f"保守交集落地 {sum(1 for r in rows if r['landable']=='intersection')} 条"
+          f"（规则{'已采用' if result['intersection_used'] else '未开启'}）")
     print(f"一致且可落地（进公开层）{sum(1 for r in rows if r['landable']=='yes')} 条；"
           f"仅研究层 {sum(1 for r in rows if r['landable']=='research_only')} 条")
     if result["errors"]:

@@ -57,18 +57,32 @@ def _write_verdicts(path: Path, rows: list[list[str]]) -> None:
 
 
 def test_committed_cross_validated_table_is_consistent() -> None:
+    """入库对照表守门：一致 15 + 保守交集 3 + 仅研究层 1，交集行必须满足交集条件。"""
     rows = _rows(XVAL)
     assert len(rows) == 50
+    counts = {"yes": 0, "intersection": 0, "research_only": 0}
     for r in rows:
         if r["landable"] == "yes":
+            counts["yes"] += 1
             assert r["agreement"] == "agree", r["relation_id"]
             assert r["codex_verdict"] == r["opus_verdict"] in ("成立", "类型需改")
             assert r["codex_grade"] == r["opus_grade"] == "support"
             assert r["current_publish_status"] not in ("supported", "verified")
             eff = r["codex_proposed_type"] or r["current_final_relation_type"]
             assert eff not in NOT_ASSIGNABLE_TYPES
+        elif r["landable"] == "intersection":
+            counts["intersection"] += 1
+            # 保守交集（2026-10-08 用户决定）：双方 support 且至少一方判成立，按现类型落地
+            assert r["agreement"] == "disagree", r["relation_id"]
+            assert r["codex_grade"] == r["opus_grade"] == "support"
+            assert "成立" in (r["codex_verdict"], r["opus_verdict"])
+            assert r["current_publish_status"] not in ("supported", "verified")
+            assert r["current_final_relation_type"] not in NOT_ASSIGNABLE_TYPES
+        elif r["landable"] == "research_only":
+            counts["research_only"] += 1
         if r["agreement"] == "disagree":
-            assert r["landable"] != "yes", f'{r["relation_id"]} 分歧条目不得可落地'
+            assert r["landable"] != "yes", f'{r["relation_id"]} 分歧条目不得按一致口径落地'
+    assert counts == {"yes": 15, "intersection": 3, "research_only": 1}
 
 
 def test_merge_produces_no_landable_without_unanimity(tmp_path: Path) -> None:
@@ -154,7 +168,8 @@ def test_merge_is_reproducible_from_committed_table(tmp_path: Path) -> None:
     """从已入库的对照表反推双方裁决，重跑合并器必须得到完全相同的一致/分歧/可落地划分。
 
     这条用例在 CI 上也会跑（只依赖入库文件），保证交叉验证的结论可复现、
-    不是只在某台机器上的一次性结果。
+    不是只在某台机器上的一次性结果。入库对照表以「保守交集已采用」口径生成，
+    故重放同样开启该开关；另设不带开关的对照用例验证交集不开启时分歧一律搁置。
     """
     committed = {r["relation_id"]: r for r in _rows(XVAL)}
     src = _rows(BATCH_INPUT)
@@ -173,12 +188,29 @@ def test_merge_is_reproducible_from_committed_table(tmp_path: Path) -> None:
                 ])
         return out
 
-    result = merge(BATCH_INPUT, rebuild("codex"), rebuild("opus"), 1)
+    codex_csv, opus_csv = rebuild("codex"), rebuild("opus")
+    result = merge(BATCH_INPUT, codex_csv, opus_csv, 1, conservative_intersection=True)
     assert not result["errors"], result["errors"][:3]
     again = {r["relation_id"]: r for r in result["rows"]}
     assert set(again) == set(committed)
     for rid, want in committed.items():
         got = again[rid]
         assert got["agreement"] == want["agreement"], rid
-        assert got["landable"] == want["landable"], rid
         assert got["disagreement_kind"] == want["disagreement_kind"], rid
+        if want["landable"] in ("yes", "intersection") and (
+                want["current_publish_status"] in ("supported", "verified")
+                or got["current_publish_status"] in ("supported", "verified")):
+            # 落地后重放：该关系已按本批进入公开层，门禁如实回落为「已在公开层，无需重复落地」。
+            # 这是 derived 门禁正确性的表现（不透传旧结论），不属于不可复现。
+            assert got["landable"] == "no", rid
+            assert "已在公开层" in got["landable_block_reason"], rid
+        else:
+            assert got["landable"] == want["landable"], rid
+
+    # 对照用例：不开保守交集时，交集行回落为普通分歧（landable=no），一致行不变
+    strict = {r["relation_id"]: r for r in merge(
+        BATCH_INPUT, codex_csv, opus_csv, 1, conservative_intersection=False)["rows"]}
+    for rid, want in committed.items():
+        if want["landable"] == "intersection" and strict[rid]["current_publish_status"] not in ("supported", "verified"):
+            assert strict[rid]["landable"] == "no", rid
+            assert strict[rid]["agreement"] == "disagree", rid

@@ -4,11 +4,11 @@
     "luxun_only_trusted_edges": 2,
     "publish_status_column": true,
     "relation_evidences_table": true,
-    "relations_evidence_supported": 7,
+    "relations_evidence_supported": 25,
     "relations_human_verified": 0,
     "relations_low_risk_heuristic": 1761,
     "relations_total": 4238,
-    "relations_trusted": 7,
+    "relations_trusted": 25,
     "source_family_column": true
   },
   "family_fallback_note": "",
@@ -30,11 +30,28 @@
           "index": 1,
           "members": [
             "ZLH-001",
+            "ZLH-009",
+            "ZLH-010",
+            "ZLH-014",
+            "ZLH-018",
+            "ZLH-021",
+            "ZLH-023",
+            "ZLH-025",
+            "ZLH-028",
+            "ZLH-029",
+            "ZLH-032",
+            "ZLH-034",
+            "ZLH-036",
+            "ZLH-037",
             "ZLH-048",
             "ZLH-071",
+            "ZLH-073",
+            "ZLH-113",
+            "ZLH-121",
+            "ZLH-122",
             "ZLH-128"
           ],
-          "size": 4
+          "size": 21
         },
         {
           "index": 2,
@@ -90,20 +107,173 @@
           "size": 1
         }
       ],
-      "community_count": 155,
-      "components": 155,
-      "edges": 7,
-      "isolated_nodes": 150,
-      "largest_component": 4,
-      "mean_degree": 0.08642,
+      "community_count": 138,
+      "components": 137,
+      "edges": 25,
+      "isolated_nodes": 133,
+      "largest_component": 23,
+      "mean_degree": 0.308642,
       "nodes": 162,
-      "nodes_with_edges": 12,
-      "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
-      "sample_sufficient": false,
-      "top_betweenness": [],
-      "top_degree": [],
-      "top_weighted_degree": [],
-      "total_weight": 44.0
+      "nodes_with_edges": 29,
+      "sample_note": "样本充足",
+      "sample_sufficient": true,
+      "top_betweenness": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          0.017857
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          0.00163
+        ],
+        [
+          "ZLH-002",
+          "茅盾",
+          0.0
+        ],
+        [
+          "ZLH-003",
+          "瞿秋白",
+          0.0
+        ],
+        [
+          "ZLH-004",
+          "夏衍",
+          0.0
+        ],
+        [
+          "ZLH-005",
+          "冯雪峰",
+          0.0
+        ],
+        [
+          "ZLH-006",
+          "潘汉年",
+          0.0
+        ],
+        [
+          "ZLH-008",
+          "田汉",
+          0.0
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          0.0
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          0.0
+        ]
+      ],
+      "top_degree": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          0.130435
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          0.012422
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          0.006211
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          0.006211
+        ],
+        [
+          "ZLH-014",
+          "冯乃超",
+          0.006211
+        ],
+        [
+          "ZLH-015",
+          "郁达夫",
+          0.006211
+        ],
+        [
+          "ZLH-018",
+          "冯铿",
+          0.006211
+        ],
+        [
+          "ZLH-021",
+          "丁玲",
+          0.006211
+        ],
+        [
+          "ZLH-023",
+          "叶紫",
+          0.006211
+        ],
+        [
+          "ZLH-025",
+          "沙汀",
+          0.006211
+        ]
+      ],
+      "top_weighted_degree": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          86.0
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          6.0
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          5.0
+        ],
+        [
+          "ZLH-014",
+          "冯乃超",
+          5.0
+        ],
+        [
+          "ZLH-015",
+          "郁达夫",
+          5.0
+        ],
+        [
+          "ZLH-018",
+          "冯铿",
+          5.0
+        ],
+        [
+          "ZLH-023",
+          "叶紫",
+          5.0
+        ],
+        [
+          "ZLH-025",
+          "沙汀",
+          5.0
+        ],
+        [
+          "ZLH-028",
+          "萧红",
+          5.0
+        ],
+        [
+          "ZLH-029",
+          "聂绀弩",
+          5.0
+        ]
+      ],
+      "total_weight": 196.0
     },
     "evidence_weighted": {
       "communities": [
@@ -111,11 +281,28 @@
           "index": 1,
           "members": [
             "ZLH-001",
+            "ZLH-009",
+            "ZLH-010",
+            "ZLH-014",
+            "ZLH-018",
+            "ZLH-021",
+            "ZLH-023",
+            "ZLH-025",
+            "ZLH-028",
+            "ZLH-029",
+            "ZLH-032",
+            "ZLH-034",
+            "ZLH-036",
+            "ZLH-037",
             "ZLH-048",
             "ZLH-071",
+            "ZLH-073",
+            "ZLH-113",
+            "ZLH-121",
+            "ZLH-122",
             "ZLH-128"
           ],
-          "size": 4
+          "size": 21
         },
         {
           "index": 2,
@@ -171,20 +358,173 @@
           "size": 1
         }
       ],
-      "community_count": 155,
-      "components": 155,
-      "edges": 7,
-      "isolated_nodes": 150,
-      "largest_component": 4,
-      "mean_degree": 0.08642,
+      "community_count": 138,
+      "components": 137,
+      "edges": 25,
+      "isolated_nodes": 133,
+      "largest_component": 23,
+      "mean_degree": 0.308642,
       "nodes": 162,
-      "nodes_with_edges": 12,
-      "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
-      "sample_sufficient": false,
-      "top_betweenness": [],
-      "top_degree": [],
-      "top_weighted_degree": [],
-      "total_weight": 39.3
+      "nodes_with_edges": 29,
+      "sample_note": "样本充足",
+      "sample_sufficient": true,
+      "top_betweenness": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          0.017857
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          0.00163
+        ],
+        [
+          "ZLH-002",
+          "茅盾",
+          0.0
+        ],
+        [
+          "ZLH-003",
+          "瞿秋白",
+          0.0
+        ],
+        [
+          "ZLH-004",
+          "夏衍",
+          0.0
+        ],
+        [
+          "ZLH-005",
+          "冯雪峰",
+          0.0
+        ],
+        [
+          "ZLH-006",
+          "潘汉年",
+          0.0
+        ],
+        [
+          "ZLH-008",
+          "田汉",
+          0.0
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          0.0
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          0.0
+        ]
+      ],
+      "top_degree": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          0.130435
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          0.012422
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          0.006211
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          0.006211
+        ],
+        [
+          "ZLH-014",
+          "冯乃超",
+          0.006211
+        ],
+        [
+          "ZLH-015",
+          "郁达夫",
+          0.006211
+        ],
+        [
+          "ZLH-018",
+          "冯铿",
+          0.006211
+        ],
+        [
+          "ZLH-021",
+          "丁玲",
+          0.006211
+        ],
+        [
+          "ZLH-023",
+          "叶紫",
+          0.006211
+        ],
+        [
+          "ZLH-025",
+          "沙汀",
+          0.006211
+        ]
+      ],
+      "top_weighted_degree": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          76.175
+        ],
+        [
+          "ZLH-048",
+          "王任叔",
+          6.25
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          5.075
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          5.0
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          4.375
+        ],
+        [
+          "ZLH-014",
+          "冯乃超",
+          4.375
+        ],
+        [
+          "ZLH-023",
+          "叶紫",
+          4.375
+        ],
+        [
+          "ZLH-028",
+          "萧红",
+          4.375
+        ],
+        [
+          "ZLH-029",
+          "聂绀弩",
+          4.375
+        ],
+        [
+          "ZLH-034",
+          "彭康",
+          4.375
+        ]
+      ],
+      "total_weight": 169.15
     },
     "full_exploratory": {
       "communities": [
@@ -554,11 +894,28 @@
           "index": 1,
           "members": [
             "ZLH-001",
+            "ZLH-009",
+            "ZLH-010",
+            "ZLH-014",
+            "ZLH-018",
+            "ZLH-021",
+            "ZLH-023",
+            "ZLH-025",
+            "ZLH-028",
+            "ZLH-029",
+            "ZLH-032",
+            "ZLH-034",
+            "ZLH-036",
+            "ZLH-037",
             "ZLH-048",
             "ZLH-071",
+            "ZLH-073",
+            "ZLH-113",
+            "ZLH-121",
+            "ZLH-122",
             "ZLH-128"
           ],
-          "size": 4
+          "size": 21
         },
         {
           "index": 2,
@@ -614,20 +971,173 @@
           "size": 1
         }
       ],
-      "community_count": 155,
-      "components": 155,
-      "edges": 7,
-      "isolated_nodes": 150,
-      "largest_component": 4,
-      "mean_degree": 0.08642,
+      "community_count": 138,
+      "components": 137,
+      "edges": 25,
+      "isolated_nodes": 133,
+      "largest_component": 23,
+      "mean_degree": 0.308642,
       "nodes": 162,
-      "nodes_with_edges": 12,
-      "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
-      "sample_sufficient": false,
-      "top_betweenness": [],
-      "top_degree": [],
-      "top_weighted_degree": [],
-      "total_weight": 39.3
+      "nodes_with_edges": 29,
+      "sample_note": "样本充足",
+      "sample_sufficient": true,
+      "top_betweenness": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          0.017857
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          0.00163
+        ],
+        [
+          "ZLH-002",
+          "茅盾",
+          0.0
+        ],
+        [
+          "ZLH-003",
+          "瞿秋白",
+          0.0
+        ],
+        [
+          "ZLH-004",
+          "夏衍",
+          0.0
+        ],
+        [
+          "ZLH-005",
+          "冯雪峰",
+          0.0
+        ],
+        [
+          "ZLH-006",
+          "潘汉年",
+          0.0
+        ],
+        [
+          "ZLH-008",
+          "田汉",
+          0.0
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          0.0
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          0.0
+        ]
+      ],
+      "top_degree": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          0.130435
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          0.012422
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          0.006211
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          0.006211
+        ],
+        [
+          "ZLH-014",
+          "冯乃超",
+          0.006211
+        ],
+        [
+          "ZLH-015",
+          "郁达夫",
+          0.006211
+        ],
+        [
+          "ZLH-018",
+          "冯铿",
+          0.006211
+        ],
+        [
+          "ZLH-021",
+          "丁玲",
+          0.006211
+        ],
+        [
+          "ZLH-023",
+          "叶紫",
+          0.006211
+        ],
+        [
+          "ZLH-025",
+          "沙汀",
+          0.006211
+        ]
+      ],
+      "top_weighted_degree": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          76.175
+        ],
+        [
+          "ZLH-048",
+          "王任叔",
+          6.25
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          5.075
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          5.0
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          4.375
+        ],
+        [
+          "ZLH-014",
+          "冯乃超",
+          4.375
+        ],
+        [
+          "ZLH-023",
+          "叶紫",
+          4.375
+        ],
+        [
+          "ZLH-028",
+          "萧红",
+          4.375
+        ],
+        [
+          "ZLH-029",
+          "聂绀弩",
+          4.375
+        ],
+        [
+          "ZLH-034",
+          "彭康",
+          4.375
+        ]
+      ],
+      "total_weight": 169.15
     },
     "low_risk_heuristic": {
       "communities": [
@@ -972,11 +1482,28 @@
           "index": 1,
           "members": [
             "ZLH-001",
+            "ZLH-009",
+            "ZLH-010",
+            "ZLH-014",
+            "ZLH-018",
+            "ZLH-021",
+            "ZLH-023",
+            "ZLH-025",
+            "ZLH-028",
+            "ZLH-029",
+            "ZLH-032",
+            "ZLH-034",
+            "ZLH-036",
+            "ZLH-037",
             "ZLH-048",
             "ZLH-071",
+            "ZLH-073",
+            "ZLH-113",
+            "ZLH-121",
+            "ZLH-122",
             "ZLH-128"
           ],
-          "size": 4
+          "size": 21
         },
         {
           "index": 2,
@@ -1032,20 +1559,173 @@
           "size": 1
         }
       ],
-      "community_count": 155,
-      "components": 155,
-      "edges": 7,
-      "isolated_nodes": 150,
-      "largest_component": 4,
-      "mean_degree": 0.08642,
+      "community_count": 138,
+      "components": 137,
+      "edges": 25,
+      "isolated_nodes": 133,
+      "largest_component": 23,
+      "mean_degree": 0.308642,
       "nodes": 162,
-      "nodes_with_edges": 12,
-      "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
-      "sample_sufficient": false,
-      "top_betweenness": [],
-      "top_degree": [],
-      "top_weighted_degree": [],
-      "total_weight": 34.3
+      "nodes_with_edges": 29,
+      "sample_note": "样本充足",
+      "sample_sufficient": true,
+      "top_betweenness": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          0.017857
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          0.00163
+        ],
+        [
+          "ZLH-002",
+          "茅盾",
+          0.0
+        ],
+        [
+          "ZLH-003",
+          "瞿秋白",
+          0.0
+        ],
+        [
+          "ZLH-004",
+          "夏衍",
+          0.0
+        ],
+        [
+          "ZLH-005",
+          "冯雪峰",
+          0.0
+        ],
+        [
+          "ZLH-006",
+          "潘汉年",
+          0.0
+        ],
+        [
+          "ZLH-008",
+          "田汉",
+          0.0
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          0.0
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          0.0
+        ]
+      ],
+      "top_degree": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          0.130435
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          0.012422
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          0.006211
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          0.006211
+        ],
+        [
+          "ZLH-014",
+          "冯乃超",
+          0.006211
+        ],
+        [
+          "ZLH-015",
+          "郁达夫",
+          0.006211
+        ],
+        [
+          "ZLH-018",
+          "冯铿",
+          0.006211
+        ],
+        [
+          "ZLH-021",
+          "丁玲",
+          0.006211
+        ],
+        [
+          "ZLH-023",
+          "叶紫",
+          0.006211
+        ],
+        [
+          "ZLH-025",
+          "沙汀",
+          0.006211
+        ]
+      ],
+      "top_weighted_degree": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          73.675
+        ],
+        [
+          "ZLH-048",
+          "王任叔",
+          6.25
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          5.075
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          5.0
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          4.375
+        ],
+        [
+          "ZLH-014",
+          "冯乃超",
+          4.375
+        ],
+        [
+          "ZLH-023",
+          "叶紫",
+          4.375
+        ],
+        [
+          "ZLH-028",
+          "萧红",
+          4.375
+        ],
+        [
+          "ZLH-029",
+          "聂绀弩",
+          4.375
+        ],
+        [
+          "ZLH-034",
+          "彭康",
+          4.375
+        ]
+      ],
+      "total_weight": 164.15
     },
     "trusted": {
       "communities": [
@@ -1053,11 +1733,28 @@
           "index": 1,
           "members": [
             "ZLH-001",
+            "ZLH-009",
+            "ZLH-010",
+            "ZLH-014",
+            "ZLH-018",
+            "ZLH-021",
+            "ZLH-023",
+            "ZLH-025",
+            "ZLH-028",
+            "ZLH-029",
+            "ZLH-032",
+            "ZLH-034",
+            "ZLH-036",
+            "ZLH-037",
             "ZLH-048",
             "ZLH-071",
+            "ZLH-073",
+            "ZLH-113",
+            "ZLH-121",
+            "ZLH-122",
             "ZLH-128"
           ],
-          "size": 4
+          "size": 21
         },
         {
           "index": 2,
@@ -1113,30 +1810,194 @@
           "size": 1
         }
       ],
-      "community_count": 155,
-      "components": 155,
-      "edges": 7,
-      "isolated_nodes": 150,
-      "largest_component": 4,
-      "mean_degree": 0.08642,
+      "community_count": 138,
+      "components": 137,
+      "edges": 25,
+      "isolated_nodes": 133,
+      "largest_component": 23,
+      "mean_degree": 0.308642,
       "nodes": 162,
-      "nodes_with_edges": 12,
-      "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
-      "sample_sufficient": false,
-      "top_betweenness": [],
-      "top_degree": [],
-      "top_weighted_degree": [],
-      "total_weight": 44.0
+      "nodes_with_edges": 29,
+      "sample_note": "样本充足",
+      "sample_sufficient": true,
+      "top_betweenness": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          0.017857
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          0.00163
+        ],
+        [
+          "ZLH-002",
+          "茅盾",
+          0.0
+        ],
+        [
+          "ZLH-003",
+          "瞿秋白",
+          0.0
+        ],
+        [
+          "ZLH-004",
+          "夏衍",
+          0.0
+        ],
+        [
+          "ZLH-005",
+          "冯雪峰",
+          0.0
+        ],
+        [
+          "ZLH-006",
+          "潘汉年",
+          0.0
+        ],
+        [
+          "ZLH-008",
+          "田汉",
+          0.0
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          0.0
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          0.0
+        ]
+      ],
+      "top_degree": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          0.130435
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          0.012422
+        ],
+        [
+          "ZLH-009",
+          "郑伯奇",
+          0.006211
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          0.006211
+        ],
+        [
+          "ZLH-014",
+          "冯乃超",
+          0.006211
+        ],
+        [
+          "ZLH-015",
+          "郁达夫",
+          0.006211
+        ],
+        [
+          "ZLH-018",
+          "冯铿",
+          0.006211
+        ],
+        [
+          "ZLH-021",
+          "丁玲",
+          0.006211
+        ],
+        [
+          "ZLH-023",
+          "叶紫",
+          0.006211
+        ],
+        [
+          "ZLH-025",
+          "沙汀",
+          0.006211
+        ]
+      ],
+      "top_weighted_degree": [
+        [
+          "ZLH-001",
+          "鲁迅",
+          86.0
+        ],
+        [
+          "ZLH-007",
+          "周扬",
+          6.0
+        ],
+        [
+          "ZLH-010",
+          "洪深",
+          5.0
+        ],
+        [
+          "ZLH-014",
+          "冯乃超",
+          5.0
+        ],
+        [
+          "ZLH-015",
+          "郁达夫",
+          5.0
+        ],
+        [
+          "ZLH-018",
+          "冯铿",
+          5.0
+        ],
+        [
+          "ZLH-023",
+          "叶紫",
+          5.0
+        ],
+        [
+          "ZLH-025",
+          "沙汀",
+          5.0
+        ],
+        [
+          "ZLH-028",
+          "萧红",
+          5.0
+        ],
+        [
+          "ZLH-029",
+          "聂绀弩",
+          5.0
+        ]
+      ],
+      "total_weight": 196.0
     }
   },
-  "sample_note_trusted": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
-  "sample_sufficient_trusted": false,
+  "sample_note_trusted": "样本充足",
+  "sample_sufficient_trusted": true,
   "sensitivity": {
     "heuristic_vs_evidence": {
       "degree_top10_overlap": {
-        "common_count": 0,
-        "jaccard_top10": 0.0,
-        "rank_changes": []
+        "common_count": 2,
+        "jaccard_top10": 0.111111,
+        "rank_changes": [
+          [
+            "ZLH-001",
+            5,
+            1
+          ],
+          [
+            "ZLH-021",
+            6,
+            8
+          ]
+        ]
       },
       "evidence_supported": {
         "communities": [
@@ -1144,11 +2005,28 @@
             "index": 1,
             "members": [
               "ZLH-001",
+              "ZLH-009",
+              "ZLH-010",
+              "ZLH-014",
+              "ZLH-018",
+              "ZLH-021",
+              "ZLH-023",
+              "ZLH-025",
+              "ZLH-028",
+              "ZLH-029",
+              "ZLH-032",
+              "ZLH-034",
+              "ZLH-036",
+              "ZLH-037",
               "ZLH-048",
               "ZLH-071",
+              "ZLH-073",
+              "ZLH-113",
+              "ZLH-121",
+              "ZLH-122",
               "ZLH-128"
             ],
-            "size": 4
+            "size": 21
           },
           {
             "index": 2,
@@ -1204,20 +2082,173 @@
             "size": 1
           }
         ],
-        "community_count": 155,
-        "components": 155,
-        "edges": 7,
-        "isolated_nodes": 150,
-        "largest_component": 4,
-        "mean_degree": 0.08642,
+        "community_count": 138,
+        "components": 137,
+        "edges": 25,
+        "isolated_nodes": 133,
+        "largest_component": 23,
+        "mean_degree": 0.308642,
         "nodes": 162,
-        "nodes_with_edges": 12,
-        "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
-        "sample_sufficient": false,
-        "top_betweenness": [],
-        "top_degree": [],
-        "top_weighted_degree": [],
-        "total_weight": 44.0
+        "nodes_with_edges": 29,
+        "sample_note": "样本充足",
+        "sample_sufficient": true,
+        "top_betweenness": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            0.017857
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            0.00163
+          ],
+          [
+            "ZLH-002",
+            "茅盾",
+            0.0
+          ],
+          [
+            "ZLH-003",
+            "瞿秋白",
+            0.0
+          ],
+          [
+            "ZLH-004",
+            "夏衍",
+            0.0
+          ],
+          [
+            "ZLH-005",
+            "冯雪峰",
+            0.0
+          ],
+          [
+            "ZLH-006",
+            "潘汉年",
+            0.0
+          ],
+          [
+            "ZLH-008",
+            "田汉",
+            0.0
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            0.0
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            0.0
+          ]
+        ],
+        "top_degree": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            0.130435
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            0.012422
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            0.006211
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            0.006211
+          ],
+          [
+            "ZLH-014",
+            "冯乃超",
+            0.006211
+          ],
+          [
+            "ZLH-015",
+            "郁达夫",
+            0.006211
+          ],
+          [
+            "ZLH-018",
+            "冯铿",
+            0.006211
+          ],
+          [
+            "ZLH-021",
+            "丁玲",
+            0.006211
+          ],
+          [
+            "ZLH-023",
+            "叶紫",
+            0.006211
+          ],
+          [
+            "ZLH-025",
+            "沙汀",
+            0.006211
+          ]
+        ],
+        "top_weighted_degree": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            86.0
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            6.0
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            5.0
+          ],
+          [
+            "ZLH-014",
+            "冯乃超",
+            5.0
+          ],
+          [
+            "ZLH-015",
+            "郁达夫",
+            5.0
+          ],
+          [
+            "ZLH-018",
+            "冯铿",
+            5.0
+          ],
+          [
+            "ZLH-023",
+            "叶紫",
+            5.0
+          ],
+          [
+            "ZLH-025",
+            "沙汀",
+            5.0
+          ],
+          [
+            "ZLH-028",
+            "萧红",
+            5.0
+          ],
+          [
+            "ZLH-029",
+            "聂绀弩",
+            5.0
+          ]
+        ],
+        "total_weight": 196.0
       },
       "heuristic": {
         "communities": [
@@ -1564,11 +2595,28 @@
             "index": 1,
             "members": [
               "ZLH-001",
+              "ZLH-009",
+              "ZLH-010",
+              "ZLH-014",
+              "ZLH-018",
+              "ZLH-021",
+              "ZLH-023",
+              "ZLH-025",
+              "ZLH-028",
+              "ZLH-029",
+              "ZLH-032",
+              "ZLH-034",
+              "ZLH-036",
+              "ZLH-037",
               "ZLH-048",
               "ZLH-071",
+              "ZLH-073",
+              "ZLH-113",
+              "ZLH-121",
+              "ZLH-122",
               "ZLH-128"
             ],
-            "size": 4
+            "size": 21
           },
           {
             "index": 2,
@@ -1624,20 +2672,173 @@
             "size": 1
           }
         ],
-        "community_count": 155,
-        "components": 155,
-        "edges": 7,
-        "isolated_nodes": 150,
-        "largest_component": 4,
-        "mean_degree": 0.08642,
+        "community_count": 138,
+        "components": 137,
+        "edges": 25,
+        "isolated_nodes": 133,
+        "largest_component": 23,
+        "mean_degree": 0.308642,
         "nodes": 162,
-        "nodes_with_edges": 12,
-        "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
-        "sample_sufficient": false,
-        "top_betweenness": [],
-        "top_degree": [],
-        "top_weighted_degree": [],
-        "total_weight": 39.3
+        "nodes_with_edges": 29,
+        "sample_note": "样本充足",
+        "sample_sufficient": true,
+        "top_betweenness": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            0.017857
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            0.00163
+          ],
+          [
+            "ZLH-002",
+            "茅盾",
+            0.0
+          ],
+          [
+            "ZLH-003",
+            "瞿秋白",
+            0.0
+          ],
+          [
+            "ZLH-004",
+            "夏衍",
+            0.0
+          ],
+          [
+            "ZLH-005",
+            "冯雪峰",
+            0.0
+          ],
+          [
+            "ZLH-006",
+            "潘汉年",
+            0.0
+          ],
+          [
+            "ZLH-008",
+            "田汉",
+            0.0
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            0.0
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            0.0
+          ]
+        ],
+        "top_degree": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            0.130435
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            0.012422
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            0.006211
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            0.006211
+          ],
+          [
+            "ZLH-014",
+            "冯乃超",
+            0.006211
+          ],
+          [
+            "ZLH-015",
+            "郁达夫",
+            0.006211
+          ],
+          [
+            "ZLH-018",
+            "冯铿",
+            0.006211
+          ],
+          [
+            "ZLH-021",
+            "丁玲",
+            0.006211
+          ],
+          [
+            "ZLH-023",
+            "叶紫",
+            0.006211
+          ],
+          [
+            "ZLH-025",
+            "沙汀",
+            0.006211
+          ]
+        ],
+        "top_weighted_degree": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            76.175
+          ],
+          [
+            "ZLH-048",
+            "王任叔",
+            6.25
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            5.075
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            5.0
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            4.375
+          ],
+          [
+            "ZLH-014",
+            "冯乃超",
+            4.375
+          ],
+          [
+            "ZLH-023",
+            "叶紫",
+            4.375
+          ],
+          [
+            "ZLH-028",
+            "萧红",
+            4.375
+          ],
+          [
+            "ZLH-029",
+            "聂绀弩",
+            4.375
+          ],
+          [
+            "ZLH-034",
+            "彭康",
+            4.375
+          ]
+        ],
+        "total_weight": 169.15
       },
       "before": {
         "communities": [
@@ -1645,11 +2846,28 @@
             "index": 1,
             "members": [
               "ZLH-001",
+              "ZLH-009",
+              "ZLH-010",
+              "ZLH-014",
+              "ZLH-018",
+              "ZLH-021",
+              "ZLH-023",
+              "ZLH-025",
+              "ZLH-028",
+              "ZLH-029",
+              "ZLH-032",
+              "ZLH-034",
+              "ZLH-036",
+              "ZLH-037",
               "ZLH-048",
               "ZLH-071",
+              "ZLH-073",
+              "ZLH-113",
+              "ZLH-121",
+              "ZLH-122",
               "ZLH-128"
             ],
-            "size": 4
+            "size": 21
           },
           {
             "index": 2,
@@ -1705,24 +2923,177 @@
             "size": 1
           }
         ],
-        "community_count": 155,
-        "components": 155,
-        "edges": 7,
-        "isolated_nodes": 150,
-        "largest_component": 4,
-        "mean_degree": 0.08642,
+        "community_count": 138,
+        "components": 137,
+        "edges": 25,
+        "isolated_nodes": 133,
+        "largest_component": 23,
+        "mean_degree": 0.308642,
         "nodes": 162,
-        "nodes_with_edges": 12,
-        "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
-        "sample_sufficient": false,
-        "top_betweenness": [],
-        "top_degree": [],
-        "top_weighted_degree": [],
-        "total_weight": 39.3
+        "nodes_with_edges": 29,
+        "sample_note": "样本充足",
+        "sample_sufficient": true,
+        "top_betweenness": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            0.017857
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            0.00163
+          ],
+          [
+            "ZLH-002",
+            "茅盾",
+            0.0
+          ],
+          [
+            "ZLH-003",
+            "瞿秋白",
+            0.0
+          ],
+          [
+            "ZLH-004",
+            "夏衍",
+            0.0
+          ],
+          [
+            "ZLH-005",
+            "冯雪峰",
+            0.0
+          ],
+          [
+            "ZLH-006",
+            "潘汉年",
+            0.0
+          ],
+          [
+            "ZLH-008",
+            "田汉",
+            0.0
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            0.0
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            0.0
+          ]
+        ],
+        "top_degree": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            0.130435
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            0.012422
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            0.006211
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            0.006211
+          ],
+          [
+            "ZLH-014",
+            "冯乃超",
+            0.006211
+          ],
+          [
+            "ZLH-015",
+            "郁达夫",
+            0.006211
+          ],
+          [
+            "ZLH-018",
+            "冯铿",
+            0.006211
+          ],
+          [
+            "ZLH-021",
+            "丁玲",
+            0.006211
+          ],
+          [
+            "ZLH-023",
+            "叶紫",
+            0.006211
+          ],
+          [
+            "ZLH-025",
+            "沙汀",
+            0.006211
+          ]
+        ],
+        "top_weighted_degree": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            76.175
+          ],
+          [
+            "ZLH-048",
+            "王任叔",
+            6.25
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            5.075
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            5.0
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            4.375
+          ],
+          [
+            "ZLH-014",
+            "冯乃超",
+            4.375
+          ],
+          [
+            "ZLH-023",
+            "叶紫",
+            4.375
+          ],
+          [
+            "ZLH-028",
+            "萧红",
+            4.375
+          ],
+          [
+            "ZLH-029",
+            "聂绀弩",
+            4.375
+          ],
+          [
+            "ZLH-034",
+            "彭康",
+            4.375
+          ]
+        ],
+        "total_weight": 169.15
       },
       "weighted_degree_top10_overlap": {
-        "common_count": 0,
-        "jaccard_top10": 0.0,
+        "common_count": 10,
+        "jaccard_top10": 1.0,
         "rank_changes": []
       }
     },
@@ -1733,11 +3104,28 @@
             "index": 1,
             "members": [
               "ZLH-001",
+              "ZLH-009",
+              "ZLH-010",
+              "ZLH-014",
+              "ZLH-018",
+              "ZLH-021",
+              "ZLH-023",
+              "ZLH-025",
+              "ZLH-028",
+              "ZLH-029",
+              "ZLH-032",
+              "ZLH-034",
+              "ZLH-036",
+              "ZLH-037",
               "ZLH-048",
               "ZLH-071",
+              "ZLH-073",
+              "ZLH-113",
+              "ZLH-121",
+              "ZLH-122",
               "ZLH-128"
             ],
-            "size": 4
+            "size": 21
           },
           {
             "index": 2,
@@ -1793,20 +3181,173 @@
             "size": 1
           }
         ],
-        "community_count": 155,
-        "components": 155,
-        "edges": 7,
-        "isolated_nodes": 150,
-        "largest_component": 4,
-        "mean_degree": 0.08642,
+        "community_count": 138,
+        "components": 137,
+        "edges": 25,
+        "isolated_nodes": 133,
+        "largest_component": 23,
+        "mean_degree": 0.308642,
         "nodes": 162,
-        "nodes_with_edges": 12,
-        "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
-        "sample_sufficient": false,
-        "top_betweenness": [],
-        "top_degree": [],
-        "top_weighted_degree": [],
-        "total_weight": 34.3
+        "nodes_with_edges": 29,
+        "sample_note": "样本充足",
+        "sample_sufficient": true,
+        "top_betweenness": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            0.017857
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            0.00163
+          ],
+          [
+            "ZLH-002",
+            "茅盾",
+            0.0
+          ],
+          [
+            "ZLH-003",
+            "瞿秋白",
+            0.0
+          ],
+          [
+            "ZLH-004",
+            "夏衍",
+            0.0
+          ],
+          [
+            "ZLH-005",
+            "冯雪峰",
+            0.0
+          ],
+          [
+            "ZLH-006",
+            "潘汉年",
+            0.0
+          ],
+          [
+            "ZLH-008",
+            "田汉",
+            0.0
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            0.0
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            0.0
+          ]
+        ],
+        "top_degree": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            0.130435
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            0.012422
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            0.006211
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            0.006211
+          ],
+          [
+            "ZLH-014",
+            "冯乃超",
+            0.006211
+          ],
+          [
+            "ZLH-015",
+            "郁达夫",
+            0.006211
+          ],
+          [
+            "ZLH-018",
+            "冯铿",
+            0.006211
+          ],
+          [
+            "ZLH-021",
+            "丁玲",
+            0.006211
+          ],
+          [
+            "ZLH-023",
+            "叶紫",
+            0.006211
+          ],
+          [
+            "ZLH-025",
+            "沙汀",
+            0.006211
+          ]
+        ],
+        "top_weighted_degree": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            73.675
+          ],
+          [
+            "ZLH-048",
+            "王任叔",
+            6.25
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            5.075
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            5.0
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            4.375
+          ],
+          [
+            "ZLH-014",
+            "冯乃超",
+            4.375
+          ],
+          [
+            "ZLH-023",
+            "叶紫",
+            4.375
+          ],
+          [
+            "ZLH-028",
+            "萧红",
+            4.375
+          ],
+          [
+            "ZLH-029",
+            "聂绀弩",
+            4.375
+          ],
+          [
+            "ZLH-034",
+            "彭康",
+            4.375
+          ]
+        ],
+        "total_weight": 164.15
       },
       "before": {
         "communities": [
@@ -1814,11 +3355,28 @@
             "index": 1,
             "members": [
               "ZLH-001",
+              "ZLH-009",
+              "ZLH-010",
+              "ZLH-014",
+              "ZLH-018",
+              "ZLH-021",
+              "ZLH-023",
+              "ZLH-025",
+              "ZLH-028",
+              "ZLH-029",
+              "ZLH-032",
+              "ZLH-034",
+              "ZLH-036",
+              "ZLH-037",
               "ZLH-048",
               "ZLH-071",
+              "ZLH-073",
+              "ZLH-113",
+              "ZLH-121",
+              "ZLH-122",
               "ZLH-128"
             ],
-            "size": 4
+            "size": 21
           },
           {
             "index": 2,
@@ -1874,24 +3432,177 @@
             "size": 1
           }
         ],
-        "community_count": 155,
-        "components": 155,
-        "edges": 7,
-        "isolated_nodes": 150,
-        "largest_component": 4,
-        "mean_degree": 0.08642,
+        "community_count": 138,
+        "components": 137,
+        "edges": 25,
+        "isolated_nodes": 133,
+        "largest_component": 23,
+        "mean_degree": 0.308642,
         "nodes": 162,
-        "nodes_with_edges": 12,
-        "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
-        "sample_sufficient": false,
-        "top_betweenness": [],
-        "top_degree": [],
-        "top_weighted_degree": [],
-        "total_weight": 39.3
+        "nodes_with_edges": 29,
+        "sample_note": "样本充足",
+        "sample_sufficient": true,
+        "top_betweenness": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            0.017857
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            0.00163
+          ],
+          [
+            "ZLH-002",
+            "茅盾",
+            0.0
+          ],
+          [
+            "ZLH-003",
+            "瞿秋白",
+            0.0
+          ],
+          [
+            "ZLH-004",
+            "夏衍",
+            0.0
+          ],
+          [
+            "ZLH-005",
+            "冯雪峰",
+            0.0
+          ],
+          [
+            "ZLH-006",
+            "潘汉年",
+            0.0
+          ],
+          [
+            "ZLH-008",
+            "田汉",
+            0.0
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            0.0
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            0.0
+          ]
+        ],
+        "top_degree": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            0.130435
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            0.012422
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            0.006211
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            0.006211
+          ],
+          [
+            "ZLH-014",
+            "冯乃超",
+            0.006211
+          ],
+          [
+            "ZLH-015",
+            "郁达夫",
+            0.006211
+          ],
+          [
+            "ZLH-018",
+            "冯铿",
+            0.006211
+          ],
+          [
+            "ZLH-021",
+            "丁玲",
+            0.006211
+          ],
+          [
+            "ZLH-023",
+            "叶紫",
+            0.006211
+          ],
+          [
+            "ZLH-025",
+            "沙汀",
+            0.006211
+          ]
+        ],
+        "top_weighted_degree": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            76.175
+          ],
+          [
+            "ZLH-048",
+            "王任叔",
+            6.25
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            5.075
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            5.0
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            4.375
+          ],
+          [
+            "ZLH-014",
+            "冯乃超",
+            4.375
+          ],
+          [
+            "ZLH-023",
+            "叶紫",
+            4.375
+          ],
+          [
+            "ZLH-028",
+            "萧红",
+            4.375
+          ],
+          [
+            "ZLH-029",
+            "聂绀弩",
+            4.375
+          ],
+          [
+            "ZLH-034",
+            "彭康",
+            4.375
+          ]
+        ],
+        "total_weight": 169.15
       },
       "weighted_degree_top10_overlap": {
-        "common_count": 0,
-        "jaccard_top10": 0.0,
+        "common_count": 10,
+        "jaccard_top10": 1.0,
         "rank_changes": []
       }
     },
@@ -1902,11 +3613,28 @@
             "index": 1,
             "members": [
               "ZLH-001",
+              "ZLH-009",
+              "ZLH-010",
+              "ZLH-014",
+              "ZLH-018",
+              "ZLH-021",
+              "ZLH-023",
+              "ZLH-025",
+              "ZLH-028",
+              "ZLH-029",
+              "ZLH-032",
+              "ZLH-034",
+              "ZLH-036",
+              "ZLH-037",
               "ZLH-048",
               "ZLH-071",
+              "ZLH-073",
+              "ZLH-113",
+              "ZLH-121",
+              "ZLH-122",
               "ZLH-128"
             ],
-            "size": 4
+            "size": 21
           },
           {
             "index": 2,
@@ -1962,20 +3690,173 @@
             "size": 1
           }
         ],
-        "community_count": 155,
-        "components": 155,
-        "edges": 7,
-        "isolated_nodes": 150,
-        "largest_component": 4,
-        "mean_degree": 0.08642,
+        "community_count": 138,
+        "components": 137,
+        "edges": 25,
+        "isolated_nodes": 133,
+        "largest_component": 23,
+        "mean_degree": 0.308642,
         "nodes": 162,
-        "nodes_with_edges": 12,
-        "sample_note": "样本不足：边 <10 或有边节点 <10，不生成 Top10 排名",
-        "sample_sufficient": false,
-        "top_betweenness": [],
-        "top_degree": [],
-        "top_weighted_degree": [],
-        "total_weight": 44.0
+        "nodes_with_edges": 29,
+        "sample_note": "样本充足",
+        "sample_sufficient": true,
+        "top_betweenness": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            0.017857
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            0.00163
+          ],
+          [
+            "ZLH-002",
+            "茅盾",
+            0.0
+          ],
+          [
+            "ZLH-003",
+            "瞿秋白",
+            0.0
+          ],
+          [
+            "ZLH-004",
+            "夏衍",
+            0.0
+          ],
+          [
+            "ZLH-005",
+            "冯雪峰",
+            0.0
+          ],
+          [
+            "ZLH-006",
+            "潘汉年",
+            0.0
+          ],
+          [
+            "ZLH-008",
+            "田汉",
+            0.0
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            0.0
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            0.0
+          ]
+        ],
+        "top_degree": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            0.130435
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            0.012422
+          ],
+          [
+            "ZLH-009",
+            "郑伯奇",
+            0.006211
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            0.006211
+          ],
+          [
+            "ZLH-014",
+            "冯乃超",
+            0.006211
+          ],
+          [
+            "ZLH-015",
+            "郁达夫",
+            0.006211
+          ],
+          [
+            "ZLH-018",
+            "冯铿",
+            0.006211
+          ],
+          [
+            "ZLH-021",
+            "丁玲",
+            0.006211
+          ],
+          [
+            "ZLH-023",
+            "叶紫",
+            0.006211
+          ],
+          [
+            "ZLH-025",
+            "沙汀",
+            0.006211
+          ]
+        ],
+        "top_weighted_degree": [
+          [
+            "ZLH-001",
+            "鲁迅",
+            86.0
+          ],
+          [
+            "ZLH-007",
+            "周扬",
+            6.0
+          ],
+          [
+            "ZLH-010",
+            "洪深",
+            5.0
+          ],
+          [
+            "ZLH-014",
+            "冯乃超",
+            5.0
+          ],
+          [
+            "ZLH-015",
+            "郁达夫",
+            5.0
+          ],
+          [
+            "ZLH-018",
+            "冯铿",
+            5.0
+          ],
+          [
+            "ZLH-023",
+            "叶紫",
+            5.0
+          ],
+          [
+            "ZLH-025",
+            "沙汀",
+            5.0
+          ],
+          [
+            "ZLH-028",
+            "萧红",
+            5.0
+          ],
+          [
+            "ZLH-029",
+            "聂绀弩",
+            5.0
+          ]
+        ],
+        "total_weight": 196.0
       },
       "before": {
         "communities": [
@@ -2323,14 +4204,25 @@
         "total_weight": 22874.0
       },
       "betweenness_top10_overlap": {
-        "common_count": 0,
-        "jaccard_top10": 0.0,
+        "common_count": 1,
+        "jaccard_top10": 0.052632,
         "rank_changes": []
       },
       "degree_top10_overlap": {
-        "common_count": 0,
-        "jaccard_top10": 0.0,
-        "rank_changes": []
+        "common_count": 3,
+        "jaccard_top10": 0.176471,
+        "rank_changes": [
+          [
+            "ZLH-007",
+            7,
+            2
+          ],
+          [
+            "ZLH-009",
+            2,
+            3
+          ]
+        ]
       }
     }
   },
