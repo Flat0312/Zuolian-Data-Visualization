@@ -36,9 +36,11 @@ VERDICT_CODEX = Path(r"D:/1大创/.xval/verdict_codex.csv")
 VERDICT_OPUS = PROJECT_ROOT / ".codex_tmp" / "verdict_opus.csv"
 PROD = ("person_relations.csv", "relation_evidences.csv", "sources.csv")
 
-pytestmark = pytest.mark.skipif(
+# 只有需要读两份**原始**裁决文件的用例才跳过；其余用例只依赖已入库的对照表与批次输入，
+# 在 CI 与全新克隆上也必须真跑——否则这套门禁在 CI 里等于不存在。
+needs_raw_verdicts = pytest.mark.skipif(
     not (VERDICT_CODEX.exists() and VERDICT_OPUS.exists()),
-    reason="两名裁决者的输出文件不在本机（交叉验证裁决文件不入库），跳过",
+    reason="两名裁决者的原始输出文件不入库（Codex 的在仓库外、Opus 的在 gitignore 区），跳过",
 )
 
 
@@ -138,6 +140,7 @@ def test_vocab_constants_match_production_gate() -> None:
     assert set(GRADES) == {"support", "associated"}
 
 
+@needs_raw_verdicts
 def test_merge_writes_nothing_to_production() -> None:
     before = {n: hashlib.sha256((PROJECT_ROOT / "data" / "processed" / n).read_bytes()).hexdigest()
               for n in PROD}
@@ -145,3 +148,37 @@ def test_merge_writes_nothing_to_production() -> None:
     after = {n: hashlib.sha256((PROJECT_ROOT / "data" / "processed" / n).read_bytes()).hexdigest()
              for n in PROD}
     assert before == after, "合并器不得改动生产层"
+
+
+def test_merge_is_reproducible_from_committed_table(tmp_path: Path) -> None:
+    """从已入库的对照表反推双方裁决，重跑合并器必须得到完全相同的一致/分歧/可落地划分。
+
+    这条用例在 CI 上也会跑（只依赖入库文件），保证交叉验证的结论可复现、
+    不是只在某台机器上的一次性结果。
+    """
+    committed = {r["relation_id"]: r for r in _rows(XVAL)}
+    src = _rows(BATCH_INPUT)
+
+    def rebuild(tag: str) -> Path:
+        out = tmp_path / f"{tag}.csv"
+        with open(out, "w", encoding="utf-8-sig", newline="") as fh:
+            w = csv.writer(fh)
+            w.writerow(EXPECTED_COLUMNS)
+            for row in src:
+                c = committed[row["relation_id"]]
+                w.writerow([
+                    row["relation_id"], c[f"{tag}_verdict"], c[f"{tag}_grade"],
+                    c[f"{tag}_proposed_type"], c[f"{tag}_key_phrase"], c[f"{tag}_reason"],
+                    tag, "2026-10-08",
+                ])
+        return out
+
+    result = merge(BATCH_INPUT, rebuild("codex"), rebuild("opus"), 1)
+    assert not result["errors"], result["errors"][:3]
+    again = {r["relation_id"]: r for r in result["rows"]}
+    assert set(again) == set(committed)
+    for rid, want in committed.items():
+        got = again[rid]
+        assert got["agreement"] == want["agreement"], rid
+        assert got["landable"] == want["landable"], rid
+        assert got["disagreement_kind"] == want["disagreement_kind"], rid
