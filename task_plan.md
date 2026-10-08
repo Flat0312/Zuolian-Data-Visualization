@@ -16,7 +16,7 @@
 | Phase 2 事实级证据层 | 已完成基础设施，持续补证 | 事实证据表、覆盖率报告、待核队列 |
 | Phase 3 研究层与发布层分离 | 已完成 | 发布生成器、发布清单、门禁测试 |
 | Phase 4 事件与地点质量治理 | 已完成基础治理，待人工复核 | 当前时空审计及待核队列；83个事件泛化挂接上海 |
-| Phase 5 人物关系抽样审计 | 已完成抽样、回源核查、400 条裁决与生产层落地；重捕候选 28 条中 4 条已于 2026-10-08 逐条独立裁决落地（公开关系 0→5→7），剩余 24 条待处置 | 裁决表与实测准确率报告、两批落地台账与报告、`phase5_quote_recapture_queue.csv`、`phase5_quote_recapture_adjudicated.csv`、`quote_attestation.py` 双方佐证门 |
+| Phase 5 人物关系抽样审计 | 已完成抽样、回源核查、400 条裁决与生产层落地；重捕候选 28 条中 4 条已于 2026-10-08 逐条独立裁决落地（公开关系 0→5→7），剩余 24 条待处置 | 裁决表与实测准确率报告、两批落地台账与报告、`phase5_quote_recapture_queue.csv`、`phase5_quote_recapture_adjudicated.csv`、`quote_attestation.py` 双方佐证门；`build_relation_evidence_sweep.py` 全量扫掠与 `merge_sweep_cross_validation.py` 双 Agent 交叉验证合并器 |
 | Phase 6 研究分析与答辩交付 | 已校正数据观察与解释边界，已更新答辩文字稿 | 首篇专题初稿；旧PPTX待重制，未演练 |
 | Phase 7 关系证据候选 | 12条冻结样本，8条支持性候选、4条不足，全部待人工复核；主Agent独立审计完成（8赞成/1维持/2赞成升级/1引文问题） | 候选表、原文定位与引文校正、`phase7_candidate_independent_audit.csv` |
 
@@ -32,6 +32,13 @@
       REL-01161 阳翰笙—林淡秋成立但不进公开层、REL-01891 叶紫—萧军判「证据不足」零改动；
       已由幂等脚本 `apply_phase5_recapture_landing.py` 落地，公开关系 5→7，
       裁决另出 `phase5_quote_recapture_adjudicated.csv`，候选包与队列文件原样未动）。
+- [x] 2026-10-08 全量扫掠 + 双 Agent 交叉验证第 1 批：`build_relation_evidence_sweep.py` 对全部 4238 条关系
+      做句级检索（候选池 1644 条，投影可公开 685、可裁决 638）；第 1 批 50 条由 Codex 与
+      Claude Opus 4.6 (Thinking) 各自 blind 裁决（输入不含夜间轮 reason，Codex 裁决文件存仓库外防污染），
+      一致 35 / 分歧 15 / 无效 0，**一致且可落地 12 条**（另 1 条仅落研究层）。生产层本批零改动。
+- [ ] 落地第 1 批 12 条（须另起幂等脚本，口径标注「双 Agent 交叉验证」，禁用 human_adjudication 通道）。
+- [ ] 决定两项规则：是否采用「保守交集」（可多解锁 6 条，公开层 7→25 而非 7→19）；
+      关系类型词表同义重复（论战/文学论战、交游/交往）如何归并。见 BLOCKED.md 2026-10-08 交叉验证节。
 - [ ] 其余 24 条重捕候选按 `recapture_status` 分类处置（16 条罗列级、5 条重捕被拒、3 条无同窗共现）。
 - [x] 界定引文缺陷范围：`research/drafts/reports/evidence_verbatim_audit_2026-09-28.md`——夜间轮 182 条引文逐字全真、选段错误约 56%；事件/人物事实证据层 442 条可核 0 条未命中，覆盖率口径不受影响。
 - [x] 校正研究观察与历史解释的边界，撤下证据不足的强结论。
