@@ -32,17 +32,28 @@
 - 不改 ``relation_risk_level`` / ``needs_manual_review`` / ``confidence``。
 - 不改候选包与队列文件：裁决另出 ``phase5_quote_recapture_adjudicated.csv``。
 
-运行时校验（任一失败即整体退出、不写任何文件）
-----------------------------------------------
+运行时校验（任一失败即整体退出、不写任何文件；全部前置到任何写盘动作之前）
+------------------------------------------------------------------------
 1. 候选包 28 行、全部 ``pending_human_review``；四条裁决行存在且字段自洽
    （recapture_status/quote_form/locator_agrees/quote_char_len）；
-2. 三条落地引文（含 REL-01891 留档）按候选包 ``source_file`` + ``normalized_start/end``
+2. **登记裁决表（``phase5_quote_recapture_adjudicated.csv``）逐行三列授权校验**
+   （2026-10-08 返工，缺陷 1）：四条已裁决行的 ``authorized_by``/``authorized_at``
+   非空且与登记一致、``authorization_quote`` 非空、不含执行者自授占位
+   （大小写不敏感）、且逐字等于模块常量 ``AUTHORIZATION_QUOTE``；
+   24 条未裁决行不得携带任何授权列内容（防后门授权）；
+3. **裁决表与内置 ``ADJUDICATION`` 双向交叉校验**（返工，缺陷 2）：行数与 relation_id
+   集合恰与候选包一致；携带批次标记的裁决行集合恰为 ``ADJUDICATION`` 的 4 条
+   （多、少、改都拒绝）；每行 ``adjudication_2026_10_08``/``evidence_landed``/
+   ``final_relation_type_after``/``publish_status_after`` 与内置裁决语义一致；
+   每行 ``quote_sha256``/``recorded_locator`` 与候选包同 relation_id 行一致；
+   落地行的 ``new_relation_evidence_id`` 与本次计算的证据号一致；
+4. 三条落地引文（含 REL-01891 留档）按候选包 ``source_file`` + ``normalized_start/end``
    在空白归一后的本地原文中**逐字回定位取回**，``quote_sha256`` 自洽；
-3. 三条落地引文过双方佐证门（复用 ``quote_attestation``，不放宽）；
-4. 每个 locator 在 sources.csv 按 citation 唯一命中既有 source_id 且与预期一致；
-5. 落地前基线、落地后终值全部为硬后置条件（含公开层 7、critical 1974 不变、
+5. 三条落地引文过双方佐证门（复用 ``quote_attestation``，不放宽）；
+6. 每个 locator 在 sources.csv 按 citation 唯一命中既有 source_id 且与预期一致；
+7. 落地前基线、落地后终值全部为硬后置条件（含公开层 7、critical 1974 不变、
    REL-01891 零痕迹、REL-01161 不公开、类型更正恰 1）；
-6. 落地后全表按门禁重算零漂移、Schema 0 错误。
+8. 落地后全表按门禁重算零漂移、Schema 0 错误。
 
 幂等：存在本批标记行时只校验「本批标记行恰 3 条」即输出「无新增/已完成」并零写入，
 对后续批次免疫。原子写（tmp + ``os.replace``）；CSV 为 utf-8-sig + CRLF + QUOTE_MINIMAL。
@@ -152,6 +163,8 @@ EXPECTED_SOURCE_REUSE = {
     "REL-01161": "SRC-0739",
     "REL-01891": "SRC-0946",  # 本批用不到，仅留档
 }
+# 执行者自授占位（大小写不敏感）：授权语命中任一子串即拒绝，与第一批 load_adjudication 同一防线。
+SELF_AUTH_PLACEHOLDERS = ("ai 自行决定", "执行者自授", "模型决定")
 
 # 落地前基线（2026-10-08 实测）
 EXPECTED_BASELINE_COUNTS = {
@@ -275,6 +288,129 @@ def load_candidates(path: Path) -> dict[str, dict[str, str]]:
     if missing:
         raise LandingError(f"候选包缺少已裁决关系：{missing}")
     return by_id
+
+
+def validate_adjudicated(cands: dict[str, dict[str, str]]) -> dict[str, dict[str, str]]:
+    """对登记裁决表做前置校验（2026-10-08 返工），任一不符抛 LandingError、调用方零写入。
+
+    裁决表不只是产物：它先作为**输入**被校验，与内置 ``ADJUDICATION``、候选包双向交叉，
+    保证「授权凭据」与「代码行为」不可能静默不一致。
+
+    第一道（缺陷 1，逐行授权三列）：已裁决行的 ``authorized_by``/``authorized_at`` 非空且
+    与登记一致、``authorization_quote`` 非空、不含执行者自授占位、且逐字等于
+    ``AUTHORIZATION_QUOTE``；未裁决行不得携带任何授权内容。
+    第二道（缺陷 2，与内置裁决交叉）：行数与 relation_id 集合恰与候选包一致；
+    裁决行集合恰为 ``ADJUDICATION`` 四条；每行裁决语义/落地标志/落地后类型与状态/
+    quote_sha256/locator 与内置字典及候选包一致。
+
+    返回 relation_id -> 裁决行（四条），供后续证据号一致性复核。
+    """
+    if not ADJUDICATED.exists():
+        raise LandingError(f"登记裁决表不存在，无法完成授权溯源前置校验：{ADJUDICATED}")
+    try:
+        cols, rows = _read(ADJUDICATED)
+    except OSError as exc:
+        raise LandingError(f"登记裁决表不可读：{ADJUDICATED}") from exc
+    required_cols = {
+        "relation_id", "batch_marker", "adjudication_2026_10_08", "evidence_landed",
+        "new_relation_evidence_id", "quote_sha256", "recorded_locator",
+        "final_relation_type_after", "publish_status_after",
+        "authorized_by", "authorized_at", "authorization_quote",
+    }
+    missing = sorted(required_cols - set(cols))
+    if missing:
+        raise LandingError(f"登记裁决表缺少必需列：{missing}")
+    if len(rows) != len(cands):
+        raise LandingError(
+            f"登记裁决表应恰为候选包的 {len(cands)} 行（28 行全量处置），实际 {len(rows)} 行"
+        )
+    rids = [r["relation_id"].strip() for r in rows]
+    if len(set(rids)) != len(rids):
+        raise LandingError("登记裁决表 relation_id 出现重复")
+    if set(rids) != set(cands):
+        raise LandingError(
+            f"登记裁决表 relation_id 集合与候选包不一致：多出 {sorted(set(rids) - set(cands))}，"
+            f"缺少 {sorted(set(cands) - set(rids))}"
+        )
+    by_rid = {r["relation_id"].strip(): r for r in rows}
+
+    def _is_adjudicated(row: dict[str, str]) -> bool:
+        return bool((row.get("batch_marker") or "").strip()) or (
+            (row.get("adjudication_2026_10_08") or "").strip() not in ("", "unadjudicated")
+        )
+
+    adjudicated_rids = {rid for rid, row in by_rid.items() if _is_adjudicated(row)}
+    if adjudicated_rids != set(ADJUDICATION):
+        raise LandingError(
+            "登记裁决表的已裁决行集合必须恰为内置 ADJUDICATION 的 4 条："
+            f"期望 {sorted(ADJUDICATION)}，实际 {sorted(adjudicated_rids)}"
+            "（多、少、改都拒绝——防止审计链被静默篡改）"
+        )
+
+    # 第一道 + 第二道：逐条对四个已裁决行做全字段交叉
+    for rid in sorted(ADJUDICATION):
+        spec = ADJUDICATION[rid]
+        row = by_rid[rid]
+        cand = cands[rid]
+        authorized_by = (row["authorized_by"] or "").strip()
+        authorized_at = (row["authorized_at"] or "").strip()
+        quote = (row["authorization_quote"] or "").strip()
+        if not authorized_by or not authorized_at or not quote:
+            raise LandingError(f"{rid} 授权溯源列不完整（authorized_by/authorized_at/authorization_quote 须非空）")
+        if any(p in quote.lower() for p in SELF_AUTH_PLACEHOLDERS):
+            raise LandingError(f"{rid} 授权语疑似执行者自授占位，拒绝落地：{quote!r}")
+        if quote != AUTHORIZATION_QUOTE:
+            raise LandingError(f"{rid} 授权语与登记逐字授权语不一致：{quote!r}")
+        if authorized_at != AUTHORIZED_AT:
+            raise LandingError(f"{rid} 授权日期与本批登记不一致：{authorized_at!r}")
+        if authorized_by != AUTHORIZED_BY:
+            raise LandingError(f"{rid} 授权人与本批登记不一致：{authorized_by!r}")
+        if (row["batch_marker"] or "").strip() != BATCH_MARKER:
+            raise LandingError(f"{rid} 批次标记异常：{(row['batch_marker'] or '').strip()!r}")
+        if (row["adjudication_2026_10_08"] or "").strip() != spec["verdict"]:
+            raise LandingError(
+                f"{rid} 裁决语义与内置 ADJUDICATION 不一致：期望 {spec['verdict']!r}，"
+                f"实际 {(row['adjudication_2026_10_08'] or '').strip()!r}"
+            )
+        want_landed = "yes" if spec["land"] else "no"
+        if (row["evidence_landed"] or "").strip() != want_landed:
+            raise LandingError(
+                f"{rid} evidence_landed 与内置裁决不一致：期望 {want_landed!r}，"
+                f"实际 {(row['evidence_landed'] or '').strip()!r}（审计链被篡改，拒绝）"
+            )
+        if not spec["land"] and (row["new_relation_evidence_id"] or "").strip():
+            raise LandingError(f"{rid} 裁决为不落地，但登记裁决表携带证据号")
+        if (row["quote_sha256"] or "").strip() != (cand["quote_sha256"] or "").strip():
+            raise LandingError(f"{rid} 登记裁决表 quote_sha256 与候选包不一致（引文被替换）")
+        if (row["recorded_locator"] or "").strip() != (cand["recorded_locator"] or "").strip():
+            raise LandingError(f"{rid} 登记裁决表 recorded_locator 与候选包不一致")
+        want_type = spec["type_after"] or (cand["current_final_relation_type"] or "").strip()
+        if (row["final_relation_type_after"] or "").strip() != want_type:
+            raise LandingError(
+                f"{rid} 裁决表落地后类型 {row['final_relation_type_after']!r} 与内置裁决 {want_type!r} 不一致"
+            )
+        if (row["publish_status_after"] or "").strip() != spec["expect_publish"]:
+            raise LandingError(
+                f"{rid} 裁决表落地后状态 {(row['publish_status_after'] or '').strip()!r} "
+                f"与内置裁决 {spec['expect_publish']!r} 不一致"
+            )
+
+    # 反向防后门：未裁决行不得携带授权内容、批次标记或落地标记
+    for rid in sorted(cands):
+        if rid in ADJUDICATION:
+            continue
+        row = by_rid[rid]
+        if (row["batch_marker"] or "").strip():
+            raise LandingError(f"{rid} 未裁决行携带批次标记：{row['batch_marker']!r}")
+        if (row["adjudication_2026_10_08"] or "").strip() != "unadjudicated":
+            raise LandingError(f"{rid} 未裁决行裁决列异常：{(row['adjudication_2026_10_08'] or '').strip()!r}")
+        if (row["evidence_landed"] or "").strip() != "no":
+            raise LandingError(f"{rid} 未裁决行 evidence_landed 应为 no")
+        for col in ("authorized_by", "authorized_at", "authorization_quote"):
+            if (row[col] or "").strip():
+                raise LandingError(f"{rid} 未裁决行不得携带授权列内容：{col}")
+
+    return {rid: by_rid[rid] for rid in sorted(ADJUDICATION)}
 
 
 def _resolve_text_file(raw: str) -> Path:
@@ -477,8 +613,9 @@ def apply_landing(data_dir: Path, dry_run: bool = False) -> dict:
     if critical_before != EXPECTED_BASELINE_CRITICAL:
         raise LandingError(f"落地前 critical 应为 {EXPECTED_BASELINE_CRITICAL}，实际 {critical_before}")
 
-    # ---- 候选包复核 + 佐证门 + 来源复用 ----
+    # ---- 候选包复核 + 登记裁决表前置校验 + 佐证门 + 来源复用 ----
     cands = load_candidates(CANDIDATES)
+    adj_file = validate_adjudicated(cands)
     persons = {r["person_id"].strip(): r for r in _read(PERSONS_CSV)[1]}
     checks = verify_candidates(cands)
     gate_attestation(cands, persons, checks)
@@ -523,6 +660,15 @@ def apply_landing(data_dir: Path, dry_run: bool = False) -> dict:
         next_n += 1
         new_evidence.append(build_evidence_row(ev_cols, rele_id, rid, cand, src_map[rid], checks[rid]))
         by_rel[rid].append(new_evidence[-1])
+
+    # 登记裁决表证据号必须与本次确定性计算一致（防「换一条证据」的静默篡改）。
+    for e in new_evidence:
+        want_eid = (adj_file[e["relation_id"]]["new_relation_evidence_id"] or "").strip()
+        if want_eid != e["relation_evidence_id"]:
+            raise LandingError(
+                f"{e['relation_id']} 登记裁决表证据号 {want_eid!r} 与本次计算 "
+                f"{e['relation_evidence_id']} 不一致，拒绝落地"
+            )
 
     for rid in LAND_IDS:
         row = rel_by_id[rid]

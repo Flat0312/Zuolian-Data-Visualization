@@ -22,11 +22,13 @@ import hashlib
 import importlib.util
 import io
 import re
+import shutil
 import subprocess
 import sys
 import tarfile
 from collections import Counter, defaultdict
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from conftest import PROJECT_ROOT, requires_local_texts
@@ -409,3 +411,164 @@ def test_replay_from_pinned_pre_landing_commit(tmp_path: Path) -> None:
 
     second = module.apply_landing(data_dir)
     assert second["status"] == "no-op"
+
+
+# ---------------------------------------------------- 篡改防御：隔离沙盒负向用例
+#
+# 每个用例都在 `git archive f011d92 data/processed` 还原的落地前基线上跑，
+# 候选包与裁决表复制到 tmp_path、模块常量指向沙盒，绝不触碰生产树。
+# 断言两件事：①抛 LandingError；②篡改之后、调用之前取三表 sha256，调用后必须一致
+# （失败路径零写入），且 supported 仍为 5。
+
+
+def _file_sha(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _tree_hashes(data_dir: Path) -> dict[str, str]:
+    return {
+        name: _file_sha(data_dir / name)
+        for name in ("person_relations.csv", "relation_evidences.csv", "sources.csv")
+    }
+
+
+def _edit_csv(path: Path, mutator) -> None:
+    with open(path, encoding="utf-8-sig", newline="") as fh:
+        reader = csv.DictReader(fh)
+        fields = list(reader.fieldnames or [])
+        rows = list(reader)
+    rows = mutator(rows)
+    with open(path, "w", encoding="utf-8-sig", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+@pytest.fixture()
+def sandbox(tmp_path: Path):
+    dest = tmp_path / "baseline"
+    _materialize(PINNED_PRE_LANDING_COMMIT, dest)
+    data_dir = dest / "data" / "processed"
+    reports = tmp_path / "reports"
+    reports.mkdir()
+    cand = reports / CANDIDATES.name
+    adj = reports / ADJUDICATED.name
+    shutil.copy2(CANDIDATES, cand)
+    shutil.copy2(ADJUDICATED, adj)
+    module = _load_landing_module()
+    module.DATA = data_dir
+    module.REPORTS = reports
+    module.CANDIDATES = cand
+    module.ADJUDICATED = adj
+    module.PERSONS_CSV = data_dir / "persons.csv"
+    module.LEDGER = reports / "phase5_recapture_landing_ledger.csv"
+    module.REPORT_MD = reports / "phase5_recapture_landing_report.md"
+    module.ADJUDICATION_RECORD = reports / "phase5_quote_recapture_adjudication_record.md"
+    return SimpleNamespace(module=module, data_dir=data_dir, cand=cand, adj=adj, reports=reports)
+
+
+def _assert_rejected_and_zero_write(sb: SimpleNamespace, match: str) -> None:
+    before = _tree_hashes(sb.data_dir)
+    with pytest.raises(sb.module.LandingError, match=match):
+        sb.module.apply_landing(sb.data_dir)
+    assert _tree_hashes(sb.data_dir) == before, "失败路径留下了写入"
+    rels = _rows(sb.data_dir / "person_relations.csv")
+    assert Counter(r["publish_status"] for r in rels)["supported"] == 5, "基线公开层被改动"
+    assert len(_rows(sb.data_dir / "relation_evidences.csv")) == 10269
+
+
+def _tamper_adjudicated(sb: SimpleNamespace, rid: str, col: str, value: str) -> None:
+    def mutator(rows):
+        for row in rows:
+            if row["relation_id"] == rid:
+                row[col] = value
+        return rows
+
+    _edit_csv(sb.adj, mutator)
+
+
+def test_sandbox_placeholder_authorization_quote_is_rejected(sandbox) -> None:
+    """缺陷 1 复现：裁决表授权语改为执行者自授占位 → 必须拒绝且零写入。"""
+    def mutator(rows):
+        for row in rows:
+            if row["batch_marker"] == BATCH_MARKER:
+                row["authorization_quote"] = "AI 自行决定按建议执行"
+        return rows
+
+    _edit_csv(sandbox.adj, mutator)
+    _assert_rejected_and_zero_write(sandbox, "授权语")
+
+
+def test_sandbox_empty_authorization_quote_is_rejected(sandbox) -> None:
+    """缺陷 1：授权语置空 → 授权溯源不完整，必须拒绝。"""
+    def mutator(rows):
+        for row in rows:
+            if row["batch_marker"] == BATCH_MARKER:
+                row["authorization_quote"] = ""
+        return rows
+
+    _edit_csv(sandbox.adj, mutator)
+    _assert_rejected_and_zero_write(sandbox, "授权")
+
+
+def test_sandbox_evidence_landed_flipped_is_rejected(sandbox) -> None:
+    """缺陷 2 复现 A：REL-01891 的 evidence_landed 由 no 改 yes → 必须拒绝。"""
+    _tamper_adjudicated(sandbox, INSUFFICIENT_ID, "evidence_landed", "yes")
+    _assert_rejected_and_zero_write(sandbox, "evidence_landed")
+
+
+def test_sandbox_missing_adjudicated_row_is_rejected(sandbox) -> None:
+    """缺陷 2 复现 B：删掉 REL-01161 整行 → 必须拒绝。"""
+    def mutator(rows):
+        return [r for r in rows if r["relation_id"] != "REL-01161"]
+
+    _edit_csv(sandbox.adj, mutator)
+    _assert_rejected_and_zero_write(sandbox, "28")
+
+
+def test_sandbox_adjudicated_quote_sha_mismatch_is_rejected(sandbox) -> None:
+    """缺陷 2：裁决表 quote_sha256 与候选包不一致（引文被换）→ 必须拒绝。"""
+    _tamper_adjudicated(sandbox, "REL-00622", "quote_sha256", "f" * 64)
+    _assert_rejected_and_zero_write(sandbox, "quote_sha256")
+
+
+def test_sandbox_tampered_candidate_quote_is_rejected(sandbox) -> None:
+    """篡改候选包 REL-00622 引文（邵荃麟→邵荃麒）→ sha 不自洽，必须拒绝（固化）。"""
+    def mutator(rows):
+        for row in rows:
+            if row["relation_id"] == "REL-00622":
+                row["recaptured_quote"] = row["recaptured_quote"].replace("邵荃麟", "邵荃麒")
+        return rows
+
+    _edit_csv(sandbox.cand, mutator)
+    _assert_rejected_and_zero_write(sandbox, "quote_sha256|逐字")
+
+
+def test_sandbox_pre_lowered_risk_is_rejected(sandbox) -> None:
+    """预先反向降险（沙盒 REL-01161 critical→low）→ 基线 critical 计数不符，必须拒绝（固化）。"""
+    _edit_csv(
+        sandbox.data_dir / "person_relations.csv",
+        lambda rows: [
+            {**r, "relation_risk_level": "low"} if r["relation_id"] == "REL-01161" else r
+            for r in rows
+        ],
+    )
+    _assert_rejected_and_zero_write(sandbox, "critical")
+
+
+@requires_texts
+def test_sandbox_clean_baseline_lands_and_idempotent(sandbox) -> None:
+    """正向对照：未篡改沙盒必须成功落地 supported=7、evidences=10272，二跑 no-op。"""
+    before = _tree_hashes(sandbox.data_dir)
+    result = sandbox.module.apply_landing(sandbox.data_dir)
+    assert result["status"] == "applied"
+    assert result["public_supported"] == 7
+    rels = _rows(sandbox.data_dir / "person_relations.csv")
+    dist = Counter(r["publish_status"] for r in rels)
+    assert dist["supported"] == 7 and dist["pending_review"] == 2451 and dist["inferred"] == 1780
+    assert len(_rows(sandbox.data_dir / "relation_evidences.csv")) == 10272
+    assert before != _tree_hashes(sandbox.data_dir)
+    hash_after = _tree_hashes(sandbox.data_dir)
+    second = sandbox.module.apply_landing(sandbox.data_dir)
+    assert second["status"] == "no-op"
+    assert _tree_hashes(sandbox.data_dir) == hash_after, "二跑发生写入"
