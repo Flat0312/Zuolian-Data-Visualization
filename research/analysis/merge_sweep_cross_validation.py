@@ -340,9 +340,19 @@ def write_report(result: dict, path: Path, paths: dict[str, Path]) -> None:
     # 「保守交集」是**可选规则**，本报告只统计不采用：双方都认为关系成立且都给 support，
     # 仅在"该不该改类型/改成哪个同义标签"上不一致。若采用，则按现类型落地（不改类型），
     # 这是双方结论的交集，不会超出任何一方认可的范围。是否采用属项目规则决定，不由本脚本擅自生效。
+    # 交集规则的正确读法：按「现类型不改」落地，只有在**至少一方判 成立**（即接受现类型）时
+    # 才是双方结论的真交集。若双方都判「类型需改」（哪怕只是改到同义词的不同标签），
+    # 按现类型落地就等于断言了一个两人都明确否定的类型——那不是交集，是造假。
     common = [
         r for r in disagree
         if r["codex_verdict"] in ("成立", "类型需改") and r["opus_verdict"] in ("成立", "类型需改")
+        and ("成立" in (r["codex_verdict"], r["opus_verdict"]))
+        and r["codex_grade"] == "support" and r["opus_grade"] == "support"
+        and r["current_publish_status"] not in PUBLIC_STATUSES
+    ]
+    both_type_change = [
+        r for r in disagree
+        if r["codex_verdict"] == "类型需改" and r["opus_verdict"] == "类型需改"
         and r["codex_grade"] == "support" and r["opus_grade"] == "support"
         and r["current_publish_status"] not in PUBLIC_STATUSES
     ]
@@ -355,22 +365,29 @@ def write_report(result: dict, path: Path, paths: dict[str, Path]) -> None:
         "",
         "### 可选规则：保守交集（本报告只统计，未采用）",
         "",
-        f"分歧中有 {len(common)} 条其实**双方都认为关系成立且证据够 support**，"
-        "只是在「要不要改类型 / 改成哪个同义标签」上不一致；其中按现类型即可进公开层的有 "
-        f"{len(common_public)} 条。",
+        f"分歧中有 {len(common)} 条**双方都认为关系成立且证据够 support**，且**至少一方判「成立」**"
+        "（即接受现类型）——只有这类才存在真正的交集：按现类型不改落地，不会超出任何一方认可的范围。"
+        f"其中按现类型即可进公开层的有 {len(common_public)} 条。",
         "",
-        "若项目决定采用「保守交集」规则（按双方结论的交集落地、类型保持现值不改），"
+        f"另有 {len(both_type_change)} 条是**双方都判「类型需改」**（REL-00011 交游/交往、"
+        "REL-00038 文学论战/论战、REL-00088 交游/交往 之类同义分歧）。这类**不属于交集**："
+        "两人都明确否定了现类型，按现类型落地等于断言一个双方都拒绝的标签。它们只能等词表归并决定后，"
+        "按归并结果重新裁决，不计入可解锁条数。",
+        "",
+        "若项目决定采用「保守交集」规则，"
         f"这 {len(common_public)} 条可与上表 {len(landable)} 条一起落地。**本脚本未采用该规则**，"
         "当前严格口径下它们仍属分歧、一律搁置。是否采用请项目一次性决定，之后重跑本合并器即可。",
         "",
-        "| relation_id | 人物对 | 现类型 | Codex | Opus | 分歧性质 |",
-        "| --- | --- | --- | --- | --- | --- |",
+        "| relation_id | 人物对 | 现类型 | Codex | Opus | 分歧性质 | 属交集 |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
     ]
-    for r in sorted(common, key=lambda x: x["relation_id"]):
+    common_ids = {r["relation_id"] for r in common}
+    for r in sorted(common + both_type_change, key=lambda x: x["relation_id"]):
         lines.append(
             f"| {r['relation_id']} | {r['person_a_name']}—{r['person_b_name']} | {r['current_final_relation_type']} "
             f"| {r['codex_verdict']}/{r['codex_proposed_type'] or '—'} "
-            f"| {r['opus_verdict']}/{r['opus_proposed_type'] or '—'} | {r['disagreement_kind']} |"
+            f"| {r['opus_verdict']}/{r['opus_proposed_type'] or '—'} | {r['disagreement_kind']} "
+            f"| {'是' if r['relation_id'] in common_ids else '否（双方都要改类型）'} |"
         )
     lines += [
         "",
